@@ -1,5 +1,7 @@
 -- This script allows to generate the schema and all the tables for the Patent Disambiguation Data:
 -- https://figshare.com/projects/Patent_Disambiguation_and_Geolocation/15080
+-- ATTENTION: SOME TABLES DO NOT HAVE A PRIMARY KEY
+
 
 -- This script was created by Christian Chacua Delgado
 -- cchacua@gmail.com
