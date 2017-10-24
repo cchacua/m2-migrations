@@ -93,7 +93,7 @@ LINES TERMINATED BY '\n';
 
 
 -- Query three tables
-USE riccaboni patstat2016b
+USE riccaboni patstat2016b;
 SELECT        riccaboni.t01.pat,
               patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR,
               patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH, 
@@ -116,13 +116,32 @@ INTO OUTFILE '/var/lib/mysql-files/riccaboni-211-merge.csv'
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n';
-
+-- 7.146.247
 
 SELECT DISTINCT patstat2016b.TLS201_APPLN.DOCDB_FAMILY_ID
               FROM patstat2016b.TLS211_PAT_PUBLN 
               INNER JOIN riccaboni.t01 ON CONCAT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH, patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR)=riccaboni.t01.pat
               INNER JOIN patstat2016b.TLS201_APPLN ON patstat2016b.TLS211_PAT_PUBLN.APPLN_ID=patstat2016b.TLS201_APPLN.APPLN_ID
+INTO OUTFILE '/var/lib/mysql-files/riccaboni-211-docfamily-pat.csv'
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n';
+
+
+SELECT DISTINCT patstat2016b.TLS201_APPLN.DOCDB_FAMILY_ID
+              FROM patstat2016b.TLS211_PAT_PUBLN 
+              RIGHT JOIN riccaboni.t08 ON CONCAT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH, patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR)=riccaboni.t08.pat
+              INNER JOIN patstat2016b.TLS201_APPLN ON patstat2016b.TLS211_PAT_PUBLN.APPLN_ID=patstat2016b.TLS201_APPLN.APPLN_ID
 INTO OUTFILE '/var/lib/mysql-files/riccaboni-211-docfamily.csv'
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n';
+
+SELECT patstat2016b.TLS201_APPLN.DOCDB_FAMILY_ID
+              FROM patstat2016b.TLS211_PAT_PUBLN 
+              RIGHT JOIN riccaboni.t08 ON CONCAT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH, patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR)=riccaboni.t08.pat
+              INNER JOIN patstat2016b.TLS201_APPLN ON patstat2016b.TLS211_PAT_PUBLN.APPLN_ID=patstat2016b.TLS201_APPLN.APPLN_ID
+INTO OUTFILE '/var/lib/mysql-files/riccaboni-211-docfamily-inventors-all.csv'
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n';

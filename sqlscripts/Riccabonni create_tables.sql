@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS t07
     name VARCHAR(500) NOT NULL default '',
     loc VARCHAR(25) NOT NULL default '',
     qual INT,
-    loctype VARCHAR(4) NOT NULL default '',
+    loctype VARCHAR(10) NOT NULL default '',
     PRIMARY KEY(ID)
 ) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci ;
 
@@ -76,8 +76,20 @@ CREATE TABLE IF NOT EXISTS t08
     name VARCHAR(500) NOT NULL default '',
     loc VARCHAR(25) NOT NULL default '',
     qual INT,
-    loctype VARCHAR(4) NOT NULL default '',
+    loctype VARCHAR(10) NOT NULL default '',
     PRIMARY KEY(ID)
+) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci ;
+
+-- t08 without primary key
+DROP TABLE IF EXISTS t08;
+CREATE TABLE IF NOT EXISTS t08
+(
+    ID VARCHAR(15) NOT NULL default '',
+    pat VARCHAR(15) NOT NULL default '',
+    name VARCHAR(500) NOT NULL default '',
+    loc VARCHAR(25) NOT NULL default '',
+    qual INT,
+    loctype VARCHAR(10) NOT NULL default ''
 ) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci ;
 
 --
