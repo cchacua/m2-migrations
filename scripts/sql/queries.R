@@ -21,6 +21,11 @@ q2<- dbSendQuery(patstat, "SELECT patstat2016b.TLS201_APPLN.APPLN_ID, patstat201
 apn<-dbFetch(q2)
 dbClearResult(q2)
 
+q2<- dbSendQuery(patstat, "SELECT * FROM patstat2016b.TLS211_PAT_PUBLN
+                 WHERE patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH='US' LIMIT 1000, 1100;")
+apn<-dbFetch(q2)
+dbClearResult(q2)
+
 q2<- dbSendQuery(patstat, "SELECT CONCAT(PUBLN_AUTH,PUBLN_NR) AS pub_number FROM patstat2016b.TLS211_PAT_PUBLN   LIMIT 1000, 1100;")
 apn211<-dbFetch(q2)
 dbClearResult(q2)
@@ -53,4 +58,10 @@ ric.pn<-dbFetch(q3)
 dbClearResult(q3)
 save(ric.pn, file="../output/riccabonit01pat.RData")
 ric.pn<-as.data.frame(ric.pn)
-
+patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR 
+q3<- dbSendQuery(patstat, "SELECT *
+                            FROM patstat2016b.TLS211_PAT_PUBLN
+                            
+                            LIMIT 0, 500;")
+apn<-dbFetch(q3, n=500)
+dbClearResult(q3)

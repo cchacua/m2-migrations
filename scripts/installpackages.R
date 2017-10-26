@@ -11,3 +11,6 @@
   devtools::install_github("rstats-db/RMySQL")
 
 ########################################################################################  
+  
+install.packages("dplyr")  
+  
