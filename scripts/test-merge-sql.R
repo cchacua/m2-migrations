@@ -13,7 +13,13 @@ length(unique(trica$V1))
 length(unique(tmerge$V1))
 # 4.252.766
 tmergeuniq<-unique(tmerge$V1)
-tmergeuniq[1:100]
+tmergeuniq<-as.data.frame(tmergeuniq)
+colnames(tmergeuniq$tmergeuniq)
+tmergeuniq.name<-substr(tmergeuniq$tmergeuniq,10,12)
+tmergeuniq.name<-as.data.frame(unique(tmergeuniq.name))
+tmergeuniq.name[1:100]
+
+
 
 tricauniq<-unique(trica$V1)
 tricauniq[1:100]

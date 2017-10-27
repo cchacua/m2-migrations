@@ -7,6 +7,7 @@
 dbListTables(patstat)
 dbListFields(patstat, "TLS201_APPLN")
 dbListFields(patstat, "TLS211_PAT_PUBLN")
+dbListFields(patstat, "TLS211_SAMPLE")
 
 # rs<-dbGetQuery(patstat, "SELECT APPLN_ID FROM TLS201_APPLN  LIMIT 0, 10;")
 # rs<-as.data.frame(rs)
@@ -23,6 +24,11 @@ dbClearResult(q2)
 
 q2<- dbSendQuery(patstat, "SELECT * FROM patstat2016b.TLS211_PAT_PUBLN
                  WHERE patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH='US' LIMIT 1000, 1100;")
+apn<-dbFetch(q2)
+dbClearResult(q2)
+
+q2<- dbSendQuery(patstat, "SELECT * FROM patstat2016b.TLS211_SAMPLE
+                 LIMIT 1000, 1100;")
 apn<-dbFetch(q2)
 dbClearResult(q2)
 
@@ -53,12 +59,16 @@ apn2<-dbFetch(q2)
 dbClearResult(q2)
 
 
+q3<- dbSendQuery(riccaboni, "SELECT * FROM riccaboni.t01;")
+ric.pn<-dbFetch(q3)
+dbClearResult(q3)
+
 q3<- dbSendQuery(riccaboni, "SELECT riccaboni.t01.pat FROM riccaboni.t01;")
 ric.pn<-dbFetch(q3)
 dbClearResult(q3)
 save(ric.pn, file="../output/riccabonit01pat.RData")
 ric.pn<-as.data.frame(ric.pn)
-patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR 
+
 q3<- dbSendQuery(patstat, "SELECT *
                             FROM patstat2016b.TLS211_PAT_PUBLN
                             
