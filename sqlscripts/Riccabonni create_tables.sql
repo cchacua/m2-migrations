@@ -30,7 +30,6 @@ CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
 ;
 
 -- 
--- REVIEW THIS TABLE, BECAUSE IT DOES NOT HAVE A PRIMARY KEY. PERHAPS THIS CAN BE CORRECTED WITH A GRAPH DATABASE
 DROP TABLE IF EXISTS t02;
 CREATE TABLE IF NOT EXISTS t02
 (
@@ -38,8 +37,7 @@ CREATE TABLE IF NOT EXISTS t02
     citing VARCHAR(15) NOT NULL default '',
     cited VARCHAR(15) NOT NULL default '',
     cite_origin CHARACTER(1) NOT NULL default '',
-    data_source CHARACTER(1) NOT NULL default '',
-    PRIMARY KEY(ID)
+    data_source CHARACTER(1) NOT NULL default ''
 ) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci ;
 
 
@@ -63,24 +61,10 @@ CREATE TABLE IF NOT EXISTS t07
     name VARCHAR(500) NOT NULL default '',
     loc VARCHAR(25) NOT NULL default '',
     qual INT,
-    loctype VARCHAR(10) NOT NULL default '',
-    PRIMARY KEY(ID)
+    loctype VARCHAR(10) NOT NULL default ''
 ) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci ;
 
---
-DROP TABLE IF EXISTS t08;
-CREATE TABLE IF NOT EXISTS t08
-(
-    ID VARCHAR(15) NOT NULL default '',
-    pat VARCHAR(15) NOT NULL default '',
-    name VARCHAR(500) NOT NULL default '',
-    loc VARCHAR(25) NOT NULL default '',
-    qual INT,
-    loctype VARCHAR(10) NOT NULL default '',
-    PRIMARY KEY(ID)
-) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci ;
-
--- t08 without primary key
+-- t08
 DROP TABLE IF EXISTS t08;
 CREATE TABLE IF NOT EXISTS t08
 (
@@ -97,8 +81,7 @@ DROP TABLE IF EXISTS t09;
 CREATE TABLE IF NOT EXISTS t09
 (
     localID VARCHAR(15) NOT NULL default '',
-    mobileID VARCHAR(15) NOT NULL default '',
-    PRIMARY KEY(localID)
+    mobileID VARCHAR(15) NOT NULL default ''
 ) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci ;
 
 
@@ -108,8 +91,7 @@ CREATE TABLE IF NOT EXISTS t10
 (
     Pub_number VARCHAR(15) NOT NULL default '',
     class VARCHAR(200) NOT NULL default '',
-    class_type CHARACTER(1) NOT NULL default '',
-    PRIMARY KEY(Pub_number)
+    class_type CHARACTER(1) NOT NULL default ''
 ) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci ;
 
 
@@ -118,8 +100,7 @@ DROP TABLE IF EXISTS t11;
 CREATE TABLE IF NOT EXISTS t11
 (
     Pub_number VARCHAR(15) NOT NULL default '',
-    Triadic_Family VARCHAR(15) NOT NULL default '',
-    PRIMARY KEY(Pub_number)
+    Triadic_Family VARCHAR(15) NOT NULL default ''
 ) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci ;
 
 
@@ -128,8 +109,7 @@ DROP TABLE IF EXISTS t12;
 CREATE TABLE IF NOT EXISTS t12
 (
     USPC VARCHAR(15) NOT NULL default '',
-    IPC VARCHAR(500) NOT NULL default '',
-    PRIMARY KEY(USPC)
+    IPC VARCHAR(500) NOT NULL default ''
 ) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci ;
 
 --

@@ -3,6 +3,13 @@
 -- Table only wih EP, WO, US
 USE patstat2016b;
 
+-- See if the publication number original works
+SELECT COUNT(DISTINCT patstat2016b.TLS211_PAT_PUBLN.publn_nr_original), patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH 
+      FROM patstat2016b.TLS211_PAT_PUBLN 
+      WHERE patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH IN ('EP', 'US', 'WO')
+      GROUP BY patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH;
+--  5.600.620 
+
 SELECT COUNT(t01.pat) AS Frequency, LEFT(t01.pat,3) AS US_Char 
       FROM t01
       WHERE LEFT(t01.pat,2)='US'
@@ -20,21 +27,23 @@ SELECT COUNT(t01.pat) AS Frequency, LEFT(t01.pat,3) AS US_Char
       */      
       
 
-SELECT COUNT(t01.pat) AS Frequency, LEFT(t01.pat,3) AS US_Char 
+SELECT COUNT(t01.pat) AS Frequency, LEFT(t01.pat,8) AS WO_Char 
       FROM t01
-      WHERE LEFT(t01.pat,3) IN ('USD', 'USH', 'USP', 'USR')
-      GROUP BY LEFT(t01.pat,3);
+      WHERE LEFT(t01.pat,2)='WO'
+      GROUP BY LEFT(t01.pat,8);
 
-      /*
-      +-----------+---------+
-      | Frequency | US_Char |
-      +-----------+---------+
-      |    241012 | USD     |
-      |       535 | USH     |
-      |     11404 | USP     |
-      |      6250 | USR     |
-      +-----------+---------+
+SELECT t01.pat
+      FROM t01
+      WHERE LEFT(t01.pat,2)='WO'
+      LIMIT 10000,10050;
       
+SELECT patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR
+      FROM patstat2016b.TLS211_PAT_PUBLN
+      WHERE patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH='WO'
+      AND CHAR_LENGTH(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR)<10
+      LIMIT 100000,100500;      
+      /*
+
       */
 
 SELECT COUNT(t01.pat) AS Frequency
@@ -99,23 +108,16 @@ SELECT COUNT(DISTINCT CONCAT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH,
     WHERE patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH='EP' ;
 -- 2.684.757 and there should be  2.684.761, so there are 4 missing patents  
 
-SELECT COUNT(DISTINCT CONCAT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH, 
-              LPAD(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR, 10, '0')))
-    FROM t01 
-    INNER JOIN TLS211_PAT_PUBLN
-    ON  t01.pat=CONCAT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH, 
-              LPAD(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR, 10, '0'))
-    WHERE patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH='WO' ;    
--- 1568009 VS 2361535
-
+---
 SELECT COUNT(DISTINCT CONCAT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH, 
               LPAD(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR, 8, '0')))
     FROM t01 
     INNER JOIN TLS211_PAT_PUBLN
     ON  t01.pat=CONCAT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH, 
               LPAD(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR, 8, '0'))
-    WHERE patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH='US' ; 
---  3.983.472 vs 4.243.972 (3.984.771)
+    WHERE patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH='US'
+    AND LEFT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR,1) NOT IN ('D', 'H', 'P', 'R') ; 
+--  3.983.470 vs 3.984.771
 
 SELECT COUNT(DISTINCT CONCAT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH,
               LEFT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR,1),
@@ -126,7 +128,7 @@ SELECT COUNT(DISTINCT CONCAT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH,
               LEFT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR,1),
               LPAD(RIGHT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR, CHAR_LENGTH(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR)-1), 7, '0'))
     WHERE patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH='US' 
-          AND LEFT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR,1) IN ('D', 'H','0') ;     
+          AND LEFT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR,1) IN ('D', 'H') ;     
 -- 214.624  VS 241.547
 
 SELECT COUNT(DISTINCT CONCAT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH,
@@ -141,3 +143,21 @@ SELECT COUNT(DISTINCT CONCAT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH,
           AND LEFT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR,2) IN ('PP', 'RE') ;
 -- 14.886 VS 17.654          
     
+--
+SELECT COUNT(DISTINCT CONCAT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH,
+              LEFT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR,4),
+              LPAD(RIGHT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR, CHAR_LENGTH(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR)-4), 6, '0')))
+    FROM riccaboni.t01 
+    INNER JOIN patstat2016b.TLS211_PAT_PUBLN
+    ON  t01.pat=CONCAT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH,
+              LEFT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR,4),
+              LPAD(RIGHT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR, CHAR_LENGTH(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR)-4), 6, '0'))
+    WHERE patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH='WO' ;    
+-- 1568014 VS 2361535
+
+
+SELECT COUNT(DISTINCT patstat2016b.TLS211_PAT_PUBLN.publn_nr_original)
+    FROM t01 
+    INNER JOIN patstat2016b.TLS211_PAT_PUBLN
+    ON  t01.pat=patstat2016b.TLS211_PAT_PUBLN.publn_nr_original
+    WHERE patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH IN ('EP', 'US', 'WO') ;
