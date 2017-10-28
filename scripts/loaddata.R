@@ -38,7 +38,6 @@ files.regpat
 # [9] "../data/regpat201602/REGPAT_Regions_NUTS3_TL3.txt"
 # [10] "../data/regpat201602/REGPAT_Regions.txt"   
 
-# 
 # t01<-read.table(files.regpat[7], header = TRUE, sep = "|", quote = '""', nrows =100)
 
 
