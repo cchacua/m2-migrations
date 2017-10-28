@@ -10,10 +10,10 @@ SELECT COUNT(DISTINCT patstat2016b.TLS211_PAT_PUBLN.publn_nr_original), patstat2
       GROUP BY patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH;
 --  5.600.620 
 
-SELECT COUNT(t01.pat) AS Frequency, LEFT(t01.pat,3) AS US_Char 
+SELECT COUNT(t01.pat) AS Frequency, LEFT(t01.pat,5) AS US_Char 
       FROM t01
       WHERE LEFT(t01.pat,2)='US'
-      GROUP BY LEFT(t01.pat,3);
+      GROUP BY LEFT(t01.pat,5);
       /*
       +-----------+---------+
       | Frequency | US_Char |
@@ -116,7 +116,7 @@ SELECT COUNT(DISTINCT CONCAT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH,
     ON  t01.pat=CONCAT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH, 
               LPAD(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR, 8, '0'))
     WHERE patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH='US'
-    AND LEFT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR,1) NOT IN ('D', 'H', 'P', 'R') ; 
+    AND LEFT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_NR,1) NOT IN ('D', 'H', 'P', 'R') ;
 --  3.983.470 vs 3.984.771
 
 SELECT COUNT(DISTINCT CONCAT(patstat2016b.TLS211_PAT_PUBLN.PUBLN_AUTH,
