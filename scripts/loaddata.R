@@ -38,7 +38,7 @@ files.regpat
 # [9] "../data/regpat201602/REGPAT_Regions_NUTS3_TL3.txt"
 # [10] "../data/regpat201602/REGPAT_Regions.txt"   
 
-# t01<-read.table(files.regpat[7], header = TRUE, sep = "|", quote = '""', nrows =100)
+t01<-read.table(files.regpat[7], header = TRUE, sep = "|", quote = '""', nrows =100)
 
 
 files.patqual<-list.files(path="../data/patentquality201709", full.names=TRUE)
@@ -49,7 +49,7 @@ files.patqual
 # [3] "../data/patentquality201709/201709_OECD_PATENT_QUALITY_USPTO.txt"
 # [4] "../data/patentquality201709/201709_uspto_indic_cohort.txt"
 
-#t01<-read.table(files.patqual[3], header = TRUE, sep = "|", nrows =100)
+t01<-read.table(files.patqual[3], header = TRUE, sep = "|", nrows =100)
 
 
 files.sql<-list.files(path="../data/sql", full.names=TRUE)
