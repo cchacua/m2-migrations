@@ -139,6 +139,9 @@ FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n';
 
+SELECT COUNT(DISTINCT a.APPLN_ID) AS c, a.pat FROM patstat2016b.t01t211wo a GROUP BY a.pat HAVING c > 1
+
+
 -- Example
 SELECT * FROM patstat2016b.t01t211wo a WHERE a.pat="WO2004005322";
 /*
@@ -166,6 +169,25 @@ SELECT * FROM patstat2016b.TLS211_PAT_PUBLN a WHERE a.APPLN_ID="931151197";
 +--------------+------------+------------+-------------------+------------+-----------+------------+----------+-------------------+--------------+
 |    901251061 | WO         | 2004005322 |                   | A1         | 931151197 | 9999-12-31 |          |                 0 | 0            |
 +--------------+------------+------------+-------------------+------------+-----------+------------+----------+-------------------+--------------+
+*/
+
+-- Verify that all of them share the same family
+SELECT a.DOCDB_FAMILY_ID, a.INPADOC_FAMILY_ID FROM patstat2016b.TLS201_APPLN a WHERE a.APPLN_ID="45707042";
+/*
++-----------------+-------------------+
+| DOCDB_FAMILY_ID | INPADOC_FAMILY_ID |
++-----------------+-------------------+
+|        30115762 |           1618647 |
++-----------------+-------------------+
+
+*/
+SELECT a.DOCDB_FAMILY_ID, a.INPADOC_FAMILY_ID FROM patstat2016b.TLS201_APPLN a WHERE a.APPLN_ID="931151197";
+/*
++-----------------+-------------------+
+| DOCDB_FAMILY_ID | INPADOC_FAMILY_ID |
++-----------------+-------------------+
+|       931151197 |         931151197 |
++-----------------+-------------------+
 */
 
 
