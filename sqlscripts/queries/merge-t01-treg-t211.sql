@@ -128,8 +128,34 @@ SELECT DISTINCT b.pat, c.APPLN_ID
     ON  b.pat=c.pat;  
 
 SELECT COUNT(DISTINCT a.pat) FROM patstat2016b.t01t211wo a;     
-    
--- 1.568.587 rows but only 1.568.014 different pub numbers 
+--  Only 1.568.014 different pub numbers 
+
+SELECT COUNT(DISTINCT a.APPLN_ID) FROM patstat2016b.t01t211wo a;     
+-- 1.568.587 application IDs
+
+SELECT COUNT(DISTINCT a.APPLN_ID) AS c, a.pat FROM patstat2016b.t01t211wo a GROUP BY a.pat HAVING c > 1
+INTO OUTFILE '/var/lib/mysql-files/t01t211wo-repeated-appln_id-.csv'
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n';
+
+-- Ejemplo
+SELECT * FROM patstat2016b.t01t211wo a WHERE a.pat="WO2004005322";
+/*
++--------------+-----------+
+| pat          | APPLN_ID  |
++--------------+-----------+
+| WO2004005322 |  45707042 |
+| WO2004005322 | 931151197 |
++--------------+-----------+
+*/
+--
+
+
+SELECT COUNT(DISTINCT b.pat) AS c, b.APPLN_ID FROM patstat2016b.t01t211wo b GROUP BY b.APPLN_ID HAVING c > 1;
+
+SELECT COUNT(DISTINCT b.pat, b.APPLN_ID) FROM patstat2016b.t01t211wo b;
+
 
 SELECT COUNT(DISTINCT a.pat)
   FROM riccaboni.t01 a
