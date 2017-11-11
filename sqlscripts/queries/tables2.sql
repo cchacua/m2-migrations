@@ -217,7 +217,7 @@ SELECT COUNT(*), riccaboni.t01.yr
       |     9418 | 1972 |
       |    41655 | 1973 |
       |    65683 | 1974 |
-      |    65902 | 1975 |
+      |    65902 | 1975 | OK
       |    65813 | 1976 |
       |    65999 | 1977 |
       |    69550 | 1978 |
@@ -304,6 +304,7 @@ INNER JOIN t01
 ON TLS211_SAMPLE.pat=t01.pat
 GROUP BY TLS211_SAMPLE.PUBLN_AUTH;
 -- 4.194.654
+
 /*
 +-----------------------------------+------------+
 | COUNT(DISTINCT TLS211_SAMPLE.pat) | PUBLN_AUTH |
@@ -312,9 +313,7 @@ GROUP BY TLS211_SAMPLE.PUBLN_AUTH;
 |                                 3 | US         |
 |                           1522964 | WO         |
 +-----------------------------------+------------+
-
 */
-
 
 -- Counting Riccaboni
 SELECT COUNT(DISTINCT t01.pat) FROM t01;

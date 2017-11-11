@@ -55,3 +55,9 @@ t01<-read.table(files.patqual[3], header = TRUE, sep = "|", nrows =100)
 files.sql<-list.files(path="../data/sql", full.names=TRUE)
 files.sql
 
+files.mergetest.epo<-list.files(path="../data/merge_test/epo", full.names=TRUE)
+files.mergetest.epo
+
+# [1] "../data/merge_test/epo/epo-pubnumber-merge2.csv"   
+# [2] "../data/merge_test/epo/epo-pubnumber-merge.csv"    
+# [3] "../data/merge_test/epo/epo-pubnumber-riccaboni.csv"

@@ -111,9 +111,11 @@ SELECT DISTINCT a.pat, c.APPLN_ID
 -- 2345793
 
 -- To allow nulls
+/*
 ALTER TABLE riccaboni.t01 MODIFY pat VARCHAR(12);
 ALTER TABLE oecd.treg07 MODIFY PCT_Nbr CHAR(12);
 ALTER TABLE patstat2016b.TLS211_PAT_PUBLN MODIFY APPLN_ID int(10) unsigned;
+*/
 
 -- Another table with the values of the join only using Patstat and Riccaboni's
 CREATE TABLE patstat2016b.t01t211wo AS
@@ -189,6 +191,19 @@ SELECT a.DOCDB_FAMILY_ID, a.INPADOC_FAMILY_ID FROM patstat2016b.TLS201_APPLN a W
 |       931151197 |         931151197 |
 +-----------------+-------------------+
 */
+
+-- WO
+CREATE TABLE patstat2016b.t01t211wo AS
+SELECT COUNT(DISTINCT a.APPLN_ID) AS N_APPLN_ID, b.pat, c.APPLN_ID
+    FROM riccaboni.t01 b
+    INNER JOIN (SELECT DISTINCT CONCAT(a.PUBLN_AUTH,
+                              LEFT(a.PUBLN_NR,4),
+                              LPAD(RIGHT(a.PUBLN_NR, CHAR_LENGTH(a.PUBLN_NR)-4), 6, '0')
+                              ) AS pat, a.APPLN_ID 
+                FROM patstat2016b.TLS211_PAT_PUBLN a
+                WHERE a.PUBLN_AUTH='WO') c
+    ON  b.pat=c.pat;  
+
 
 
 
