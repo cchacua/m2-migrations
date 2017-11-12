@@ -1,6 +1,7 @@
 # To see secure folder:
 # SHOW VARIABLES LIKE "secure_file_priv";
 
+# mysql -h "localhost" -u "root" -p
 
 # PATSTAT
 

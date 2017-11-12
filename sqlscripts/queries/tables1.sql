@@ -221,3 +221,7 @@ INTO OUTFILE '/var/lib/mysql-files/riccaboni-211-docfamily-inventors-all.csv'
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n';
+
+SELECT * FROM patstat2016b.TLS201_APPLN LIMIT 0, 10;
+SELECT * FROM patstat2016b.TLS201_APPLN LIMIT 6012997, 3;
+

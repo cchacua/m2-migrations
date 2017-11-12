@@ -2,7 +2,7 @@ files.patstat<-list.files(path="../data/patstat2016b/raw", full.names=TRUE)
 files.patstat
 
 # Read a file
-# tls201<-read.csv(files.patstat[1], header = TRUE, nrows = 3)
+# tls201<-read.csv(files.patstat[1], header = TRUE, skip=6012997, nrows = 3)
 
 files.riccaboni<-list.files(path="../data/riccaboni", full.names=TRUE)
 files.riccaboni
@@ -39,6 +39,7 @@ files.regpat
 # [10] "../data/regpat201602/REGPAT_Regions.txt"   
 
 t01<-read.table(files.regpat[7], header = TRUE, sep = "|", quote = '""', nrows =100)
+t01<-read.table(files.regpat[3], header = TRUE, sep = "|", quote = '""', nrows =10)
 
 
 files.patqual<-list.files(path="../data/patentquality201709", full.names=TRUE)

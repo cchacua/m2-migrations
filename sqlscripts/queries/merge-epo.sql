@@ -90,4 +90,22 @@ SELECT CONCAT(b.PUBLN_AUTH, LPAD(b.PUBLN_NR, 7, '0')) AS pubnumber, b.PUBLN_KIND
       SELECT a.pat, a.yr
         FROM riccaboni.t01 a
         WHERE a.pat IN  ('EP1691026','2691026');
-      -- Only EP1691026 exists and it is from 2015 
+      -- Only EP1691026 exists and it is from 2015
+
+-----------------------------------------------------------------------------------
+-- Merge with REGPAT
+
+SELECT COUNT(CHAR_LENGTH(a.Pub_nbr)), CHAR_LENGTH(a.Pub_nbr)
+      FROM oecd.treg03 a
+      GROUP BY CHAR_LENGTH(a.Pub_nbr);
+  -- All publication numbers from regpat also have 9 characters    
+
+SELECT COUNT(DISTINCT b.Pub_nbr)
+    FROM riccaboni.t01 a
+    INNER JOIN (SELECT DISTINCT c.Pub_nbr FROM oecd.treg03 c) b ON  a.pat=b.Pub_nbr;
+  -- There are 2.672.608 patents using the merge from RegPat, so it's better to use Patstat
+  
+SELECT a.Pub_nbr
+        FROM oecd.treg03 a
+        WHERE a.Pub_nbr IN  ('EP0691026','EP2578407','EP2600934','EP2679627');
+    -- And even the four patents are also missing in the Regpat dataset
