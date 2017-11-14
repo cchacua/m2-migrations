@@ -213,13 +213,6 @@ SELECT COUNT(DISTINCT b.pat) AS c, b.APPLN_ID FROM patstat2016b.t01t211wo b GROU
 SELECT COUNT(DISTINCT b.pat, b.APPLN_ID) FROM patstat2016b.t01t211wo b;
 
 
-SELECT COUNT(DISTINCT a.pat)
-  FROM riccaboni.t01 a
-  LEFT JOIN (SELECT DISTINCT c.pat FROM patstat2016b.t01t211wo c) b
-  ON a.pat=b.pat
-  LEFT JOIN (SELECT DISTINCT e.pat FROM patstat2016b.t01r07t211 e) d
-  ON a.pat=d.pat
-  ;
 -- 1552380  
 -- (1568014-1552380)+2345793-2361535 = -108 With Patstat ID
 -- (1568014-1552380)+2345816-2361535 = -85 Without Patstat ID

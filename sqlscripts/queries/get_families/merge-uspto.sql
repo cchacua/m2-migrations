@@ -149,7 +149,31 @@ SELECT COUNT(a.pat), a.yr
     WHERE LEFT(a.pat,2)='US' AND LEFT(a.pat,3) NOT IN ('USD', 'USH', 'USP', 'USR') AND c.pnumber IS NULL
     GROUP BY a.yr;
     
-    
+/*
++--------------+------+
+| COUNT(a.pat) | yr   |
++--------------+------+
+|            1 | 1992 |
+|            2 | 1995 |
+|           14 | 1996 |
+|           21 | 1997 |
+|           46 | 1998 |
+|           37 | 1999 |
+|           80 | 2000 |
+|           81 | 2001 |
+|          160 | 2002 |
+|          156 | 2003 |
+|          179 | 2004 |
+|          202 | 2005 |
+|          159 | 2006 |
+|          102 | 2007 |
+|           41 | 2008 |
+|           19 | 2009 |
+|            1 | 2010 |
++--------------+------+
+17 rows in set (3 min 21,88 sec)
+Here the problem persists even for patents after 2001
+*/    
 -----------------------
 -- D, H
 
