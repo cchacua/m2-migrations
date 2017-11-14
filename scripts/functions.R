@@ -6,11 +6,13 @@ df.diff <- function(df1, df2) {
 }
 
 # Query table to latex:
-query.latex <- function(query, ndigits=0) {
+query.latex <- function(query, ndigits=0, tcaption=NULL, tlabel=NULL) {
 table.temp<- dbSendQuery(patstat, query)
 table.latex<-dbFetch(table.temp)
 dbClearResult(table.temp)
 table.latex<-xtable(table.latex)
 digits(table.latex) <- ndigits
+caption(table.latex)<- tcaption
+label(table.latex)<-tlabel
 print(table.latex, include.rownames = FALSE, booktabs = TRUE)
 }
