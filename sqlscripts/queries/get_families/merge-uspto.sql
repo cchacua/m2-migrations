@@ -320,6 +320,11 @@ SELECT COUNT(DISTINCT CONCAT(b.PUBLN_AUTH, LEFT(b.PUBLN_NR,2), LPAD(RIGHT(b.PUBL
             
              */
 
+      SELECT RIGHT(b.PUBLN_NR, CHAR_LENGTH(b.PUBLN_NR)-2) AS 'Only number'
+                              FROM patstat2016b.TLS211_PAT_PUBLN b
+                              WHERE b.PUBLN_AUTH='US' AND LEFT(b.PUBLN_NR,2) IN ('PP', 'RE') AND CHAR_LENGTH(b.PUBLN_NR)='6'
+                              LIMIT 0,100;
+
 -- To verify that all have 10 characters after the transformation
 SELECT COUNT(DISTINCT CONCAT(b.PUBLN_AUTH, LEFT(b.PUBLN_NR,2), LPAD(RIGHT(b.PUBLN_NR, CHAR_LENGTH(b.PUBLN_NR)-2), 6, '0'))) AS pnumber, CHAR_LENGTH(CONCAT(b.PUBLN_AUTH, LEFT(b.PUBLN_NR,2), LPAD(RIGHT(b.PUBLN_NR, CHAR_LENGTH(b.PUBLN_NR)-2), 6, '0'))) AS Nchar
                         FROM patstat2016b.TLS211_PAT_PUBLN b
@@ -335,12 +340,17 @@ SELECT COUNT(c.pnumber)
 -- 14.886 VS 17.654          
 
 -- Example merged
-SELECT c.pnumber
+SELECT c.pnumber, a.yr
     FROM riccaboni.t01 a
     INNER JOIN (SELECT DISTINCT CONCAT(b.PUBLN_AUTH, LEFT(b.PUBLN_NR,2), LPAD(RIGHT(b.PUBLN_NR, CHAR_LENGTH(b.PUBLN_NR)-2), 6, '0')) AS pnumber
                         FROM patstat2016b.TLS211_PAT_PUBLN b
                         WHERE b.PUBLN_AUTH='US' AND LEFT(b.PUBLN_NR,2) IN ('PP', 'RE')) c
     ON  a.pat=c.pnumber
+    LIMIT 0,10;
+
+SELECT a.pat, a.yr
+    FROM riccaboni.t01 a
+    WHERE LEFT(a.pat, 4)='USPP'
     LIMIT 0,10;
 
 -- Extract only those that were not matched

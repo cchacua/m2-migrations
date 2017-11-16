@@ -18,4 +18,5 @@
 install.packages("dplyr")  
 #install.packages("Hmisc")    
 install.packages("xtable")  
-
+install.packages("ggplot2") 
+install.packages("scales")
