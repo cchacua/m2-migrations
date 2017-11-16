@@ -23,6 +23,13 @@ SELECT CONCAT(b.PUBLN_AUTH, LPAD(b.PUBLN_NR, 7, '0')) AS pubnumber, b.PUBLN_KIND
     WHERE b.PUBLN_AUTH='EP' ;
 -- There are 5.118.953 rows as there are publication numbers with other publication kinds, etc    
 
+SELECT CONCAT(b.PUBLN_AUTH, LPAD(b.PUBLN_NR, 7, '0')) AS pubnumber, b.PUBLN_KIND, b.PAT_PUBLN_ID, b.APPLN_ID
+    FROM riccaboni.t01 a 
+    INNER JOIN patstat2016b.TLS211_PAT_PUBLN b
+    ON  a.pat=CONCAT(b.PUBLN_AUTH, LPAD(b.PUBLN_NR, 7, '0'))
+    WHERE b.PUBLN_AUTH='EP' 
+    LIMIT 0,10;
+
 -- Export EPO publication numbers to CSV
   -- Those from riccaboni
   SELECT a.pat AS pubnumber

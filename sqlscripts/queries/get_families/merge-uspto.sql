@@ -124,6 +124,14 @@ SELECT COUNT(c.pnumber)
     ON  a.pat=c.pnumber;
 --  3.983.470 vs 3.984.771
 
+SELECT c.pnumber
+    FROM riccaboni.t01 a
+    INNER JOIN (SELECT DISTINCT CONCAT(b.PUBLN_AUTH, LPAD(b.PUBLN_NR, 8, '0')) AS pnumber
+                        FROM patstat2016b.TLS211_PAT_PUBLN b
+                        WHERE b.PUBLN_AUTH='US' AND LEFT(b.PUBLN_NR,1) NOT IN ('D', 'H', 'P', 'R')) c
+    ON  a.pat=c.pnumber
+    LIMIT 0,10;
+
 
 -- Extract only those that were not matched
 SELECT a.pat, a.yr
@@ -219,6 +227,16 @@ SELECT COUNT(c.pnumber)
     
 -- 214.624  VS 241.547
 
+-- Those that were matched
+SELECT a.pat, a.yr
+    FROM riccaboni.t01 a
+    LEFT JOIN (SELECT DISTINCT CONCAT(b.PUBLN_AUTH, LEFT(b.PUBLN_NR,1), LPAD(RIGHT(b.PUBLN_NR, CHAR_LENGTH(b.PUBLN_NR)-1), 7, '0')) AS pnumber
+                        FROM patstat2016b.TLS211_PAT_PUBLN b
+                        WHERE b.PUBLN_AUTH='US' AND LEFT(b.PUBLN_NR,1) IN ('D', 'H')) c
+    ON  a.pat=c.pnumber
+    WHERE LEFT(a.pat,3) IN ('USD','USH')
+    LIMIT 0,10;
+    
 -- Extract only those that were not matched
 SELECT a.pat, a.yr
     FROM riccaboni.t01 a
@@ -315,6 +333,15 @@ SELECT COUNT(c.pnumber)
                         WHERE b.PUBLN_AUTH='US' AND LEFT(b.PUBLN_NR,2) IN ('PP', 'RE')) c
     ON  a.pat=c.pnumber;
 -- 14.886 VS 17.654          
+
+-- Example merged
+SELECT c.pnumber
+    FROM riccaboni.t01 a
+    INNER JOIN (SELECT DISTINCT CONCAT(b.PUBLN_AUTH, LEFT(b.PUBLN_NR,2), LPAD(RIGHT(b.PUBLN_NR, CHAR_LENGTH(b.PUBLN_NR)-2), 6, '0')) AS pnumber
+                        FROM patstat2016b.TLS211_PAT_PUBLN b
+                        WHERE b.PUBLN_AUTH='US' AND LEFT(b.PUBLN_NR,2) IN ('PP', 'RE')) c
+    ON  a.pat=c.pnumber
+    LIMIT 0,10;
 
 -- Extract only those that were not matched
 SELECT a.pat, a.yr

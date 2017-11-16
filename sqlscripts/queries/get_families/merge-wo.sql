@@ -15,6 +15,17 @@ SELECT COUNT(*), CHAR_LENGTH(a.pat), LEFT(a.pat,2) AS Authority
       +----------+--------------------+-----------+
       */
       
+-- Verify beginning of WO patents
+SELECT COUNT(*), CHAR_LENGTH(a.pat), LEFT(a.pat,6) AS Authority
+      FROM riccaboni.t01 a
+      WHERE LEFT(a.pat,2)='WO'
+      GROUP BY CHAR_LENGTH(a.pat),  LEFT(a.pat,6);      
+      
+-- Verify beginning of WO patents in patstat
+SELECT COUNT(*), CHAR_LENGTH(a.PUBLN_NR), LEFT(a.PUBLN_NR,4) AS Year
+      FROM patstat2016b.TLS211_PAT_PUBLN a
+      WHERE a.PUBLN_AUTH='WO'
+      GROUP BY CHAR_LENGTH(a.PUBLN_NR), LEFT(a.PUBLN_NR,4);        
 ----------------------------------------------------------------------------------------
 -- Make the merge
 ----------------------------------------------------------------------------------------
@@ -31,6 +42,53 @@ SELECT COUNT(c.pnumber)
                 WHERE d.PUBLN_AUTH='WO') c
     ON  a.pat=c.pnumber;
     --1.568.014 vs 2.361.535
+
+SELECT COUNT(c.pnumber)
+    FROM riccaboni.t01 a
+    INNER JOIN (SELECT DISTINCT CONCAT(d.PUBLN_AUTH,
+                              LEFT(d.PUBLN_NR,4),
+                              LPAD(RIGHT(d.PUBLN_NR, CHAR_LENGTH(d.PUBLN_NR)-4), 6, '0')
+                              ) AS pnumber 
+                FROM patstat2016b.TLS211_PAT_PUBLN d
+                WHERE d.PUBLN_AUTH='WO' AND LEFT(d.PUBLN_NR,4) BETWEEN 1978 AND 2014) c
+    ON  a.pat=c.pnumber;
+-- 1.568.014
+
+SELECT COUNT(c.pnumber)
+    FROM riccaboni.t01 a
+    INNER JOIN (SELECT DISTINCT CONCAT(d.PUBLN_AUTH,
+                              '20',
+                              LEFT(d.PUBLN_NR,2),
+                              LPAD(RIGHT(d.PUBLN_NR, CHAR_LENGTH(d.PUBLN_NR)-2), 6, '0')
+                              ) AS pnumber 
+                FROM patstat2016b.TLS211_PAT_PUBLN d
+                WHERE d.PUBLN_AUTH='WO' AND LEFT(d.PUBLN_NR,2) IN ('00', '01','02','03','04','05','06','07','08','09','10','11','12','13','14')) c
+    ON  a.pat=c.pnumber;
+--  381.431 VS 335965
+
+
+SELECT COUNT(c.pnumber)
+    FROM riccaboni.t01 a
+    INNER JOIN (SELECT DISTINCT CONCAT(d.PUBLN_AUTH,
+                              '19',
+                              LEFT(d.PUBLN_NR,2),
+                              LPAD(RIGHT(d.PUBLN_NR, CHAR_LENGTH(d.PUBLN_NR)-2), 6, '0')
+                              ) AS pnumber 
+                FROM patstat2016b.TLS211_PAT_PUBLN d
+                WHERE d.PUBLN_AUTH='WO' AND LEFT(d.PUBLN_NR,2) BETWEEN 78 AND 99 ) c
+    ON  a.pat=c.pnumber;
+-- 412.118    
+
+SELECT c.pnumber
+    FROM riccaboni.t01 a
+    INNER JOIN (SELECT DISTINCT CONCAT(d.PUBLN_AUTH,
+                              LEFT(d.PUBLN_NR,4),
+                              LPAD(RIGHT(d.PUBLN_NR, CHAR_LENGTH(d.PUBLN_NR)-4), 6, '0')
+                              ) AS pnumber 
+                FROM patstat2016b.TLS211_PAT_PUBLN d
+                WHERE d.PUBLN_AUTH='WO') c
+    ON  a.pat=c.pnumber
+    LIMIT 0,10;
 
 -- Extract only those that were not matched
 -- Analyze those that were not matched
