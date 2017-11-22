@@ -236,6 +236,49 @@ SELECT a.pat, a.yr
     ON  a.pat=c.pnumber
     WHERE LEFT(a.pat,3) IN ('USD','USH')
     LIMIT 0,10;
+
+-- Year for those that were matched
+SELECT COUNT(a.pat), a.yr
+    FROM riccaboni.t01 a
+    INNER JOIN (SELECT DISTINCT CONCAT(b.PUBLN_AUTH, LEFT(b.PUBLN_NR,1), LPAD(RIGHT(b.PUBLN_NR, CHAR_LENGTH(b.PUBLN_NR)-1), 7, '0')) AS pnumber
+                        FROM patstat2016b.TLS211_PAT_PUBLN b
+                        WHERE b.PUBLN_AUTH='US' AND LEFT(b.PUBLN_NR,1) IN ('D', 'H')) c
+    ON  a.pat=c.pnumber
+    GROUP BY a.yr;
+/*
++--------------+------+
+| COUNT(a.pat) | yr   |
++--------------+------+
+|            1 | 1983 |
+|            2 | 1984 |
+|            2 | 1985 |
+|            6 | 1986 |
+|            2 | 1988 |
+|            3 | 1989 |
+|            5 | 1990 |
+|           24 | 1991 |
+|           23 | 1992 |
+|           43 | 1993 |
+|          170 | 1994 |
+|          516 | 1995 |
+|         2763 | 1996 |
+|         6190 | 1997 |
+|         6725 | 1998 |
+|         8462 | 1999 |
+|        14694 | 2000 |
+|        15612 | 2001 |
+|        17231 | 2002 |
+|        18676 | 2003 |
+|        19679 | 2004 |
+|        20942 | 2005 |
+|        20412 | 2006 |
+|        21486 | 2007 |
+|        20479 | 2008 |
+|        16665 | 2009 |
+|         3811 | 2010 |
++--------------+------+
+*/
+
     
 -- Extract only those that were not matched
 SELECT a.pat, a.yr
@@ -348,10 +391,52 @@ SELECT c.pnumber, a.yr
     ON  a.pat=c.pnumber
     LIMIT 0,10;
 
+
+
 SELECT a.pat, a.yr
     FROM riccaboni.t01 a
     WHERE LEFT(a.pat, 4)='USPP'
     LIMIT 0,10;
+
+-- Year of the matched patents
+SELECT COUNT(a.pat), a.yr
+    FROM riccaboni.t01 a
+    INNER JOIN (SELECT DISTINCT CONCAT(b.PUBLN_AUTH, LEFT(b.PUBLN_NR,2), LPAD(RIGHT(b.PUBLN_NR, CHAR_LENGTH(b.PUBLN_NR)-2), 6, '0')) AS pnumber
+                        FROM patstat2016b.TLS211_PAT_PUBLN b
+                        WHERE b.PUBLN_AUTH='US' AND LEFT(b.PUBLN_NR,2) IN ('PP', 'RE')) c
+    ON  a.pat=c.pnumber
+    GROUP BY a.yr;
+
+/*
++--------------+------+
+| COUNT(a.pat) | yr   |
++--------------+------+
+|            3 | 1988 |
+|            2 | 1989 |
+|            5 | 1990 |
+|            7 | 1991 |
+|           18 | 1992 |
+|           26 | 1993 |
+|           47 | 1994 |
+|           85 | 1995 |
+|          126 | 1996 |
+|          209 | 1997 |
+|          365 | 1998 |
+|         1045 | 1999 |
+|         1228 | 2000 |
+|         1450 | 2001 |
+|         1442 | 2002 |
+|         1345 | 2003 |
+|         1540 | 2004 |
+|         1619 | 2005 |
+|         1362 | 2006 |
+|         1146 | 2007 |
+|         1239 | 2008 |
+|          569 | 2009 |
+|            8 | 2010 |
++--------------+------+
+
+*/
 
 -- Extract only those that were not matched
 SELECT a.pat, a.yr
@@ -455,4 +540,28 @@ SELECT COUNT(a.Pub_nbr) AS Frequency, LEFT(a.Pub_nbr,5) AS US_Char
       FROM oecd.tqual03 a
       GROUP BY LEFT(a.Pub_nbr,5); 
   -- It does not work, because it doest not have the same structure for the publication number    
-      
+
+
+------------------------------------------------------------------------------------
+
+CREATE TABLE patstat2016b.tusptest AS
+SELECT c.pnumber, c.PUBLN_KIND, c.PAT_PUBLN_ID, c.APPLN_ID
+    FROM riccaboni.t01 a
+    INNER JOIN (SELECT DISTINCT CONCAT(b.PUBLN_AUTH, LPAD(b.PUBLN_NR, 8, '0')) AS pnumber, b.PUBLN_KIND, b.PAT_PUBLN_ID, b.APPLN_ID 
+                        FROM patstat2016b.TLS211_PAT_PUBLN b
+                        WHERE b.PUBLN_AUTH='US' AND LEFT(b.PUBLN_NR,1) NOT IN ('D', 'H', 'P', 'R')) c
+    ON  a.pat=c.pnumber
+UNION ALL   
+SELECT c.pnumber, c.PUBLN_KIND, c.PAT_PUBLN_ID, c.APPLN_ID
+    FROM riccaboni.t01 a
+    INNER JOIN (SELECT DISTINCT CONCAT(b.PUBLN_AUTH, LEFT(b.PUBLN_NR,1), LPAD(RIGHT(b.PUBLN_NR, CHAR_LENGTH(b.PUBLN_NR)-1), 7, '0')) AS pnumber, b.PUBLN_KIND, b.PAT_PUBLN_ID, b.APPLN_ID 
+                        FROM patstat2016b.TLS211_PAT_PUBLN b
+                        WHERE b.PUBLN_AUTH='US' AND LEFT(b.PUBLN_NR,1) IN ('D', 'H')) c
+    ON  a.pat=c.pnumber
+UNION ALL   
+SELECT c.pnumber, c.PUBLN_KIND, c.PAT_PUBLN_ID, c.APPLN_ID
+    FROM riccaboni.t01 a
+    INNER JOIN (SELECT DISTINCT CONCAT(b.PUBLN_AUTH, LEFT(b.PUBLN_NR,2), LPAD(RIGHT(b.PUBLN_NR, CHAR_LENGTH(b.PUBLN_NR)-2), 6, '0')) AS pnumber, b.PUBLN_KIND, b.PAT_PUBLN_ID, b.APPLN_ID 
+                        FROM patstat2016b.TLS211_PAT_PUBLN b
+                        WHERE b.PUBLN_AUTH='US' AND LEFT(b.PUBLN_NR,2) IN ('PP', 'RE')) c
+    ON  a.pat=c.pnumber;
