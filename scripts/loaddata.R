@@ -98,6 +98,17 @@ files.patqual
 
 t01<-read.table(files.patqual[3], header = TRUE, sep = "|", nrows =100)
 
+
+################################################################################################
+# OECD Patent Quality 201709
+################################################################################################
+files.patentsview<-list.files(path="../data/uspto-patentview", full.names=TRUE)
+files.patentsview
+
+# [1] "../data/uspto-patentview/application.tsv"     
+# [2] "../data/uspto-patentview/patentid_applnid.txt"
+# [3] "../data/uspto-patentview/raw"      
+
 ################################################################################################
 # Others, SQL
 ################################################################################################
