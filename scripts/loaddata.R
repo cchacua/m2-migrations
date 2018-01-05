@@ -28,7 +28,9 @@ files.riccaboni
 # [12] "../data/riccaboni/USPC_to_IPC_fullList.txt"               
 # [13] "../data/riccaboni/wipo_class_ID.txt"     
 
-# ri.t01<-read.table(files.riccaboni[7], header = TRUE, sep = "|", nrows =100000)
+
+ri.t01<-read.table(files.riccaboni[1], header = TRUE, sep = "|", nrows =100000)
+ri.t08<-read.table(files.riccaboni[8], header = FALSE, sep = "|", nrows =100)
 # View(t01[291192,])
 
 
