@@ -5,7 +5,9 @@
 ---------------------------------------------------------------------------------------------------
 SHOW INDEX FROM riccaboni.t08;                                     
 
-
+---------------------------------------------------------------------------------------------------
+-- Merge and new table
+---------------------------------------------------------------------------------------------------
 DROP TABLE IF EXISTS riccaboni.t08_allclasses;
 CREATE TABLE riccaboni.t08_names_allclasses AS
 SELECT a.ID, a.pat, a.name, a.loc, a.qual, a.loctype
@@ -13,31 +15,76 @@ SELECT a.ID, a.pat, a.name, a.loc, a.qual, a.loctype
       INNER JOIN riccaboni.t08 a
       ON b.pat=a.pat;
 /*
-Query OK, 7652380 rows affected (5 min 49,21 sec)
+Query OK, 7.652.380 rows affected (5 min 49,21 sec)
 Records: 7652380  Duplicates: 0  Warnings: 0
 */
-SELECT a.ID, a.pat, a.name, a.loc, a.qual, a.loctype
-      FROM riccaboni.t08 a
-      INNER JOIN riccaboni.t01_allclasses b
-      ON a.pat=b.pat
-      LIMIT 0,100;
+
+---------------------------------------------------------------------------------------------------
+-- Countings
+---------------------------------------------------------------------------------------------------
+
+SELECT COUNT(DISTINCT UPPER(a.name))       
+      FROM riccaboni.t08_names_allclasses a;
+/*
++------------------------+
+| COUNT(DISTINCT a.name) |
++------------------------+
+|                2005599 |
++------------------------+
+1 row in set (19,49 sec)
+
++-------------------------------+
+| COUNT(DISTINCT UPPER(a.name)) |
++-------------------------------+
+|                       2005599 |
++-------------------------------+
+1 row in set (22,22 sec)
+
+
+*/
+
+
+SELECT COUNT(DISTINCT a.ID)       
+      FROM riccaboni.t08_names_allclasses a;
+/*
++----------------------+
+| COUNT(DISTINCT a.ID) |
++----------------------+
+|              1.710.247 |
++----------------------+
+1 row in set (15,62 sec)
+*/
+
+
+SELECT COUNT(DISTINCT a.ID, UPPER(a.name))       
+      FROM riccaboni.t08_names_allclasses a;
+/*
++------------------------------+
+| COUNT(DISTINCT a.ID, a.name) |
++------------------------------+
+|                      2365662 |
++------------------------------+
+1 row in set (22,45 sec)
++-------------------------------------+
+| COUNT(DISTINCT a.ID, UPPER(a.name)) |
++-------------------------------------+
+|                             2365662 |
++-------------------------------------+
+1 row in set (27,68 sec)
+
+*/
+
+
+---------------------------------------------------------------------------------------------------
+-- File
+---------------------------------------------------------------------------------------------------
       
-SELECT a.ID, a.pat, a.name, a.loc, a.qual, a.loctype
-      FROM riccaboni.t08 a
-      INNER JOIN (SELECT DISTINCT c.pat FROM riccaboni.t01_allclasses c) b
-      ON a.pat=b.pat
-      LIMIT 0,100;
-
-SELECT a.ID, a.pat, a.name, a.loc, a.qual, a.loctype
-      FROM riccaboni.t01_allclasses b 
-      INNER JOIN riccaboni.t08 a
-      ON b.pat=a.pat
-      LIMIT 0,100;
-
-SELECT * FROM riccaboni.t08 a WHERE a.pat='EP1550317';
-
-      
-SELECT DISTINCT a.name, a.ID       
-      FROM riccaboni.t08_allclasses a
-      GROUP BY a.ID
-      LIMIT 0,100;
+SELECT DISTINCT a.ID, a.name       
+      FROM riccaboni.t08_names_allclasses a
+      INTO OUTFILE '/var/lib/mysql-files/Names_ID_Classes.csv'
+            FIELDS TERMINATED BY ','
+            ENCLOSED BY '"'
+            LINES TERMINATED BY '\n';
+/*
+Query OK, 2365662 rows affected (41,79 sec)
+*/            
