@@ -137,6 +137,8 @@ colnames(t01)
 files.sql<-list.files(path="../data/sql", full.names=TRUE)
 files.sql
 
+# [1] "../data/sql/01 Names_ID_Classes.csv"
+
 files.mergetest.epo<-list.files(path="../data/merge_test/epo", full.names=TRUE)
 files.mergetest.epo
 
