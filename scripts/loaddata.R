@@ -82,8 +82,9 @@ write.csv(colnames(t01), "../output/databases/oecd_citations/colnames.csv")
 
 t01<-read.table(files.oecdcitations[7], header = FALSE, sep = "|", quote = '""', skip= 600, nrows =100)
 
-
-
+t01<-read.table(files.oecdcitations[13], header = TRUE, sep = "|", quote = '""', nrows =100)
+colnames(t01)
+write.csv(colnames(t01), "../output/databases/oecd_citations/colnames.csv")
 
 ################################################################################################
 # OECD Patent Quality 201709
@@ -108,6 +109,25 @@ files.patentsview
 # [1] "../data/uspto-patentview/application.tsv"     
 # [2] "../data/uspto-patentview/patentid_applnid.txt"
 # [3] "../data/uspto-patentview/raw"      
+
+t01<-read.table(files.patentsview[1], header = TRUE, nrows =100)
+t01<-read.table(files.patentsview[2], header = TRUE, nrows =100)
+colnames(t01)
+
+################################################################################################
+# PCT Nationality
+################################################################################################
+files.pct<-list.files(path="../data/pct", full.names=TRUE)
+files.pct
+
+# [1] "../data/pct/inventors_names_patstat.csv"       
+# [2] "../data/pct/No"                                
+# [3] "../data/pct/regpat_pct_inv_reg_nationality.csv"
+
+t01<-read.csv2(files.pct[1], header = TRUE, nrows =100)
+t01<-read.csv2(files.pct[3], header = TRUE, nrows =100)
+colnames(t01)
+
 
 ################################################################################################
 # Others, SQL

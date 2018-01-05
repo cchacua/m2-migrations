@@ -654,4 +654,88 @@ SELECT COUNT(a.US_Pub_nbr) AS Frequency, LEFT(a.US_Pub_nbr,4) AS US_Char
 |     16579 | USRE    |
 +-----------+---------+
 */      
-    
+
+SELECT COUNT(a.US_Pub_nbr) AS Frequency, LEFT(a.US_Pub_nbr,4) AS US_Char 
+      FROM oecd_citations.US_CIT_COUNTS a
+      WHERE CHAR_LENGTH(a.US_Pub_nbr)=12
+      GROUP BY LEFT(a.US_Pub_nbr,4);
+/*
++-----------+---------+
+| Frequency | US_Char |
++-----------+---------+
+|   1559533 | US20    |
++-----------+---------+
+All pnumbers with 12 characters beging with US20
+*/      
+
+SELECT COUNT(a.US_Pub_nbr) AS Frequency, LEFT(a.US_Pub_nbr,8) AS US_Char 
+      FROM oecd_citations.US_CIT_COUNTS a
+      WHERE CHAR_LENGTH(a.US_Pub_nbr)=12
+      GROUP BY LEFT(a.US_Pub_nbr,8);
+/*
+It begings with 200100
++-----------+----------+
+| Frequency | US_Char  |
++-----------+----------+
+|       379 | US200100 |
+|       494 | US200101 |
+*/
+      
+-----------------------------------------------------------------------------------------------
+-- Merge with Patents view
+-----------------------------------------------------------------------------------------------
+
+-- Types of codes
+SELECT COUNT(b.series_code), b.series_code
+                              FROM uspto.PVIEW b
+                              GROUP BY b.series_code;
+
+/*
++----------------------+-------------+
+| COUNT(b.series_code) | series_code |
++----------------------+-------------+
+|                    1 | 00          |
+|                  157 | 02          |
+|                  367 | 03          |
+|                 1294 | 04          |
+|               332437 | 05          |
+|               585256 | 06          |
+|               623526 | 07          |
+|               697928 | 08          |
+|               715810 | 09          |
+|               649741 | 10          |
+|               594300 | 11          |
+|               636545 | 12          |
+|               631662 | 13          |
+|               421245 | 14          |
+|                32016 | 15          |
+|               424390 | 29          |
+|                  339 | 35          |
+|                19650 | D           |
++----------------------+-------------+
+18 rows in set (4,67 sec)
+
+*/
+
+SELECT COUNT(DISTINCT b.number), CHAR_LENGTH(b.number) AS Nchar
+                              FROM uspto.PVIEW b
+                              GROUP BY CHAR_LENGTH(b.number);
+/*
++--------------------------+-------+
+| COUNT(DISTINCT b.number) | Nchar |
++--------------------------+-------+
+|                    19648 |     7 |
+|                  6337820 |     8 |
++--------------------------+-------+
+*/    
+
+
+SELECT COUNT(a.number) AS Frequency, LEFT(a.number,4) AS US_Char 
+      FROM uspto.PVIEW a
+      WHERE CHAR_LENGTH(a.number)=8
+      GROUP BY LEFT(a.number,4);
+      
+SELECT COUNT(a.number) AS Frequency, RIGHT(a.number,2) AS US_Char 
+      FROM uspto.PVIEW a
+      WHERE CHAR_LENGTH(a.number)=8
+      GROUP BY RIGHT(a.number,2);      
