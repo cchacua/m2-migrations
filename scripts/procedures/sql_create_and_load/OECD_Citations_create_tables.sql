@@ -80,3 +80,47 @@ ENGINE=MyISAM
 CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
 ;
 
+
+-----------------------------------------------------------------------------------------------
+-- EP_CITATIONS
+-----------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS EP_CITATIONS;
+CREATE TABLE IF NOT EXISTS EP_CITATIONS
+(
+Citing_pub_nbr VARCHAR(15),
+Citing_pub_date CHAR(8),
+Citing_app_nbr VARCHAR(20),
+Citing_appln_id VARCHAR(15),
+Cited_pub_nbr VARCHAR(20),
+Cited_pub_date CHAR(8),
+Cited_App_auth CHAR(2),
+Cited_App_nbr VARCHAR(20),
+Cited_Appln_id VARCHAR(15),
+Cit_Total int(10) unsigned, 
+Citn_origin CHAR(3),
+Citn_category VARCHAR(5),
+Citn_lag_year VARCHAR(3), 
+Citn_lag_month VARCHAR(4),
+ISA CHAR(2)
+)
+ENGINE=MyISAM
+CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
+;
+
+
+
+-----------------------------------------------------------------------------------------------
+-- WO_EQUIVALENTS
+-----------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS WO_EQUIVALENTS;
+CREATE TABLE IF NOT EXISTS WO_EQUIVALENTS
+(
+Cited_appln_id VARCHAR(15),
+WO_eqv_appln_id VARCHAR(15),
+Eqv_app_nbr VARCHAR(20),
+Eqv_pub_nbr VARCHAR(20),
+Eqv_total int(10) unsigned
+)
+ENGINE=MyISAM
+CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
+;

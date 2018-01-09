@@ -468,11 +468,11 @@ SELECT c.pnumber, c.PUBLN_KIND, c.PAT_PUBLN_ID, c.APPLN_ID
     INNER JOIN (SELECT DISTINCT CONCAT(d.PUBLN_AUTH,
                               LEFT(d.PUBLN_NR,4),
                               LPAD(RIGHT(d.PUBLN_NR, CHAR_LENGTH(d.PUBLN_NR)-4), 6, '0')
-                              ) AS pnumber, d.PUBLN_KIND, d.PAT_PUBLN_ID, d.APPLN_ID 
+                              ) AS pnumber, d.PUBLN_KIND, d.PAT_PUBLN_ID, d.APPLN_ID
                 FROM patstat2016b.TLS211_PAT_PUBLN d
                 WHERE d.PUBLN_AUTH='WO' AND LEFT(d.PUBLN_NR,4) BETWEEN 1978 AND 2014) c
     ON  a.pat=c.pnumber
-UNION ALL    
+UNION ALL
 SELECT c.pnumber, c.PUBLN_KIND, c.PAT_PUBLN_ID, c.APPLN_ID
     FROM riccaboni.t01 a
     INNER JOIN (SELECT DISTINCT CONCAT(d.PUBLN_AUTH,
@@ -483,7 +483,7 @@ SELECT c.pnumber, c.PUBLN_KIND, c.PAT_PUBLN_ID, c.APPLN_ID
                 FROM patstat2016b.TLS211_PAT_PUBLN d
                 WHERE d.PUBLN_AUTH='WO' AND LEFT(d.PUBLN_NR,2) IN ('00', '01','02','03','04','05','06','07','08','09','10','11','12','13','14')) c
     ON  a.pat=c.pnumber
-UNION ALL    
+UNION ALL
 SELECT c.pnumber, c.PUBLN_KIND, c.PAT_PUBLN_ID, c.APPLN_ID
     FROM riccaboni.t01 a
     INNER JOIN (SELECT DISTINCT CONCAT(d.PUBLN_AUTH,
@@ -493,11 +493,11 @@ SELECT c.pnumber, c.PUBLN_KIND, c.PAT_PUBLN_ID, c.APPLN_ID
                               ) AS pnumber, d.PUBLN_KIND, d.PAT_PUBLN_ID, d.APPLN_ID  
                 FROM patstat2016b.TLS211_PAT_PUBLN d
                 WHERE d.PUBLN_AUTH='WO' AND LEFT(d.PUBLN_NR,2) BETWEEN 78 AND 99 ) c
-    ON  a.pat=c.pnumber ;  
+    ON  a.pat=c.pnumber;
 --  2361563 vs 2.361.535  because there are duplicates
 SELECT COUNT(DISTINCT a.PAT_PUBLN_ID)
   FROM patstat2016b.twopt a;
---2985895  
+--2985895
 
 SELECT COUNT(DISTINCT a.pnumber)
   FROM patstat2016b.twopt a;
