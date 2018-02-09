@@ -4,6 +4,10 @@ CREATE SCHEMA `oecd` DEFAULT CHARACTER SET utf8 ;
 use oecd;
 --
 
+
+---------------------------------------------------------------------------------------------------
+--  treg07 201602_PCT_Inv_reg
+---------------------------------------------------------------------------------------------------
 DROP TABLE IF EXISTS treg07;
 CREATE TABLE IF NOT EXISTS treg07
 (   PCT_Nbr CHAR(12) NOT NULL default '',
@@ -19,6 +23,10 @@ CREATE TABLE IF NOT EXISTS treg07
 ENGINE=MyISAM
 CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
 ;
+
+---------------------------------------------------------------------------------------------------
+--  treg03 201602_EPO_Inv_reg
+---------------------------------------------------------------------------------------------------
 
 DROP TABLE IF EXISTS treg03;
 CREATE TABLE IF NOT EXISTS treg03

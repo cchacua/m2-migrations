@@ -12,7 +12,14 @@
   #   sudo apt-get install r-cran-rmysql
   install.packages("devtools")
   devtools::install_github("rstats-db/RMySQL")
-
+  
+  # To install sf (or udunits2)
+  # sudo apt-get install libudunits2-dev
+  
+  # To install sf (gdal)
+  # sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
+  # sudo apt update
+  # sudo apt install gdal-bin python-gdal python3-gdal libgdal1-dev
 ########################################################################################  
   
 install.packages("dplyr")  
@@ -23,3 +30,7 @@ install.packages("scales")
 install.packages("stringr")
 install.packages("data.table")
 install.packages("sp")
+
+install.packages("udunits2")
+install.packages("sf")
+install.packages("mapview")

@@ -7,6 +7,25 @@ files.patstat
 # Read a file
 # tls201<-read.csv(files.patstat[1], header = TRUE, skip=6012997, nrows = 3)
 
+files.patstat2<-list.files(path="../data/patstat2016b/raw2", full.names=TRUE)
+files.patstat2
+# [1] "../data/patstat2016b/raw2/tls206_part01.txt"
+# [2] "../data/patstat2016b/raw2/tls206_part02.txt"
+# [3] "../data/patstat2016b/raw2/tls206_part03.txt"
+# [4] "../data/patstat2016b/raw2/tls206_part04.txt"
+# [5] "../data/patstat2016b/raw2/tls206_part05.txt"
+# [6] "../data/patstat2016b/raw2/tls206_part06.txt"
+# [7] "../data/patstat2016b/raw2/tls207_part01.txt"
+# [8] "../data/patstat2016b/raw2/tls207_part02.txt"
+# [9] "../data/patstat2016b/raw2/tls207_part03.txt"
+# [10] "../data/patstat2016b/raw2/tls906_part01.txt"
+# [11] "../data/patstat2016b/raw2/tls906_part02.txt"
+# [12] "../data/patstat2016b/raw2/tls906_part03.txt"
+# [13] "../data/patstat2016b/raw2/tls906_part04.txt"
+# [14] "../data/patstat2016b/raw2/tls906_part05.txt"
+# [15] "../data/patstat2016b/raw2/tls906_part06.txt"
+
+tls906<-read.csv(files.patstat2[10], header = TRUE, nrows = 3)
 
 ################################################################################################
 # Morrison, Riccaboni and Pammolli (2017)
@@ -29,8 +48,8 @@ files.riccaboni
 # [13] "../data/riccaboni/wipo_class_ID.txt"     
 
 
-ri.t01<-read.table(files.riccaboni[1], header = TRUE, sep = "|", nrows =100000)
-ri.t08<-read.table(files.riccaboni[8], header = FALSE, sep = "|", nrows =100)
+# ri.t01<-read.table(files.riccaboni[1], header = TRUE, sep = "|", nrows =100000)
+# ri.t08<-read.table(files.riccaboni[8], header = FALSE, sep = "|", nrows =100)
 # View(t01[291192,])
 
 
@@ -51,9 +70,9 @@ files.regpat
 # [9] "../data/regpat201602/REGPAT_Regions_NUTS3_TL3.txt"
 # [10] "../data/regpat201602/REGPAT_Regions.txt"   
 
-t01<-read.table(files.regpat[7], header = TRUE, sep = "|", quote = '""', nrows =100)
-t01<-read.table(files.regpat[3], header = TRUE, sep = "|", quote = '""', nrows =10)
-
+# t01<-read.table(files.regpat[7], header = TRUE, sep = "|", quote = '""', nrows =100)
+# t01<-read.table(files.regpat[3], header = TRUE, sep = "|", quote = '""', nrows =10)
+# 
 
 ################################################################################################
 # OECD Citations 201709
@@ -78,15 +97,15 @@ files.oecdcitations
 # [15] "../data/oecd_citations/201709_WO_NPL_Citations.txt"  
 # [16] "../data/oecd_citations/raw" 
 
-t01<-read.table(files.oecdcitations[9], header = TRUE, sep = "|", quote = '""', nrows =100)
-colnames(t01)
-write.csv(colnames(t01), "../output/databases/oecd_citations/colnames.csv")
-
-t01<-read.table(files.oecdcitations[7], header = FALSE, sep = "|", quote = '""', skip= 600, nrows =100)
-
-t01<-read.table(files.oecdcitations[13], header = TRUE, sep = "|", quote = '""', nrows =100)
-colnames(t01)
-write.csv(colnames(t01), "../output/databases/oecd_citations/colnames.csv")
+# t01<-read.table(files.oecdcitations[9], header = TRUE, sep = "|", quote = '""', nrows =100)
+# colnames(t01)
+# write.csv(colnames(t01), "../output/databases/oecd_citations/colnames.csv")
+# 
+# t01<-read.table(files.oecdcitations[7], header = FALSE, sep = "|", quote = '""', skip= 600, nrows =100)
+# 
+# t01<-read.table(files.oecdcitations[13], header = TRUE, sep = "|", quote = '""', nrows =100)
+# colnames(t01)
+# write.csv(colnames(t01), "../output/databases/oecd_citations/colnames.csv")
 
 ################################################################################################
 # OECD Patent Quality 201709
@@ -99,7 +118,7 @@ files.patqual
 # [3] "../data/patentquality201709/201709_OECD_PATENT_QUALITY_USPTO.txt"
 # [4] "../data/patentquality201709/201709_uspto_indic_cohort.txt"
 
-t01<-read.table(files.patqual[3], header = TRUE, sep = "|", nrows =100)
+# t01<-read.table(files.patqual[3], header = TRUE, sep = "|", nrows =100)
 
 
 ################################################################################################
@@ -112,9 +131,9 @@ files.patentsview
 # [2] "../data/uspto-patentview/patentid_applnid.txt"
 # [3] "../data/uspto-patentview/raw"      
 
-t01<-read.table(files.patentsview[1], header = TRUE, nrows =100)
-t01<-read.table(files.patentsview[2], header = TRUE, nrows =100)
-colnames(t01)
+# t01<-read.table(files.patentsview[1], header = TRUE, nrows =100)
+# t01<-read.table(files.patentsview[2], header = TRUE, nrows =100)
+# colnames(t01)
 
 ################################################################################################
 # PCT Nationality
@@ -126,10 +145,24 @@ files.pct
 # [2] "../data/pct/No"                                
 # [3] "../data/pct/regpat_pct_inv_reg_nationality.csv"
 
-t01<-read.csv2(files.pct[1], header = TRUE, nrows =100)
-t01<-read.csv2(files.pct[3], header = TRUE, nrows =100)
-colnames(t01)
+# t01<-read.csv2(files.pct[1], header = TRUE, nrows =100)
+# t01<-read.csv2(files.pct[3], header = TRUE, nrows =100)
+# colnames(t01)
 
+
+################################################################################################
+# GADM (Global administrative areas)
+################################################################################################
+files.gadm<-list.files(path="../data/gadm", full.names=TRUE)
+files.gadm
+
+# [1] "../data/gadm/00 USA_adm0.rds"
+# [2] "../data/gadm/gadm28_adm0.cpg"
+# [3] "../data/gadm/gadm28_adm0.dbf"
+# [4] "../data/gadm/gadm28_adm0.prj"
+# [5] "../data/gadm/gadm28_adm0.shp"
+# [6] "../data/gadm/gadm28_adm0.shx"
+# [7] "../data/gadm/raw" 
 
 ################################################################################################
 # Others, SQL

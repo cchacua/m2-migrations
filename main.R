@@ -1,6 +1,10 @@
 # Main script
 
 source("./scripts/loadpackages.R")
+source("./scripts/loaddata.R")
+
+
+
 
 # Patents by year and filling authority in Riccaboni's dataset
 pat.df<-dbGetQuery(patstat, "SELECT COUNT(a.pat) AS 'Npat', a.yr AS 'Year', LEFT(a.pat,2) AS 'Authority'
