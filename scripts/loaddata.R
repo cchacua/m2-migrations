@@ -27,6 +27,11 @@ files.patstat2
 
 tls906<-read.csv(files.patstat2[10], header = TRUE, nrows = 3)
 
+tls206<-read.csv(files.patstat2[1], header = TRUE, nrows = 3)
+tls206<-read.csv(files.patstat2[1], header = TRUE, nrows = 10, skip=6597570)
+nchar(as.vector(tls206$JP))
+
+
 ################################################################################################
 # Morrison, Riccaboni and Pammolli (2017)
 ################################################################################################
