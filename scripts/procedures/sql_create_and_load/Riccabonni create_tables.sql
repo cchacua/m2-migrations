@@ -75,9 +75,9 @@ CREATE TABLE IF NOT EXISTS t08
     loctype VARCHAR(10)  default ''
 ) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci ;
 
---
-DROP TABLE IF EXISTS t09;
-CREATE TABLE IF NOT EXISTS t09
+-- t09 mobility links
+DROP TABLE IF EXISTS riccaboni.t09;
+CREATE TABLE IF NOT EXISTS riccaboni.t09
 (
     localID VARCHAR(15)  default '',
     mobileID VARCHAR(15)  default ''

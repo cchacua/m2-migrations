@@ -129,7 +129,7 @@ SELECT COUNT(DISTINCT a.APPLN_ID)
 ---------------------------------------------------------------------------------------------------
 DROP TABLE IF EXISTS riccaboni.t01_allclasses_appid_patstat_us;
 CREATE TABLE riccaboni.t01_allclasses_appid_patstat_us AS
-SELECT DISTINCT a.APPLN_ID
+SELECT DISTINCT a.*
       FROM riccaboni.t01_allclasses_appid_patstat a 
       INNER JOIN patstat2016b.TLS207_PERS_APPLN b
       ON a.APPLN_ID=b.APPLN_ID
@@ -153,3 +153,6 @@ SELECT COUNT(DISTINCT a.APPLN_ID) FROM riccaboni.t01_allclasses_appid_patstat_us
 +----------------------------+
 1 row in set (2,67 sec)
 */
+
+SHOW INDEX FROM riccaboni.t01_allclasses_appid_patstat_us;                                     
+ALTER TABLE riccaboni.t01_allclasses_appid_patstat_us ADD PRIMARY KEY(APPLN_ID);

@@ -23,14 +23,69 @@ LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/data/riccab
 FIELDS TERMINATED BY '|';
 SHOW WARNINGS;
 -- 08 NO PRIMARY KEY, ATTENTION: NO HEADERS! 
-LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/data/riccaboni/LinkedInventorNameLocData.txt' INTO TABLE t08
-FIELDS TERMINATED BY '|';
+LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/data/riccaboni/LinkedInventorNameLocData.txt' INTO TABLE riccaboni.t08
+FIELDS TERMINATED BY '|' ESCAPED BY '';
 SHOW WARNINGS;
+
+/*
+SELECT COUNT(DISTINCT b.loc), CHAR_LENGTH(b.loc) AS Nchar
+                              FROM riccaboni.t08 b
+                              GROUP BY CHAR_LENGTH(b.loc);
+
++-----------------------+-------+
+| COUNT(DISTINCT b.loc) | Nchar |
++-----------------------+-------+
+|                     1 |     0 |
+|                     1 |     7 |
+|                    14 |     8 |
+|                    48 |     9 |
+|                    52 |    10 |
+|                    75 |    11 |
+|                   319 |    12 |
+|                  1183 |    13 |
+|                  6762 |    14 |
+|                 43499 |    15 |
+|                238269 |    16 |
+|                565285 |    17 |
+|                413997 |    18 |
+|                341966 |    19 |
+|                463445 |    20 |
+|                150527 |    21 |
+|                     7 |    22 |
++-----------------------+-------+
+17 rows in set (41,69 sec)
+
+SELECT COUNT(*) FROM riccaboni.t08 b;
++----------+
+| COUNT(*) |
++----------+
+| 25307460 |
++----------+
+
+SELECT *
+      FROM riccaboni.t08 b
+      WHERE CHAR_LENGTH(b.loc) IN ('7','8','9','10');
+
+*/
+
 -- 09 OK
-LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/data/riccaboni/mobilityLinks.txt' INTO TABLE t09
+LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/data/riccaboni/mobilityLinks.txt' INTO TABLE riccaboni.t09
 FIELDS TERMINATED BY '|'
 IGNORE 1 LINES ;
 SHOW WARNINGS;
+
+/*
+SELECT COUNT(*) FROM riccaboni.t09 b;
++----------+
+| COUNT(*) |
++----------+
+|  1015484 |
++----------+
+1 row in set (0,00 sec)
+
+
+*/
+
 -- 10 NO PRIMARY KEY
 LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/data/riccaboni/Patent_classes.txt' INTO TABLE t10
 FIELDS TERMINATED BY '|'
