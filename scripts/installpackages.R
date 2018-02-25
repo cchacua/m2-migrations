@@ -30,7 +30,10 @@ install.packages("scales")
 install.packages("stringr")
 install.packages("data.table")
 install.packages("sp")
+install.packages("maps")
+
 
 install.packages("udunits2")
 install.packages("sf")
 install.packages("mapview")
+

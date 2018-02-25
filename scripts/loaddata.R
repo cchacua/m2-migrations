@@ -25,11 +25,11 @@ files.patstat2
 # [14] "../data/patstat2016b/raw2/tls906_part05.txt"
 # [15] "../data/patstat2016b/raw2/tls906_part06.txt"
 
-tls906<-read.csv(files.patstat2[10], header = TRUE, nrows = 3)
-
-tls206<-read.csv(files.patstat2[1], header = TRUE, nrows = 3)
-tls206<-read.csv(files.patstat2[1], header = TRUE, nrows = 10, skip=6597570)
-nchar(as.vector(tls206$JP))
+# tls906<-read.csv(files.patstat2[10], header = TRUE, nrows = 3)
+# 
+# tls206<-read.csv(files.patstat2[1], header = TRUE, nrows = 3)
+# tls206<-read.csv(files.patstat2[1], header = TRUE, nrows = 10, skip=6597570)
+# nchar(as.vector(tls206$JP))
 
 
 ################################################################################################
@@ -180,9 +180,9 @@ files.li
 # [3] "../data/li_uspto/raw"         
 # [4] "../data/li_uspto/usreldoc.csv" 
 
-li01<-read.csv(files.li[1], header = TRUE, nrows =10)
-li02<-read.csv(files.li[2], header = TRUE, nrows =10)
-li03<-read.csv(files.li[4], header = TRUE, nrows =10)
+# li01<-read.csv(files.li[1], header = TRUE, nrows =10)
+# li02<-read.csv(files.li[2], header = TRUE, nrows =10)
+# li03<-read.csv(files.li[4], header = TRUE, nrows =10)
 
 ################################################################################################
 # Others, SQL

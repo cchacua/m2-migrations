@@ -15,8 +15,9 @@ SELECT a.ID, a.pat, a.name, a.loc, a.qual, a.loctype
       INNER JOIN riccaboni.t08 a
       ON b.pat=a.pat;
 /*
-Query OK, 7.652.380 rows affected (5 min 49,21 sec)
+Query OK, 7.652.380 rows affected (3 min 9,94 sec)
 Records: 7652380  Duplicates: 0  Warnings: 0
+
 */
 
 ---------------------------------------------------------------------------------------------------
@@ -31,7 +32,8 @@ SELECT COUNT(DISTINCT a.loc) FROM riccaboni.t08_names_allclasses_t01 a;
 +-----------------------+
 |                786305 |
 +-----------------------+
-1 row in set (13,42 sec)
+1 row in set (12,97 sec)
+
 */
 
 SELECT DISTINCT a.loc 
@@ -40,3 +42,24 @@ SELECT DISTINCT a.loc
             FIELDS TERMINATED BY ','
             ENCLOSED BY '"'
             LINES TERMINATED BY '\n';
+
+
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+-- TO MAKE TEST
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+
+SELECT a.ID, a.pat, a.name, a.loc, a.qual, a.loctype
+      FROM riccaboni.t01_allclasses_appid_patstat_us_allteam b 
+      INNER JOIN riccaboni.t08_names_allclasses_t01 a
+      ON b.pat=a.pat
+      LIMIT 0,1000
+INTO OUTFILE '/var/lib/mysql-files/t08_allusa_test.csv'
+            FIELDS TERMINATED BY ','
+            ENCLOSED BY '"'
+            LINES TERMINATED BY '\n';
+
+
+
+

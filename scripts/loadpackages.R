@@ -11,5 +11,6 @@ library(scales)
 library(stringr)
 library(data.table)
 library(sp)
-library(sf)
+#library(sf)
 library(mapview)
+
