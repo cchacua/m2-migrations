@@ -99,8 +99,8 @@ SELECT COUNT(DISTINCT a.pat) FROM riccaboni.t01 a WHERE CONCAT(',', a.classes, '
 -- 3 - Comparison
 ---------------------------------------------------------------------------------------------------
 /* 
-0 = 2443177 
-1+2 = 2449583
+0 = 2.443177 
+1+2 = 2.449583
 
 So, there are a total of 2443177 different patents, from which 6406 can be classiffied in both categories
 */

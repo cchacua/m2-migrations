@@ -22,8 +22,11 @@ SELECT COUNT(DISTINCT b.DOCDB_FAMILY_ID)
 1 row in set (12,17 sec)
 
 
-So, there is patent inflation (overcounting of patents) 1206237 PATENTS vs  779.698 FAMILIES
+So, there is patent inflation (overcounting of patents) 1.206237 PATENTS vs  779.698 FAMILIES
+
+
 */
+
 
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------

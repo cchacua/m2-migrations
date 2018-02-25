@@ -170,6 +170,21 @@ files.gadm
 # [7] "../data/gadm/raw" 
 
 ################################################################################################
+# Li et al
+################################################################################################
+files.li<-list.files(path="../data/li_uspto", full.names=TRUE)
+files.li
+
+# [1] "../data/li_uspto/invpat.csv"  
+# [2] "../data/li_uspto/patent.csv"  
+# [3] "../data/li_uspto/raw"         
+# [4] "../data/li_uspto/usreldoc.csv" 
+
+li01<-read.csv(files.li[1], header = TRUE, nrows =10)
+li02<-read.csv(files.li[2], header = TRUE, nrows =10)
+li03<-read.csv(files.li[4], header = TRUE, nrows =10)
+
+################################################################################################
 # Others, SQL
 ################################################################################################
 files.sql<-list.files(path="../data/sql", full.names=TRUE)
