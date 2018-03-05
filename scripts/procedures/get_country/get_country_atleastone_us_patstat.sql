@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
--- GET ONLY PATENTS IN WHICH AT LEAST ONE AUTHOR COMES FROM THE USA
+-- GET ONLY PATENTS IN WHICH AT LEAST ONE AUTHOR COMES FROM THE USA, USING PATSTAT
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 
@@ -52,6 +52,31 @@ SELECT COUNT(DISTINCT a.APPLN_ID)
 
 2379102 JOIN vs 2379110 RICPATSTAT, so there are 8 missing patents
 */                 
+
+
+
+SELECT DISTINCT a.APPLN_ID, a.pat
+      FROM riccaboni.t01_allclasses_appid_patstat a 
+      LEFT JOIN patstat2016b.TLS207_PERS_APPLN b
+      ON a.APPLN_ID=b.APPLN_ID
+      WHERE b.APPLN_ID IS NULL;
+/*
++----------+--------------+
+| APPLN_ID | pat          |
++----------+--------------+
+| 47180883 | WO1992014404 |
+| 51228974 | US04981859   |
+| 57899532 | WO2009088183 |
+| 57899536 | WO2009088216 |
+| 58044509 | WO2009096677 |
+| 58044516 | WO2009096710 |
+| 58044519 | WO2009096734 |
+| 58044520 | WO2009096735 |
++----------+--------------+
+8 rows in set (21,66 sec)
+
+*/
+
 
 SELECT COUNT(DISTINCT a.PERSON_ID)
       FROM patstat2016b.TLS206_PERSON a

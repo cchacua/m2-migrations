@@ -66,6 +66,26 @@ SELECT *
       FROM riccaboni.t08 b
       WHERE CHAR_LENGTH(b.loc) IN ('7','8','9','10');
 
+SELECT COUNT(DISTINCT a.pat)
+      FROM riccaboni.t08 a;
+
++-----------------------+
+| COUNT(DISTINCT a.pat) |
++-----------------------+
+|               9234879 |
++-----------------------+
+1 row in set (1 min 12,30 sec)
+
+
+SELECT COUNT(DISTINCT a.pat)
+      FROM riccaboni.t01 a;
++-----------------------+
+| COUNT(DISTINCT a.pat) |
++-----------------------+
+|               9290268 |
++-----------------------+
+1 row in set (9,44 sec)
+
 */
 
 -- 09 OK

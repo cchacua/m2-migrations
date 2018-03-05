@@ -3,23 +3,30 @@
 -- TABLE WITH AUTHORS' NAMES FOR THE SELECTED CLASSES
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
-SHOW INDEX FROM riccaboni.t08;                                     
+SHOW INDEX FROM riccaboni.t08;
+ALTER TABLE riccaboni.t08 ADD INDEX(pat);
+ALTER TABLE riccaboni.t08 ADD INDEX(ID);
+                                     
 SHOW INDEX FROM riccaboni.t01_allclasses; 
+
 ---------------------------------------------------------------------------------------------------
 -- Merge and new table
 ---------------------------------------------------------------------------------------------------
 DROP TABLE IF EXISTS riccaboni.t08_names_allclasses_t01;
 CREATE TABLE riccaboni.t08_names_allclasses_t01 AS
-SELECT a.ID, a.pat, a.name, a.loc, a.qual, a.loctype
-      FROM riccaboni.t01_allclasses b 
-      INNER JOIN riccaboni.t08 a
-      ON b.pat=a.pat;
-/*
-Query OK, 7.652.380 rows affected (3 min 9,94 sec)
-Records: 7652380  Duplicates: 0  Warnings: 0
+SELECT b.ID, b.pat, b.name, b.loc, b.qual, b.loctype
+      FROM riccaboni.t01_allclasses a 
+      INNER JOIN riccaboni.t08 b
+      ON a.pat=b.pat;
 
+/*
+Query OK, 7.652.380 rows affected (2 min 51,85 sec)
+Records: 7652380  Duplicates: 0  Warnings: 0
 */
 
+SHOW INDEX FROM riccaboni.t08_names_allclasses_t01;                                     
+ALTER TABLE riccaboni.t08_names_allclasses_t01 ADD INDEX(ID);
+ALTER TABLE riccaboni.t08_names_allclasses_t01 ADD INDEX(pat);
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 -- SELECT ONLY COORDINATES
@@ -54,7 +61,7 @@ SELECT a.ID, a.pat, a.name, a.loc, a.qual, a.loctype
       FROM riccaboni.t01_allclasses_appid_patstat_us_allteam b 
       INNER JOIN riccaboni.t08_names_allclasses_t01 a
       ON b.pat=a.pat
-      LIMIT 0,1000
+      LIMIT 0,10000
 INTO OUTFILE '/var/lib/mysql-files/t08_allusa_test.csv'
             FIELDS TERMINATED BY ','
             ENCLOSED BY '"'
@@ -62,4 +69,44 @@ INTO OUTFILE '/var/lib/mysql-files/t08_allusa_test.csv'
 
 
 
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+-- COUNT NUMBER OF DIFFERENT INVENTORS AND IDS
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 
+
+SELECT COUNT(DISTINCT a.ID) FROM riccaboni.t08_names_allclasses_t01 a;
+/*
++----------------------+
+| COUNT(DISTINCT a.ID) |
++----------------------+
+|              1710247 |
++----------------------+
+1 row in set (18,26 sec)
+
+So, all the inventors who have at least one patent with a US inventor are 1.710.247 
+*/
+
+
+SELECT COUNT(DISTINCT a.name) FROM riccaboni.t08_names_allclasses_t01 a;
+/*
++------------------------+
+| COUNT(DISTINCT a.name) |
++------------------------+
+|                2005599 |
++------------------------+
+1 row in set (57,21 sec)
+*/
+
+
+SELECT COUNT(DISTINCT a.pat) FROM riccaboni.t08_names_allclasses_t01 a;
+/*
++-----------------------+
+| COUNT(DISTINCT a.pat) |
++-----------------------+
+|               2434318 |
++-----------------------+
+1 row in set (25,47 sec)
+
+*/

@@ -16,14 +16,19 @@ SELECT a.*
       FROM riccaboni.t01_allclasses_appid_patstat_us_allteam b 
       INNER JOIN riccaboni.t08 a
       ON b.pat=a.pat;
+
+
+
 /*
 
-Query OK, 2465653 rows affected (1 min 39,43 sec)
-Records: 2465653  Duplicates: 0  Warnings: 0
+Query OK, 2.673.214 rows affected (1 min 34,29 sec)
+Records: 2.673.214  Duplicates: 0  Warnings: 0
 
 */
 
-
+SHOW INDEX FROM riccaboni.t08_names_allclasses_us_allteam;                                     
+ALTER TABLE riccaboni.t08_names_allclasses_us_allteam ADD INDEX(pat);
+ALTER TABLE riccaboni.t08_names_allclasses_us_allteam ADD INDEX(ID);
 ---------------------------------------------------------------------------------------------------
 -- Countings
 ---------------------------------------------------------------------------------------------------
@@ -35,9 +40,10 @@ SELECT COUNT(DISTINCT UPPER(a.name))
 +-------------------------------+
 | COUNT(DISTINCT UPPER(a.name)) |
 +-------------------------------+
-|                        786258 |
+|                        820570 |
 +-------------------------------+
-1 row in set (14,43 sec)
+1 row in set (16,24 sec)
+
 
 */
 
@@ -48,9 +54,10 @@ SELECT COUNT(DISTINCT a.ID)
 +----------------------+
 | COUNT(DISTINCT a.ID) |
 +----------------------+
-|               602644 |
+|               626797 |
 +----------------------+
-1 row in set (6,06 sec)
+1 row in set (5,02 sec)
+
 
 
 */
@@ -62,9 +69,11 @@ SELECT COUNT(DISTINCT a.ID, UPPER(a.name))
 +-------------------------------------+
 | COUNT(DISTINCT a.ID, UPPER(a.name)) |
 +-------------------------------------+
-|                              877722 |
+|                              918678 |
 +-------------------------------------+
-1 row in set (16,25 sec)
+1 row in set (16,75 sec)
+
+
 */
 
 

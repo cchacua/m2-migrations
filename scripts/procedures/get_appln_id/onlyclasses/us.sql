@@ -99,11 +99,24 @@ Records: 980142  Duplicates: 0  Warnings: 0
 980142 US_CIT_COUNTS vs 1044200 Riccaboni
 */
 
+---------------------------------------------------------------------------------------------------
+-- Table for US non-matched patents: riccaboni.t01_allclasses_us_nonappid
+---------------------------------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS riccaboni.t01_allclasses_us_nonappid; 
+CREATE TABLE riccaboni.t01_allclasses_us_nonappid AS
 SELECT DISTINCT a.pat
     FROM riccaboni.t01_allclasses a
-    LEFT JOIN (SELECT DISTINCT CONCAT(LEFT(b.US_Pub_nbr,2), LPAD(RIGHT(b.US_Pub_nbr, CHAR_LENGTH(b.US_Pub_nbr)-2), 8, '0')) AS pat, b.US_Appln_id AS APPLN_ID FROM oecd_citations.US_CIT_COUNTS b) c 
+    LEFT JOIN (SELECT DISTINCT CONCAT(LEFT(b.US_Pub_nbr,2), LPAD(RIGHT(b.US_Pub_nbr, CHAR_LENGTH(b.US_Pub_nbr)-2), 8, '0')) AS pat FROM oecd_citations.US_CIT_COUNTS b) c 
     ON  a.pat=c.pat
     WHERE LEFT(a.pat,2)='US' AND c.pat IS NULL;  
+/*
+Query OK, 64058 rows affected (1 min 11,50 sec)
+Records: 64058  Duplicates: 0  Warnings: 0
+*/
+
+SELECT * FROM riccaboni.t01_allclasses_us_nonappid LIMIT 0,10;
+
 
 SELECT COUNT(DISTINCT a.pat), a.yr, LEFT(a.pat,4)
     FROM riccaboni.t01_allclasses a
@@ -284,6 +297,19 @@ SELECT COUNT(DISTINCT a.pat), a.yr, LEFT(a.pat,4)
 
 */
 
+---------------------------------------------------------------------------------------------------
+-- Table nonappid applicant type and appnumber
+---------------------------------------------------------------------------------------------------
+
+
+SELECT a.*, b.* 
+  FROM riccaboni.t01_allclasses_us_nonappid a
+  INNER JOIN li.patent b
+  ON a.pat=CONCAT('US', b.Patent)
+  WHERE b.AppNum!=''
+  LIMIT 0,10;
+
+SELECT * FROM patstat2016b.TLS201_APPLN a WHERE a.APPLN_NR='4612337' AND a.APPLN_AUTH='US';
 
 ---------------------------------------------------------------------------------------------------
 -- Using PATSTAT and creating a new table riccaboni.t01_allclasses_us_appid

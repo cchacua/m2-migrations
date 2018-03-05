@@ -2,28 +2,26 @@ require(sp)
 require(rgdal)
 require(maps)
 
-# 1 - Read points with coordinates and turn it into a SpatialPointsDataFrame
-tric_loc<-read.csv(files.sql[1], header = FALSE)
-colnames(tric_loc)<-"loc"
-tric_loc$loc<-as.character(tric_loc$loc)
-tric_loc<-do.call("rbind", strsplit(tric_loc$loc, ","))
-tric_loc<-data.frame(apply(tric_loc, 2, as.numeric))
-colnames(tric_loc)<-c("lat","long")
+files.locations<-list.files(path="../data/sql/21 Distinct locations/parts", full.names=TRUE) 
+files.locations
 
-#tric_loc<-tric_loc[1:10000,]
-coordinates(tric_loc) <- c("long", "lat")
+mapusa.gadm<-readRDS(files.gadm[1])
 
-# 2 - Read USA polygons
-mapusa<-readRDS(files.gadm[1])
+lapply(files.locations,pointinus)
 
-# 3 - Set coordinate systems as equal
-proj4string(tric_loc) <- proj4string(mapusa)
+files.locations_proc<-list.files(path="../data/sql/21 Distinct locations/outputs/", full.names=TRUE) 
+files.locations_proc
 
-# 4 - Test
-inside.usa <- !is.na(over(tric_loc, as(mapusa, "SpatialPolygons")))
-inside.usa.df<-as.data.frame(inside.usa)
-inside.usa.df[inside.usa.df$inside.usa==TRUE,]
-mean(inside.usa)
+
+points.raw<-read.csv(files.sql[1], header = FALSE, stringsAsFactors=FALSE)
+points.output<-merge.csv("../data/sql/21 Distinct locations/outputs/")
+
+points.raw[points.raw$V1=="",]
+points.output[points.output$loc=="",]
+
+
+points.output.usa<-points.output[points.output$isin==TRUE,]
+write.csv(points.output.usa, "../data/sql/21 Distinct locations/points.output.usa.csv")
 
 
 ########################################################################################

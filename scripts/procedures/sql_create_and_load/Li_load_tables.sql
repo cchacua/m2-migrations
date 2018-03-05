@@ -24,6 +24,11 @@ SELECT COUNT(DISTINCT b.Assignee), CHAR_LENGTH(b.Assignee) AS Nchar
                               FROM li.invpat b
                               GROUP BY CHAR_LENGTH(b.Assignee);
 
+SELECT COUNT(DISTINCT b.Patent), CHAR_LENGTH(b.Patent) AS Nchar
+                              FROM li.invpat b
+                              GROUP BY CHAR_LENGTH(b.Patent);
+
+SELECT * FROM li.invpat LIMIT 0,10;
 
 */
 
@@ -44,6 +49,8 @@ Records: 4243972  Deleted: 0  Skipped: 0  Warnings: 0
 SELECT COUNT(DISTINCT b.AppNum), CHAR_LENGTH(b.AppNum) AS Nchar
                               FROM li.patent b
                               GROUP BY CHAR_LENGTH(b.AppNum);
+
+SELECT * FROM li.patent a WHERE a.AppType!='' LIMIT 0,10;
 */
 
 ---------------------------------------------------------------------------------------------------
@@ -62,6 +69,8 @@ Records: 1428471  Deleted: 0  Skipped: 0  Warnings: 0
 SELECT COUNT(DISTINCT b.Kind), CHAR_LENGTH(b.Kind) AS Nchar
                               FROM li.usreldoc b
                               GROUP BY CHAR_LENGTH(b.Kind);
+
+SELECT * FROM li.usreldoc LIMIT 0,10;
 */
 
 
