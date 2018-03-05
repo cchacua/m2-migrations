@@ -6,15 +6,29 @@
 -- 3: T01 converted as table similar to T08
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
+--SHOW INDEX FROM patstat2016b.TLS207_PERS_APPLN;                                     
+--ALTER TABLE patstat2016b.TLS207_PERS_APPLN ADD PRIMARY KEY(PERSON_ID, APPLN_ID, APPLT_SEQ_NR, INVT_SEQ_NR);
 
+SHOW INDEX FROM  patstat2016b.TLS206_PERSON;                                     
+ALTER TABLE patstat2016b.TLS206_PERSON ADD INDEX(PERSON_ID);
 
 ---------------------------------------------------------------------------------------------------
--- ONLY PATSTAT: patstat2016b.TLS207_PERS_APPLN_allclasses_onlynames ATTENTION: THIS TABLE CONTAINS DATA ON APPLICANTS AND INVENTORS
+-- ONLY PATSTAT: patstat2016b.TLS207_PERS_APPLN_allclasses_names_pat ATTENTION: THIS TABLE CONTAINS DATA ON APPLICANTS AND INVENTORS
 ---------------------------------------------------------------------------------------------------
 
 SHOW INDEX FROM riccaboni.t01_allclasses_appid_patstat;                                     
+ALTER TABLE riccaboni.t01_allclasses_appid_patstat ADD INDEX (APPLN_ID);
 
 SHOW INDEX FROM patstat2016b.TLS207_PERS_APPLN;                                     
+ALTER TABLE patstat2016b.TLS207_PERS_APPLN ADD INDEX(PERSON_ID);
+/*Query OK, 203539051 rows affected (12 min 31,19 sec)
+Records: 203539051  Duplicates: 0  Warnings: 0
+*/
+ALTER TABLE patstat2016b.TLS207_PERS_APPLN ADD INDEX(APPLN_ID);
+/*Query OK, 203539051 rows affected (25 min 8,57 sec)
+Records: 203539051  Duplicates: 0  Warnings: 0
+*/
+
 
 SHOW INDEX FROM patstat2016b.TLS906_PERSON;                                     
 ALTER TABLE patstat2016b.TLS906_PERSON ADD INDEX(PERSON_ID);
