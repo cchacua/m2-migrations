@@ -5,7 +5,23 @@
 # Set UTF 8 to future queries
 rs <- dbSendQuery(patstat, 'SET CHARACTER SET "UTF8"')
 # Get data
-names.one.df<-dbGetQuery(patstat, "SELECT DISTINCT MAX(a.name) AS name, a.finalID FROM riccaboni.t08_names_allclasses_t01_t09_onlynames a GROUP BY a.finalID HAVING COUNT(a.finalID)=1 ORDER BY a.finalID")
+
+# Select patents with only one author (easiest to merge)
+names_oneinv.df<-dbGetQuery(patstat, 
+                                 "SELECT a.pat, c.PERSON_ID, c.INVT_SEQ_NR, a.ID, a.name, c.PERSON_NAME, c.HAN_NAME, c.PSN_NAME, c.DOC_STD_NAME ,c.PERSON_CTRY_CODE
+                            FROM christian.inv_pat_allclasses_equalcounting_t08 a 
+                            INNER JOIN christian.counting_invenbypatents_allclasses b
+                            ON a.pat=b.pat
+                            INNER JOIN christian.inv_pat_allclasses_equalcounting_patstat c
+                            ON a.pat=c.pat
+                            WHERE b.n01='1'
+                            ORDER BY a.pat")
+
+# names.one.df<-dbGetQuery(patstat, "SELECT DISTINCT MAX(a.name) AS name, a.finalID FROM riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone_mobility a GROUP BY a.finalID HAVING COUNT(a.finalID)=1 ORDER BY a.finalID")
+#names.one.df<-dbGetQuery(patstat, "SELECT DISTINCT MAX(a.name) AS name, a.finalID FROM riccaboni.t08_names_allclasses_t01_t09_onlynames a GROUP BY a.finalID HAVING COUNT(a.finalID)=1 ORDER BY a.finalID")
+names.one.df<-names_oneinv.df
+
+
 nrow(names.one.df)
 #names.one.df<-dbGetQuery(patstat, "SELECT DISTINCT MIN(a.name) AS name, a.finalID FROM riccaboni.t08_names_allclasses_t01_t09_onlynames a GROUP BY a.finalID HAVING COUNT(a.finalID)=1 ORDER BY a.finalID")
 
@@ -22,6 +38,19 @@ nrow(names.one.df)
 # 1. Get the number of comas
 names.one.df$ncommas<-str_count(names.one.df$name, ",")
 table(names.one.df$ncommas)
+
+names.one.df$npncommas<-str_count(nnames.one.df$PERSON_NAME, ",")
+table(names.one.df$npncommas)
+
+# 1.1 Get the number of comas with blanks (both)
+names.one.df$ncommasblanksboth<-str_count(names.one.df$name, " , ")
+table(names.one.df$ncommasblanksboth)
+
+names.one.df$ncommasblanksleft<-str_count(names.one.df$name, " ,")
+table(names.one.df$ncommasblanksleft)
+
+names.one.df$ncommasblanksright<-str_count(names.one.df$name, ", ")
+table(names.one.df$ncommasblanksright)
 
 # 2. Get precision: First 2 character 
 # High quality IDs:
@@ -42,6 +71,8 @@ table(names.one.df$ncommas)
 # US: Unlocated split inventor
 
 names.one.df$qualid<-substr(names.one.df$finalID, 0, 2)
+table(names.one.df$qualid)
+
 
 # 3. Binary if at least one number in the string
 names.one.df$number<-grepl("[[:digit:]]", names.one.df$name)
@@ -50,11 +81,19 @@ View(names.one.df[names.one.df$number==TRUE,])
 # This allows to see that the name disambiguation is not that good. For most of the cases when there is a number, it is possible to see that it is part of the address and we are referring to the same inventor
 # To substitute number by nothig gsub('[[:digit:]]+', '', names.one.df$number)
 
+# 4. Char lenght
+names.one.df$nchar<-nchar(names.one.df$name)
+table(names.one.df$nchar)
+View(names.one.df[names.one.df$nchar>=54,])
 
+names.one.df$nchar<-nchar(names.one.df$PERSON_NAME)
+table(names.one.df$nchar)
 
-
-
-
+# 5 Get the number of blanks
+names.one.df$nblanks<-str_count(names.one.df$name, " ")
+table(names.one.df$nblanks)
+View(names.one.df[names.one.df$nblanks==0,])
+# To add spaces between commas if commas =1
 
 
 

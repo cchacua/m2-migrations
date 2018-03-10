@@ -63,6 +63,7 @@ Query OK, 2365662 rows affected (41,79 sec)
 ---------------------------------------------------------------------------------------------------
 -- TABLE ID, NAME AND MOBIITY INVENTOR LINK FOR ALL INVENTORS IN THE CLASSES: riccaboni.t08_names_allclasses_t01_t09
 -- THIS IS BETTER THAN THE PREVIOUS TABLE
+-- ATTENTION-- IT IS NECESSARY TO ALSO ADD THE RESULTS FROM T01_AS_T08
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 
@@ -110,6 +111,6 @@ SELECT COUNT(DISTINCT a.name) FROM riccaboni.t08_names_allclasses_t01_t09_onlyna
 
 SELECT COUNT(DISTINCT a.name, a.ID) FROM riccaboni.t08_names_allclasses_t01_t09_onlynames a;
 
-
-
-
+SHOW INDEX FROM riccaboni.t08_names_allclasses_t01_t09_onlynames;                                     
+ALTER TABLE riccaboni.t08_names_allclasses_t01_t09_onlynames ADD INDEX(ID);
+ALTER TABLE riccaboni.t08_names_allclasses_t01_t09_onlynames ADD INDEX(finalID);

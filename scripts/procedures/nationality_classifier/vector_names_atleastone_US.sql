@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
--- TABLE WITH AUTHORS' NAMES FOR THE SELECTED CLASSES
+-- TABLE WITH AUTHORS' NAMES FOR THE SELECTED CLASSES USING T08
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 SHOW INDEX FROM riccaboni.t08;                                     
@@ -11,10 +11,10 @@ ALTER TABLE riccaboni.t08 ADD INDEX(pat);
 ---------------------------------------------------------------------------------------------------
 DROP TABLE IF EXISTS riccaboni.t08_names_allclasses_us_atleastone;
 CREATE TABLE riccaboni.t08_names_allclasses_us_atleastone AS
-SELECT a.*
-      FROM riccaboni.t01_allclasses_appid_patstat_us_atleastone b 
-      INNER JOIN riccaboni.t08 a
-      ON b.pat=a.pat;
+SELECT b.*
+      FROM riccaboni.t01_allclasses_appid_patstat_us_atleastone a
+      INNER JOIN riccaboni.t08 b
+      ON a.pat=b.pat;
 /*
 Query OK, 3122408 rows affected (1 min 9,74 sec)
 Records: 3122408  Duplicates: 0  Warnings: 0
@@ -90,10 +90,197 @@ SELECT DISTINCT a.ID, a.name
             LINES TERMINATED BY '\n';
 */            
 
+
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+-- TABLE WITH AUTHORS' NAMES FOR THE SELECTED CLASSES USING T01_AS_T08
+-- riccaboni.t01_allclasses_as_t08_us_atleastone
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+
+
+DROP TABLE IF EXISTS riccaboni.t01_allclasses_as_t08_us_atleastone;
+CREATE TABLE riccaboni.t01_allclasses_as_t08_us_atleastone AS
+SELECT b.*
+      FROM riccaboni.t01_allclasses_appid_patstat_us_atleastone a 
+      INNER JOIN riccaboni.t01_allclasses_as_t08 b
+      ON a.pat=b.pat;
+/*
+Query OK, 3043373 rows affected (1 min 21,14 sec)
+Records: 3043373  Duplicates: 0  Warnings: 0
+*/
+
+
+SELECT COUNT(DISTINCT b.localInventor), CHAR_LENGTH(b.localInventor) AS Nchar
+                              FROM riccaboni.t01_allclasses_as_t08_us_atleastone b
+                              GROUP BY CHAR_LENGTH(b.localInventor);
+/*
++---------------------------------+-------+
+| COUNT(DISTINCT b.localInventor) | Nchar |
++---------------------------------+-------+
+|                               1 |     0 |
+|                               5 |     3 |
+|                              69 |     4 |
+|                             544 |     5 |
+|                            4738 |     6 |
+|                           36446 |     7 |
+|                          225028 |     8 |
+|                          477147 |     9 |
++---------------------------------+-------+
+8 rows in set (1 min 43,16 sec)
+
+*/
+ALTER TABLE riccaboni.t01_allclasses_as_t08_us_atleastone MODIFY localInventor VARCHAR(10);
+
+SHOW INDEX FROM riccaboni.t01_allclasses_as_t08_us_atleastone;                                     
+ALTER TABLE riccaboni.t01_allclasses_as_t08_us_atleastone ADD INDEX(localInventor);
+ALTER TABLE riccaboni.t01_allclasses_as_t08_us_atleastone ADD INDEX(pat);
+
+
+SELECT *      
+      FROM riccaboni.t01_allclasses_as_t08_us_atleastone a LIMIT 0,10;
+
+SELECT COUNT(DISTINCT a.pat)       
+      FROM riccaboni.t01_allclasses_as_t08_us_atleastone a;
+/*
++-----------------------+
+| COUNT(DISTINCT a.pat) |
++-----------------------+
+|               1067135 |
++-----------------------+
+1 row in set (1,90 sec)
+*/
+
+SELECT COUNT(DISTINCT a.localInventor)       
+      FROM riccaboni.t01_allclasses_as_t08_us_atleastone a;
+/*
++---------------------------------+
+| COUNT(DISTINCT a.localInventor) |
++---------------------------------+
+|                          743978 |
++---------------------------------+
+1 row in set (5,59 sec)
+*/
+
+/*
+TO SUM UP:
+
+743534 DIFFERENT LOCAL IDS T08 VS 743978 DIFFERENT LOCAL IDS IN T01_AS_T08
+SO, THERE ARE 444 NEW LOCAL IDS
+*/
+
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+-- TABLE WITH IDs FOR THE SELECTED CLASSES, AT LEAST ONE INVENTOR RESIDING IN THE US, COMBINING BOTH T08 AND T01_AS_T08
+-- FINAL TABLE: riccaboni.t08_names_allclasses_us_mob_atleastone
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+
+*/
+
+DROP TABLE IF EXISTS riccaboni.t08_extended_allclasses_us_atleastone_onlyid;
+CREATE TABLE riccaboni.t08_extended_allclasses_us_atleastone_onlyid AS
+SELECT DISTINCT a.localInventor, b.ID
+      FROM riccaboni.t01_allclasses_as_t08_us_atleastone a 
+      INNER JOIN riccaboni.t08_names_allclasses_us_atleastone b
+      ON a.localInventor=b.ID;
+/*Query OK, 743534 rows affected (5 min 40,05 sec)
+Records: 743534  Duplicates: 0  Warnings: 0
+So, all the authors in t08 are in t01_as_t08, at least in this case (for these classes and the US)
+*/
+
+DROP TABLE IF EXISTS riccaboni.t08_extended_allclasses_us_atleastone_onlyid;
+CREATE TABLE riccaboni.t08_extended_allclasses_us_atleastone_onlyid AS
+SELECT DISTINCT a.localInventor AS ID
+      FROM riccaboni.t01_allclasses_as_t08_us_atleastone a 
+UNION 
+SELECT DISTINCT b.ID
+      FROM riccaboni.t08_names_allclasses_us_atleastone b;
+/*
+Query OK, 743978 rows affected (25,03 sec)
+Records: 743978  Duplicates: 0  Warnings: 0
+*/
+SHOW INDEX FROM riccaboni.t08_extended_allclasses_us_atleastone_onlyid; 
+ALTER TABLE riccaboni.t08_extended_allclasses_us_atleastone_onlyid ADD INDEX(ID);
+
+SHOW INDEX FROM riccaboni.t08; 
+
+SHOW INDEX FROM riccaboni.t09; 
+
+DROP TABLE IF EXISTS riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone;
+CREATE TABLE riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone AS
+SELECT DISTINCT a.ID, a.name
+      FROM riccaboni.t08 a
+      INNER JOIN riccaboni.t01_allclasses_as_t08_us_atleastone b
+      ON a.ID=b.localInventor;
+/*
+Query OK, 1353539 rows affected (17 min 8,76 sec)
+Records: 1353539  Duplicates: 0  Warnings: 0
+*/
+
+
+SELECT COUNT(DISTINCT a.ID)       
+      FROM riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone a;
+
+/*
++----------------------+
+| COUNT(DISTINCT a.ID) |
++----------------------+
+|               743646 |
++----------------------+
+1 row in set (2,85 sec)
+*/
+
+
+DROP TABLE IF EXISTS riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone_mobility;
+CREATE TABLE riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone_mobility AS
+SELECT DISTINCT a.ID, c.mobileID, IFNULL(c.mobileID, a.ID) AS finalID, a.name
+      FROM riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone a
+      LEFT JOIN riccaboni.t09 c
+      ON a.ID=c.localID;
+/*
+Query OK, 1353539 rows affected (36,23 sec)
+Records: 1353539  Duplicates: 0  Warnings: 0
+*/
+
+SELECT COUNT(DISTINCT a.ID)       
+      FROM riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone_mobility a;
+
+/*
++----------------------+
+| COUNT(DISTINCT a.ID) |
++----------------------+
+|               743646 |
++----------------------+
+1 row in set (2,85 sec)
+*/
+
+SELECT COUNT(DISTINCT a.finalID)       
+      FROM riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone_mobility a;
+/*
++---------------------------+
+| COUNT(DISTINCT a.finalID) |
++---------------------------+
+|                    669335 |
++---------------------------+
+1 row in set (2,66 sec)
+*/
+
+SELECT COUNT(DISTINCT a.name)       
+      FROM riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone_mobility a;
+/*
++------------------------+
+| COUNT(DISTINCT a.name) |
++------------------------+
+|                1205003 |
++------------------------+
+1 row in set (10,80 sec)
+*/
+
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 -- TABLE WITH AUTHORS' NAMES FOR THE SELECTED CLASSES, WITH MOBILITY LINKS
--- FINAL TABLE: riccaboni.t08_names_allclasses_us_mob_atleastone
+-- riccaboni.t08_names_allclasses_us_mob_atleastone
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 

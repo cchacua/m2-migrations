@@ -98,6 +98,44 @@ SELECT COUNT(*) FROM patstat2016b.TLS207_PERS_APPLN_allclasses_names_pat a WHERE
 1 row in set (9,53 sec)
 */
 
+SELECT * FROM patstat2016b.TLS207_PERS_APPLN_allclasses_names_pat a WHERE a.INVT_SEQ_NR>'0' LIMIT 0,10;
+
+SELECT COUNT(DISTINCT PERSON_NAME) FROM patstat2016b.TLS207_PERS_APPLN_allclasses_names_pat a WHERE a.INVT_SEQ_NR>'0';
+/*
++-----------------------------+
+| COUNT(DISTINCT PERSON_NAME) |
++-----------------------------+
+|                     1.841.226 |
++-----------------------------+
+1 row in set (1 min 52,88 sec)*/
+SELECT COUNT(DISTINCT DOC_STD_NAME) FROM patstat2016b.TLS207_PERS_APPLN_allclasses_names_pat a WHERE a.INVT_SEQ_NR>'0';
+/*
++------------------------------+
+| COUNT(DISTINCT DOC_STD_NAME) |
++------------------------------+
+|                      1.502.106 |
++------------------------------+
+1 row in set (1 min 48,60 sec)
+DOC_STD_NAME shouldn't be used
+*/
+SELECT COUNT(DISTINCT PSN_NAME) FROM patstat2016b.TLS207_PERS_APPLN_allclasses_names_pat a WHERE a.INVT_SEQ_NR>'0';
+/*
++--------------------------+
+| COUNT(DISTINCT PSN_NAME) |
++--------------------------+
+|                  1.863.861 |
++--------------------------+
+1 row in set (1 min 34,34 sec)
+*/
+SELECT COUNT(DISTINCT HAN_NAME) FROM patstat2016b.TLS207_PERS_APPLN_allclasses_names_pat a WHERE a.INVT_SEQ_NR>'0';
+/*
++--------------------------+
+| COUNT(DISTINCT HAN_NAME) |
++--------------------------+
+|                  1.853.700 |
++--------------------------+
+1 row in set (1 min 51,20 sec)
+*/
 
 ---------------------------------------------------------------------------------------------------
 -- ONLY RICCABONI: riccaboni.t08_allclasses_t09_patstat

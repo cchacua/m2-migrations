@@ -56,6 +56,201 @@ SHOW INDEX FROM riccaboni.t08_allclasses_t09_patstat_pat_inv_counts;
 ALTER TABLE riccaboni.t08_allclasses_t09_patstat_pat_inv_counts ADD INDEX(pat);
 
 ---------------------------------------------------------------------------------------------------
+-- Table with the three countings: T01 AS T08, MERGE OF PATSTAT and T08
+-- christian.counting_invenbypatents_allclasses
+-- ATTENTION: CONDITION TO GET THE PATENTS THAT HAVE THE SAME NUMBER OF INVENTORS:
+-- WHERE a.n01=a.npas AND a.n01=a.n08 AND a.npas=a.n08;
+---------------------------------------------------------------------------------------------------
+
+SELECT COUNT(*) 
+FROM (
+SELECT a.pat
+  FROM riccaboni.t01_allclasses_as_t08_pat_inv_counts a
+UNION
+SELECT b.pat
+  FROM patstat2016b.TLS207_PERS_APPLN_allclasses_names_pat_inv_counts b
+UNION
+SELECT c.pat
+  FROM riccaboni.t08_allclasses_t09_patstat_pat_inv_counts c) d;
+
+/*
++----------+
+| COUNT(*) |
++----------+
+|  2443177 |
++----------+
+
+So, table t01 as t08 contains everything
+mysql> SELECT COUNT(n08)     FROM christian.counting_invenbypatents_allclasses a;
++------------+
+| COUNT(n08) |
++------------+
+|    2370257 |
++------------+
+1 row in set (1,16 sec)
+
+mysql> SELECT COUNT(npas)     FROM christian.counting_invenbypatents_allclasses a;
++-------------+
+| COUNT(npas) |
++-------------+
+|     2378310 |
++-------------+
+1 row in set (1,14 sec)
+*/
+
+
+DROP TABLE IF EXISTS christian.counting_invenbypatents_allclasses;
+CREATE TABLE christian.counting_invenbypatents_allclasses AS
+SELECT a.pat, a.n AS n01, b.n AS npas, c.n AS n08
+  FROM riccaboni.t01_allclasses_as_t08_pat_inv_counts a
+  LEFT JOIN patstat2016b.TLS207_PERS_APPLN_allclasses_names_pat_inv_counts b
+  ON a.pat=b.pat
+  LEFT JOIN riccaboni.t08_allclasses_t09_patstat_pat_inv_counts c
+  ON a.pat=c.pat;
+/*
+Query OK, 2443177 rows affected (1 min 24,15 sec)
+Records: 2443177  Duplicates: 0  Warnings: 0
+*/
+
+SHOW INDEX FROM christian.counting_invenbypatents_allclasses;
+ALTER TABLE christian.counting_invenbypatents_allclasses ADD INDEX(pat);
+
+
+SELECT COUNT(DISTINCT a.pat)
+    FROM christian.counting_invenbypatents_allclasses a;
+
+-- Equal in three
+SELECT COUNT(DISTINCT a.pat)
+    FROM christian.counting_invenbypatents_allclasses a
+    WHERE a.n01=a.npas AND a.n01=a.n08 AND a.npas=a.n08;
+/*
++-----------------------+
+| COUNT(DISTINCT a.pat) |
++-----------------------+
+|               2344312 |
++-----------------------+
+1 row in set (8,06 sec)
+
+2443177-2344312=98865 so in 98.865 the countings are not the same (incluiding 73496 missing patents in patstat or in t08)
+*/
+
+
+-- Equal in two
+SELECT COUNT(DISTINCT a.pat)
+    FROM christian.counting_invenbypatents_allclasses a
+    WHERE a.n01=a.npas;
+/*
++-----------------------+
+| COUNT(DISTINCT a.pat) |
++-----------------------+
+|               2359021 |
++-----------------------+
+1 row in set (7,28 sec)
+2359021-2344312=14709
+*/
+
+SELECT COUNT(DISTINCT a.pat)
+    FROM christian.counting_invenbypatents_allclasses a
+    WHERE a.n01=a.n08;
+/*
++-----------------------+
+| COUNT(DISTINCT a.pat) |
++-----------------------+
+|               2359652 |
++-----------------------+
+1 row in set (7,48 sec)
+2359652-2344312=15340
+
+
+*/
+SELECT COUNT(DISTINCT a.pat)
+    FROM christian.counting_invenbypatents_allclasses a
+    WHERE a.npas=a.n08;
+/*
++-----------------------+
+| COUNT(DISTINCT a.pat) |
++-----------------------+
+|               2344331 |
++-----------------------+
+1 row in set (7,80 sec)
+2344331-2344312=19
+SO, THE PROBLEMS IN THE COINCIDENCE OF THE THREE ARE MAINLY DRIVEN BY THE NOT COINCIDENCE OF a.npas=a.n08
+*/
+
+
+-- Different in the three
+SELECT COUNT(DISTINCT a.pat)
+    FROM christian.counting_invenbypatents_allclasses a
+    WHERE a.n01!=a.npas AND a.n01!=a.n08 AND a.npas!=a.n08;
+/*
++-----------------------+
+| COUNT(DISTINCT a.pat) |
++-----------------------+
+|                    61 |
++-----------------------+
+1 row in set (1,42 sec)
+*/
+
+-- At least one null
+SELECT COUNT(DISTINCT a.pat)
+    FROM christian.counting_invenbypatents_allclasses a
+    WHERE a.n08 IS NULL OR a.npas IS NULL;
+/*
++-----------------------+
+| COUNT(DISTINCT a.pat) |
++-----------------------+
+|                 73496 |
++-----------------------+
+1 row in set (1,56 sec)
+98865-73496=25369
+
+N08NOTNULL-(n01=a.n08)=25369-15340=10029
+15340/25369=0.604675
+*/
+
+-- Both are null
+SELECT COUNT(DISTINCT a.pat)
+    FROM christian.counting_invenbypatents_allclasses a
+    WHERE a.n08 IS NULL AND a.npas IS NULL;
+/*
++-----------------------+
+| COUNT(DISTINCT a.pat) |
++-----------------------+
+|                 64291 |
++-----------------------+
+1 row in set (1,31 sec)
+*/
+
+SELECT COUNT(DISTINCT a.pat)
+    FROM christian.counting_invenbypatents_allclasses a
+    WHERE a.n08 IS NULL;
+/*
++-----------------------+
+| COUNT(DISTINCT a.pat) |
++-----------------------+
+|                 72920 |
++-----------------------+
+1 row in set (1,28 sec)
+*/
+
+SELECT COUNT(DISTINCT a.pat)
+    FROM christian.counting_invenbypatents_allclasses a
+    WHERE a.npas IS NULL;
+/*
++-----------------------+
+| COUNT(DISTINCT a.pat) |
++-----------------------+
+|                 64867 |
++-----------------------+
+1 row in set (1,26 sec)
+*/
+
+/*
+So, there are more null patents in t08 than in pastat's merge
+*/
+
+
+---------------------------------------------------------------------------------------------------
 -- SELECT ONLY THOSE THAT DO NOT EXACTLY MATCH: T08 MERGE VS T01_AS_T08
 ---------------------------------------------------------------------------------------------------
 

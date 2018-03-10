@@ -23,7 +23,7 @@ LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/data/riccab
 FIELDS TERMINATED BY '|';
 SHOW WARNINGS;
 -- 08 NO PRIMARY KEY, ATTENTION: NO HEADERS! 
-LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/data/riccaboni/LinkedInventorNameLocData.txt' INTO TABLE riccaboni.t08
+LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/data/riccaboni/LinkedInventorNameLocData.txt' INTO TABLE t08
 FIELDS TERMINATED BY '|' ESCAPED BY '';
 SHOW WARNINGS;
 

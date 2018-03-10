@@ -104,6 +104,50 @@ ALTER TABLE riccaboni.t01_allclasses_appid_patstat_us_atleastone ADD INDEX(APPLN
 ---------------------------------------------------------------------------------------------------
 
 
+SHOW INDEX FROM riccaboni.t01_allclasses_appid_patstat_us_atleastone;
+SHOW INDEX FROM patstat2016b.TLS207_PERS_APPLN_allclasses_names_pat;
+
+-- Number or different names in which at least one of the inventors resides in the US
+SELECT COUNT(DISTINCT a.PERSON_NAME) 
+FROM patstat2016b.TLS207_PERS_APPLN_allclasses_names_pat a 
+INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_atleastone b 
+ON a.pat=b.pat WHERE a.INVT_SEQ_NR>'0';
+/*
++-------------------------------+
+| COUNT(DISTINCT a.PERSON_NAME) |
++-------------------------------+
+|                        893665 |
++-------------------------------+
+1 row in set (1 min 38,38 sec)
+*/
+
+SELECT COUNT(DISTINCT a.PSN_NAME)
+FROM patstat2016b.TLS207_PERS_APPLN_allclasses_names_pat a 
+INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_atleastone b 
+ON a.pat=b.pat WHERE a.INVT_SEQ_NR>'0';
+/*
++----------------------------+
+| COUNT(DISTINCT a.PSN_NAME) |
++----------------------------+
+|                     900849 |
++----------------------------+
+1 row in set (2 min 2,67 sec)
+
+*/
+SELECT COUNT(DISTINCT a.HAN_NAME)
+FROM patstat2016b.TLS207_PERS_APPLN_allclasses_names_pat a 
+INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_atleastone b 
+ON a.pat=b.pat WHERE a.INVT_SEQ_NR>'0';
+/*
++----------------------------+
+| COUNT(DISTINCT a.HAN_NAME) |
++----------------------------+
+|                     898488 |
++----------------------------+
+1 row in set (1 min 51,22 sec)
+
+
+*/
 
 
 
