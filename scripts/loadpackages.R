@@ -13,4 +13,4 @@ library(data.table)
 library(sp)
 #library(sf)
 library(mapview)
-
+library(stringi)

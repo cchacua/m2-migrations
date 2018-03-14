@@ -37,3 +37,4 @@ install.packages("udunits2")
 install.packages("sf")
 install.packages("mapview")
 
+install.packages("stringi")

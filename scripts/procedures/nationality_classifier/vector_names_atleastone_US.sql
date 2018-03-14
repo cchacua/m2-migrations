@@ -203,9 +203,11 @@ Records: 743978  Duplicates: 0  Warnings: 0
 SHOW INDEX FROM riccaboni.t08_extended_allclasses_us_atleastone_onlyid; 
 ALTER TABLE riccaboni.t08_extended_allclasses_us_atleastone_onlyid ADD INDEX(ID);
 
+
 SHOW INDEX FROM riccaboni.t08; 
 
 SHOW INDEX FROM riccaboni.t09; 
+SHOW INDEX FROM riccaboni.t01_allclasses_as_t08_us_atleastone;
 
 DROP TABLE IF EXISTS riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone;
 CREATE TABLE riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone AS
@@ -214,8 +216,10 @@ SELECT DISTINCT a.ID, a.name
       INNER JOIN riccaboni.t01_allclasses_as_t08_us_atleastone b
       ON a.ID=b.localInventor;
 /*
-Query OK, 1353539 rows affected (17 min 8,76 sec)
-Records: 1353539  Duplicates: 0  Warnings: 0
+
+Query OK, 1350758 rows affected (18 min 47,24 sec)
+Records: 1350758  Duplicates: 0  Warnings: 0
+
 */
 
 
@@ -228,19 +232,32 @@ SELECT COUNT(DISTINCT a.ID)
 +----------------------+
 |               743646 |
 +----------------------+
-1 row in set (2,85 sec)
+1 row in set (3,04 sec)
+
 */
 
-
+                    
 DROP TABLE IF EXISTS riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone_mobility;
 CREATE TABLE riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone_mobility AS
-SELECT DISTINCT a.ID, c.mobileID, IFNULL(c.mobileID, a.ID) AS finalID, a.name
+SELECT DISTINCT a.ID, c.mobileID, IFNULL(c.mobileID, a.ID) AS finalID, a.name,
+           CHAR_LENGTH(a.name) AS ncharac, 
+           ROUND ((CHAR_LENGTH(a.name)- CHAR_LENGTH(REPLACE(a.name, ' ', ''))) / CHAR_LENGTH(' ')) AS nblanks,
+           ROUND ((CHAR_LENGTH(a.name)- CHAR_LENGTH(REPLACE(a.name, '.', ''))) / CHAR_LENGTH('.')) AS ndots,
+           ROUND ((CHAR_LENGTH(a.name)- CHAR_LENGTH(REPLACE(a.name, ',', ''))) / CHAR_LENGTH(',')) AS ncommas,
+           ROUND ((CHAR_LENGTH(a.name)- CHAR_LENGTH(REPLACE(a.name, ' , ', ''))) / CHAR_LENGTH(' , ')) AS ncommasblanksboth,
+           ROUND ((CHAR_LENGTH(a.name)- CHAR_LENGTH(REPLACE(a.name, ' ,', ''))) / CHAR_LENGTH(' ,')) AS ncommasblanksleft,
+           ROUND ((CHAR_LENGTH(a.name)- CHAR_LENGTH(REPLACE(a.name, ', ', ''))) / CHAR_LENGTH(', ')) AS ncommasblanksright,
+           LEFT(a.ID, 2) AS qualid,
+           IF(a.name REGEXP '[0-9]', '1', '0') AS hnumber
       FROM riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone a
       LEFT JOIN riccaboni.t09 c
       ON a.ID=c.localID;
 /*
-Query OK, 1353539 rows affected (36,23 sec)
-Records: 1353539  Duplicates: 0  Warnings: 0
+Query OK, 1350758 rows affected (1 min 4,56 sec)
+Records: 1350758  Duplicates: 0  Warnings: 0
+
+
+
 */
 
 SELECT COUNT(DISTINCT a.ID)       
@@ -276,6 +293,43 @@ SELECT COUNT(DISTINCT a.name)
 +------------------------+
 1 row in set (10,80 sec)
 */
+
+SELECT a.ncharac, COUNT(a.ncharac)       
+      FROM riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone_mobility a GROUP BY a.ncharac;
+
+SELECT a.nblanks, COUNT(a.nblanks)       
+      FROM riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone_mobility a GROUP BY a.nblanks;
+/*
++---------+------------------+
+| nblanks | COUNT(a.nblanks) |
++---------+------------------+
+|       0 |              932 |
+|       1 |           385311 |
+|       2 |           832171 |
+|       3 |            71774 |
+|       4 |            23378 |
+|       5 |            18033 |
+|       6 |            13382 |
+|       7 |             4455 |
+|       8 |              938 |
+|       9 |              316 |
+|      10 |               39 |
+|      11 |               15 |
+|      12 |                6 |
+|      13 |                2 |
+|      14 |                3 |
+|      15 |                2 |
+|      22 |                1 |
++---------+------------------+
+17 rows in set (1,71 sec)
+
+*/
+
+SELECT * FROM riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone_mobility WHERE finalID='UM313986';
+SELECT * FROM riccaboni.t08 WHERE ID='UI4804984';
+SELECT * FROM riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone_mobility WHERE finalID='UI4804984';
+SELECT * FROM riccaboni.t08 WHERE ID='LS4654436';
+SELECT * FROM riccaboni.t08 WHERE ID='HI2061832';
 
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
