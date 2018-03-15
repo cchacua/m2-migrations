@@ -5,51 +5,10 @@
 # Set UTF 8 to future queries
 rs <- dbSendQuery(patstat, 'SET CHARACTER SET "UTF8"')
 
-# Get data
-
-# Non repeated IDS, with almost clean strings
-cleannames_one<-function(query, filename=NULL){
-  namesone.df<-dbGetQuery(patstat, query)
-  print(paste("Number of rows:", nrow(namesone.df)))
-  print(paste("Distinct IDs:",length(unique(namesone.df$finalID))))
-  
-  namesone.df.m<-str_split(namesone.df$name, ", ",  simplify=TRUE)
-  namesone.df.m<-as.data.frame(namesone.df.m)
-  namesone.df$firstname<-as.character(namesone.df.m[,2])
-  namesone.df$lastname<-as.character(namesone.df.m[,1])
-  
-  # Delete just one character first names
-    print("********************************First Names********************************")
-    #print(namesone.df[stri_length(namesone.df$firstname)<2, 3:4])
-    namesone.df$firstname[stri_length(namesone.df$firstname)<2]<-""
-    #print(namesone.df[stri_length(namesone.df$firstname)<2, 3:4])
-    
-  # Delete last names with just one character
-    print("********************************Last Names********************************")
-    #print(namesone.df[stri_length(namesone.df$lastname)<2, 3:4])
-    namesone.df$lastname[stri_length(namesone.df$lastname)<2]<-""
-    #print(namesone.df[stri_length(namesone.df$lastname)<2, 3:4])
-  
-  #print("********************************Parenthesis********************************")   
-    #print(part1.df[grepl(")",part1.df$full),])
-    
-  namesone.df$full<-as.character(paste0(ifelse(namesone.df$firstname=="", "",paste0(namesone.df$firstname, " ")), namesone.df$lastname))
-
-  #write.csv(namesone.df, paste0("../output/nationality/", filename))
-  return(namesone.df)
-}
-
-
-
-
-
-
-
-
-
 
 ###################
-
+# Part 1
+###################
 part1.df<-cleannames_one(query="SELECT DISTINCT a.name, a.finalID 
                         FROM (SELECT MAX(b.name) AS name, b.finalID, MAX(b.ncommas) AS ncommas, MAX(b.ncharac) AS ncharac, MAX(b.nblanks) AS nblanks, MAX(b.ncommasblanksright) AS ncommasblanksright, MAX(b.hnumber) AS hnumber, MAX(b.ndots) AS ndots FROM riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone_mobility b GROUP BY b.finalID HAVING COUNT(b.finalID)=1 ) a 
                         WHERE a.ncommas='1' AND a.ncharac<='20' AND a.nblanks='1'AND a.ncommasblanksright='1' AND a.hnumber='0' AND a.ndots='0'
@@ -67,6 +26,17 @@ DROP TABLE IF EXISTS christian.idnames_part01;
 
 # Run on MySQL 
 "
+DROP TABLE IF EXISTS christian.idnames_part01;
+CREATE TABLE christian.idnames_part01 AS
+SELECT DISTINCT a.name, a.finalID 
+                        FROM (SELECT MAX(b.name) AS name, b.finalID, MAX(b.ncommas) AS ncommas, MAX(b.ncharac) AS ncharac, MAX(b.nblanks) AS nblanks, MAX(b.ncommasblanksright) AS ncommasblanksright, MAX(b.hnumber) AS hnumber, MAX(b.ndots) AS ndots FROM riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone_mobility b GROUP BY b.finalID HAVING COUNT(b.finalID)=1 ) a 
+                        WHERE a.ncommas='1' AND a.ncharac<='20' AND a.nblanks='1'AND a.ncommasblanksright='1' AND a.hnumber='0' AND a.ndots='0'
+                        ORDER BY a.finalID;
+/*
+Query OK, 187031 rows affected (25,35 sec)
+Records: 187031  Duplicates: 0  Warnings: 0
+*/
+
 SHOW INDEX FROM christian.idnames_part01; 
 ALTER TABLE christian.idnames_part01 ADD INDEX(finalID);
 
@@ -75,63 +45,110 @@ ALTER TABLE riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone_mobil
 
 DROP TABLE IF EXISTS christian.idnames_a01;
 CREATE TABLE christian.idnames_a01 AS
-SELECT a.* 
+SELECT a.*, b.finalID AS bfid
 FROM riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone_mobility a
 LEFT JOIN christian.idnames_part01 b
 ON a.finalID=b.finalID
 WHERE b.finalID IS NULL;
+/*
+Query OK, 1163727 rows affected (21,56 sec)
+Records: 1163727  Duplicates: 0  Warnings: 0
+1350758-1163727=187031 IT'S OK
+*/
+
 SHOW INDEX FROM christian.idnames_a01; 
 ALTER TABLE christian.idnames_a01 ADD INDEX(finalID);
 "
 
-################
-
-part2.df<-cleannames_one(query="SELECT DISTINCT a.name, a.finalID 
+###################
+# Part 2
+###################
+part2.list<-cleannames_one(query="SELECT DISTINCT a.name, a.finalID 
                         FROM (SELECT MAX(b.name) AS name, b.finalID, MAX(b.ncommas) AS ncommas, MAX(b.ncharac) AS ncharac, MAX(b.nblanks) AS nblanks, MAX(b.ncommasblanksright) AS ncommasblanksright, MAX(b.hnumber) AS hnumber, MAX(b.ndots) AS ndots FROM riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone_mobility b GROUP BY b.finalID HAVING COUNT(b.finalID)=1 ) a 
                         WHERE a.ncommas='1' AND a.ncharac<='20' AND a.nblanks='1'AND a.ncommasblanksright='1' AND a.hnumber='0' AND a.ndots!='0'
                         ORDER BY a.finalID",
                          filename = "part2.csv")
+part2_c<-as.data.frame(part2.list[1])
+part2_nc<-as.data.frame(part2.list[2])
 
-part2.df.clean<-part2.df[toupper(part2.df$firstname)!='INC.' & toupper(part2.df$firstname)!='LLC.' & toupper(part2.df$firstname)!='LTD.',]
-part2.df.clean<-part2.df.clean[toupper(part2.df.clean$lastname)!='INC.' & toupper(part2.df.clean$lastname)!='LLC.' & toupper(part2.df.clean$lastname)!='LTD.',]
-# Delete When the number of points is half the lenght of the string
-part2.df.clean$firstname[str_count(part2.df.clean$firstname, "\\.")/stri_length(part2.df.clean$firstname)>=.5]<-""
-part2.df.clean$lastname[str_count(part2.df.clean$lastname, "\\.")/stri_length(part2.df.clean$lastname)>=.5]<-""
-# Delete first character after a point
-part2.df.clean$firstname<-sub("^.?\\.", "", part2.df.clean$firstname)
-part2.df.clean$lastname<-sub("^.?\\.", "", part2.df.clean$lastname)
-# Delete last character after a point if Upper Case
-part2.df.clean$firstname<-sub("[[:upper:]]\\.$", "", part2.df.clean$firstname)
-# Delete last point
-part2.df.clean$firstname<-sub("\\.$", "", part2.df.clean$firstname)
-# Delete last -
-part2.df.clean$firstname<-sub("\\-$", "", part2.df.clean$firstname)
-# Delete begining -
-part2.df.clean$firstname<-sub("^\\-", "", part2.df.clean$firstname)
-# Deleting again single characters
+"
+DROP TABLE IF EXISTS christian.idnames_part02;
+CREATE TABLE christian.idnames_part02 AS
+SELECT DISTINCT a.name, a.finalID 
+                        FROM (SELECT MAX(b.name) AS name, b.finalID, MAX(b.ncommas) AS ncommas, MAX(b.ncharac) AS ncharac, MAX(b.nblanks) AS nblanks, MAX(b.ncommasblanksright) AS ncommasblanksright, MAX(b.hnumber) AS hnumber, MAX(b.ndots) AS ndots FROM riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone_mobility b GROUP BY b.finalID HAVING COUNT(b.finalID)=1 ) a 
+                        WHERE a.ncommas='1' AND a.ncharac<='20' AND a.nblanks='1'AND a.ncommasblanksright='1' AND a.hnumber='0' AND a.ndots!='0'
+                        ORDER BY a.finalID;
 
-# All of this should be a function, and should be runed for first and last names
+SHOW INDEX FROM christian.idnames_part02; 
+ALTER TABLE christian.idnames_part02 ADD INDEX(finalID);
+
+DROP TABLE IF EXISTS christian.idnames_a02;
+CREATE TABLE christian.idnames_a02 AS
+SELECT a.*
+FROM christian.idnames_a01 a
+LEFT JOIN christian.idnames_part02 b
+ON a.finalID=b.finalID
+WHERE b.finalID IS NULL;
+/*
+Query OK, 1163512 rows affected (19,71 sec)
+Records: 1163512  Duplicates: 0  Warnings: 0
+
+1163727-1163512=215 IT'S OK
+*/
+
+SHOW INDEX FROM christian.idnames_a02; 
+ALTER TABLE christian.idnames_a02 ADD INDEX(finalID);
+
+DROP TABLE IF EXISTS christian.idnames_a01;
+"
+
+###################
+# Part 3
+###################
+
+part3.list<-cleannames_one(query="SELECT DISTINCT a.name, a.finalID 
+FROM (SELECT MAX(b.name) AS name, b.finalID, MAX(b.ncommas) AS ncommas, MAX(b.ncharac) AS ncharac, MAX(b.nblanks) AS nblanks, MAX(b.ncommasblanksright) AS ncommasblanksright, MAX(b.hnumber) AS hnumber, MAX(b.ndots) AS ndots FROM christian.idnames_a02 b GROUP BY b.finalID HAVING COUNT(b.finalID)=1 ) a 
+WHERE a.ncommas='1' AND a.ncharac<='20' AND a.nblanks='1'AND a.ncommasblanksright='1'
+ORDER BY a.finalID",
+                           filename = "part3.csv")
+part3_c<-as.data.frame(part3.list[1])
+part3_nc<-as.data.frame(part3.list[2])
+
+"
+DROP TABLE IF EXISTS christian.idnames_part03;
+CREATE TABLE christian.idnames_part03 AS
+SELECT DISTINCT a.name, a.finalID 
+FROM (SELECT MAX(b.name) AS name, b.finalID, MAX(b.ncommas) AS ncommas, MAX(b.ncharac) AS ncharac, MAX(b.nblanks) AS nblanks, MAX(b.ncommasblanksright) AS ncommasblanksright, MAX(b.hnumber) AS hnumber, MAX(b.ndots) AS ndots FROM riccaboni.t08_names_allclasses_t01_t09_onlynames_us_atleastone_mobility b GROUP BY b.finalID HAVING COUNT(b.finalID)=1 ) a 
+WHERE a.ncommas='1' AND a.ncharac<='20' AND a.nblanks='1'AND a.ncommasblanksright='1' AND a.hnumber='0' AND a.ndots!='0'
+ORDER BY a.finalID;
+
+SHOW INDEX FROM christian.idnames_part03; 
+ALTER TABLE christian.idnames_part03 ADD INDEX(finalID);
+
+DROP TABLE IF EXISTS christian.idnames_a03;
+CREATE TABLE christian.idnames_a03 AS
+SELECT a.*
+FROM christian.idnames_a02 a
+LEFT JOIN christian.idnames_part03 b
+ON a.finalID=b.finalID
+WHERE b.finalID IS NULL;
+/*
+Query OK, 1163512 rows affected (19,71 sec)
+Records: 1163512  Duplicates: 0  Warnings: 0
+
+1163727-1163512=215 IT'S OK
+*/
+
+SHOW INDEX FROM christian.idnames_a03; 
+ALTER TABLE christian.idnames_a03 ADD INDEX(finalID);
+
+DROP TABLE IF EXISTS christian.idnames_a02;
+"
+
 
 ################
 
-
-  
-dictionaryupper<-c("INC", "LLC")
-
-
-
 tt<-read.csv("../output/nationality/part1.csv")
-print(tt[1,"full"])
-
-print(namesone.df[grepl("\\.",namesone.df$full),])
-
-# And also first names with one letter and a dot
-View(namesone.df[grepl("\\.",namesone.df$firstname),])
-View(namesone.df[stri_length(namesone.df$firstname)<=5 & grepl("\\.",namesone.df$firstname),])
-
-#And also last names with one letter and a dot
-View(namesone.df[grepl("\\.",namesone.df$lastname),])
-View(namesone.df[stri_length(namesone.df$lastname)<=5 & grepl("\\.",namesone.df$lastname),])
 
 
 namesone.df<-dbGetQuery(patstat, 

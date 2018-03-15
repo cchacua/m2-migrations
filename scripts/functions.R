@@ -56,3 +56,49 @@ merge.csv = function(mypath){
   datalist
 }
 
+
+cleanstring<-function(x){
+  vector<-as.character(x)
+  vector[stri_length(vector)<2]<-""
+  # Delete When the number of points is half the lenght of the string
+  vector[str_count(vector, "\\.")/stri_length(vector)>=.5]<-""
+  # Delete first character after a point
+  vector<-sub("^.?\\.", "", vector)
+  # Delete last character after a point if Upper Case
+  vector<-sub("[[:upper:]]\\.$", "", vector)
+  # Delete last point
+  vector<-sub("\\.$", "", vector)
+  # Delete last -
+  vector<-sub("\\-$", "", vector)
+  # Delete begining -
+  vector<-sub("^\\-", "", vector)
+  # Deleting again single characters
+  vector[stri_length(vector)<2]<-""
+  return(vector)
+}
+
+
+cleannames_one<-function(query, filename=NULL){
+  df<-dbGetQuery(patstat, query)
+  print(paste("Number of rows:", nrow(df)))
+  print(paste("Distinct IDs:",length(unique(df$finalID))))
+  
+  df.m<-str_split(df$name, ", ",  simplify=TRUE)
+  df.m<-as.data.frame(df.m)
+  df$firstname<-as.character(df.m[,2])
+  df$lastname<-as.character(df.m[,1])
+  
+  df_c<-df[toupper(df$firstname)!='INC.' & toupper(df$firstname)!='LLC.' & toupper(df$firstname)!='LTD.' & toupper(df$lastname)!='INC.' & toupper(df$lastname)!='LLC.' & toupper(df$lastname)!='LTD.',]
+  # df_c<-df_c[toupper(df_c$lastname)!='INC.' & toupper(df_c$lastname)!='LLC.' & toupper(df_c$lastname)!='LTD.',]
+  
+  df_nc<-df[toupper(df$firstname)=='INC.' | toupper(df$firstname)=='LLC.' | toupper(df$firstname)=='LTD.' | toupper(df$lastname)=='INC.' | toupper(df$lastname)=='LLC.' | toupper(df$lastname)=='LTD.',]
+  
+  df_c$firstname<-cleanstring(df_c$firstname)
+  df_c$lastname<-cleanstring(df_c$lastname)
+  
+  df_c$full<-as.character(paste0(ifelse(df_c$firstname=="", "",paste0(df_c$firstname, " ")), df_c$lastname))
+  
+  write.csv(df_c, paste0("../output/nationality/", filename, "_c.csv"))
+  write.csv(df_nc, paste0("../output/nationality/", filename, "_nc.csv"))
+  return(list(df_c, df_nc))
+}
