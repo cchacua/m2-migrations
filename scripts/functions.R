@@ -97,7 +97,7 @@ cleanstring<-function(x){
   # ñ
   vector<-gsub("\\{hacek\\s+over\\s+\\(n\\)\\}", "ñ", vector)
   # r
-  vector<-gsub("\\{{grave\\s+over\\s+\\(r\\)\\}", "r̀", vector)
+  vector<-gsub("\\{grave\\s+over\\s+\\(r\\)\\}", "r̀", vector)
   # Delete text between parenthesis (106691)
   vector<-sub("\\s*\\([^\\)]+\\)", "", vector) 
   
@@ -145,12 +145,16 @@ cleanstring<-function(x){
   # All after "; c/o " 26693, 7783
   vector<-sub(";?\\s?(c/o|C/o|C/O|c/O|c/c|C/C)+(.*)", "", vector)
   # All after legal, 4890
-  vector<-sub(";?\\s?(legal|Legal|LEGAL|IBM |Universität|University|Universiteit|Universiteit|Lund Institute|Hewlett-Packard|QUALCOMM|Ludwig Ins|Division |Department|Research|The\\s+|the\\s+|Pfizer|PFIZER|EASTMAN KODAK|Eastman Kodak|Microsfot|Microsoft|Univ |Dept |Office|Management|Massachusetts|National|Apartment|SmithKline|Pharm Res|Unilever|)+(.*)", "", vector)
+  vector<-sub(";?\\s?(legal|Legal|LEGAL|IBM |Universität|University|Universiteit|Universiteit|Lund Institute|Hewlett-Packard|QUALCOMM|Ludwig Ins|Division |Department|Research|The\\s+|the\\s+|Pfizer|PFIZER|EASTMAN KODAK|Eastman Kodak|Microsfot|Microsoft|Univ |Dept |Office|Management|Massachusetts|National|Apartment|SmithKline|Pharm Res|Unilever)+(.*)", "", vector)
   # Delete extra espaces
   vector<-sub("\\s+", " ", str_trim(vector))
   # Deleting again single characters
   vector[stri_length(vector)<2]<-""
 
+  
+  # FUTURE WORK
+  # To define later: information in parenthesis can help to identify same person
+  # Née, Born, can be useful to identify married women
   return(vector)
 }
 
