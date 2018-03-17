@@ -62,6 +62,16 @@ cleanstring<-function(x){
   vector[stri_length(vector)<2]<-""
   # Delete When the number of points is half the lenght of the string
   vector[str_count(vector, "\\.")/stri_length(vector)>=.5]<-""
+  # Delete sequence of numbers at the begining
+  vector<-sub("^[[:digit:]]+ \\: +", "", vector)
+  # Delete characters between blanks and with a point if Upper Case (105760)
+  vector<-sub("* [[:upper:]]\\. +", " ", vector)
+  # Delete characters between blanks if Upper Case (105576)
+  vector<-sub("* [[:upper:]] +", " ", vector)
+  # Delete first character after a point
+  vector<-sub("^.?\\.", "", vector)
+  # Delete first character after a point (1172)
+  vector<-sub("^.?\\.", "", vector)
   # Delete first character after a point
   vector<-sub("^.?\\.", "", vector)
   # Delete last character after a point if Upper Case
@@ -72,11 +82,59 @@ cleanstring<-function(x){
   vector<-sub("\\-$", "", vector)
   # Delete begining -
   vector<-sub("^\\-", "", vector)
+  # Change 0 by O
+  vector<-sub("0", "O", vector)
+  # Change 1 by I
+  vector<-sub("1", "I", vector)
+  # Change 3 by "
+  vector<-sub("3", "", vector)
+  # Delete first letter and then a blank (46)
+  vector<-sub("^[[:upper:]] +", "", vector) 
+  # Delete blank and last letter (179, 105469)
+  vector<-sub("* [[:upper:]]$", "", vector) 
+  # Delete text between parenthesis (106691)
+  vector<-sub("\\s*\\([^\\)]+\\)", "", vector) 
+  
+  # Delete "- " (65238)
+  vector<-sub("- ", " ", vector) 
+  # Delete +di (106731)
+  vector<-sub(" \\+di", "", vector)
+  # Delete points
+  vector<-sub("\\.", " ", vector)
+  # Delete Jr (65238,65284, 105688)
+  vector<-sub("* +(JR .|Jr .|jr .|JR\\. .|Jr\\. .|SR .|Sr .|sr .|SR\\. .|Sr\\. .)", "", vector)
+  # Delete Jr at the begining
+  vector<-sub("^(JR .|Jr .|jr .|JR\\. .|Jr\\. .|SR .|Sr .|sr .|SR\\. .|Sr\\. .)", "", vector)
+  # Delete Jr at the end
+  vector<-sub(" +(JR|Jr|jr|JR\\.|Jr\\.|SR|Sr|sr|SR\\.|Sr\\.)$", "", vector)
+
+  # # Delete Sr (106361)
+  # vector<-sub("* +()", "", vector)
+  # # Delete Sr at the begining
+  # vector<-sub("^()", "", vector)
+  # Delete Dr,
+  vector<-sub("* +(DR .|Dr.|dr .|DR\\. .|Dr\\. .|Mr .|MR .|Mr\\. .|MR\\. .|Md .|MD .|Md\\. .|MD\\. .|Prof .|Prof\\. .)", "", vector)
+  # Delete Dr at the begining
+  vector<-sub("^(DR .|Dr .|dr .|DR\\. .|Dr\\. .|Mr .|MR .|Mr\\. .|MR\\. .|Md .|MD .|Md\\. .|MD\\. .|Prof .|Prof\\. .)", "", vector)
+  # Delete at the end
+  vector<-sub(" +(DR|Dr|dr|DR\\.|Dr\\.|Mr|MR|Mr\\.|MR\\.|Md|MD|Md\\.|MD\\.|Prof|Prof\\.)$", "", vector)
+  
+  # Delete characters between blanks if Upper Case
+  vector<-sub("* [[:upper:]] +", " ", vector)
+  # Delete extra espaces
+  vector<-sub("\\s+", " ", str_trim(vector))
+  
+  # Delete leters after space 
+  
+  
+
   # Deleting again single characters
   vector[stri_length(vector)<2]<-""
+
   return(vector)
 }
 
+#cleanstring("Srivatsan")
 
 cleannames_one<-function(query, filename=NULL){
   df<-dbGetQuery(patstat, query)
@@ -88,10 +146,10 @@ cleannames_one<-function(query, filename=NULL){
   df$firstname<-as.character(df.m[,2])
   df$lastname<-as.character(df.m[,1])
   
-  df_c<-df[toupper(df$firstname)!='INC.' & toupper(df$firstname)!='LLC.' & toupper(df$firstname)!='LTD.' & toupper(df$lastname)!='INC.' & toupper(df$lastname)!='LLC.' & toupper(df$lastname)!='LTD.',]
+  df_c<-df[toupper(df$firstname)!='INC.' & toupper(df$firstname)!='INC' & toupper(df$firstname)!='LLC.' & toupper(df$firstname)!='LLC' & toupper(df$firstname)!='LTD.' & toupper(df$firstname)!='LTD' & toupper(df$lastname)!='INC.' & toupper(df$lastname)!='INC' & toupper(df$lastname)!='LLC.' & toupper(df$lastname)!='LLC' & toupper(df$lastname)!='LTD.' & toupper(df$lastname)!='LTD',]
   # df_c<-df_c[toupper(df_c$lastname)!='INC.' & toupper(df_c$lastname)!='LLC.' & toupper(df_c$lastname)!='LTD.',]
   
-  df_nc<-df[toupper(df$firstname)=='INC.' | toupper(df$firstname)=='LLC.' | toupper(df$firstname)=='LTD.' | toupper(df$lastname)=='INC.' | toupper(df$lastname)=='LLC.' | toupper(df$lastname)=='LTD.',]
+  df_nc<-df[toupper(df$firstname)=='INC.' | toupper(df$firstname)=='INC' | toupper(df$firstname)=='LLC.' | toupper(df$firstname)=='LLC' | toupper(df$firstname)=='LTD.' | toupper(df$firstname)=='LTD' | toupper(df$lastname)=='INC.' | toupper(df$lastname)=='INC' | toupper(df$lastname)=='LLC.' | toupper(df$lastname)=='LLC' | toupper(df$lastname)=='LTD.' | toupper(df$lastname)=='LTD',]
   
   df_c$firstname<-cleanstring(df_c$firstname)
   df_c$lastname<-cleanstring(df_c$lastname)
