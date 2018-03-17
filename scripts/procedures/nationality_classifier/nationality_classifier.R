@@ -174,6 +174,8 @@ part4.list<-cleannames_one(query="SELECT DISTINCT a.name, a.finalID
                            filename = "part4.csv")
 # Attention to companies
 part4_c<-as.data.frame(part4.list[1])
+part4_c<-part4_c[order(nchar(part4_c$full), decreasing = TRUE),]
+
 write.csv(unique(part4_c$full), paste0("../output/nationality/", "part4_onlynames.csv"))
 # length(unique(part3_c$full))
 # [1] 100919

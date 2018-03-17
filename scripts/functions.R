@@ -65,9 +65,9 @@ cleanstring<-function(x){
   # Delete sequence of numbers at the begining
   vector<-sub("^[[:digit:]]+ \\: +", "", vector)
   # Delete characters between blanks and with a point if Upper Case (105760)
-  vector<-sub("* [[:upper:]]\\. +", " ", vector)
+  vector<-gsub("* [[:upper:]]\\. +", " ", vector)
   # Delete characters between blanks if Upper Case (105576)
-  vector<-sub("* [[:upper:]] +", " ", vector)
+  vector<-gsub("* [[:upper:]] +", " ", vector)
   # Delete first character after a point
   vector<-sub("^.?\\.", "", vector)
   # Delete first character after a point (1172)
@@ -75,7 +75,7 @@ cleanstring<-function(x){
   # Delete first character after a point
   vector<-sub("^.?\\.", "", vector)
   # Delete last character after a point if Upper Case
-  vector<-sub("[[:upper:]]\\.$", "", vector)
+  vector<-gsub("[[:upper:]]\\.$", "", vector)
   # Delete last point
   vector<-sub("\\.$", "", vector)
   # Delete last -
@@ -83,24 +83,30 @@ cleanstring<-function(x){
   # Delete begining -
   vector<-sub("^\\-", "", vector)
   # Change 0 by O
-  vector<-sub("0", "O", vector)
+  vector<-gsub("0", "O", vector)
   # Change 1 by I
-  vector<-sub("1", "I", vector)
+  vector<-gsub("1", "I", vector)
   # Change 3 by "
-  vector<-sub("3", "", vector)
+  vector<-gsub("3", "", vector)
   # Delete first letter and then a blank (46)
   vector<-sub("^[[:upper:]] +", "", vector) 
   # Delete blank and last letter (179, 105469)
-  vector<-sub("* [[:upper:]]$", "", vector) 
+  vector<-sub("* [[:upper:]]$", "", vector)
+  # á
+  vector<-gsub("\\{acute\\s+over\\s+\\(α\\)\\}", "á", vector)
+  # ñ
+  vector<-gsub("\\{hacek\\s+over\\s+\\(n\\)\\}", "ñ", vector)
+  # r
+  vector<-gsub("\\{{grave\\s+over\\s+\\(r\\)\\}", "r̀", vector)
   # Delete text between parenthesis (106691)
   vector<-sub("\\s*\\([^\\)]+\\)", "", vector) 
   
   # Delete "- " (65238)
-  vector<-sub("- ", " ", vector) 
+  vector<-gsub("- ", " ", vector) 
   # Delete +di (106731)
   vector<-sub(" \\+di", "", vector)
   # Delete points
-  vector<-sub("\\.", " ", vector)
+  vector<-gsub("\\.", " ", vector)
   # Delete Jr (65238,65284, 105688)
   vector<-sub("* +(JR .|Jr .|jr .|JR\\. .|Jr\\. .|SR .|Sr .|sr .|SR\\. .|Sr\\. .)", "", vector)
   # Delete Jr at the begining
@@ -118,23 +124,39 @@ cleanstring<-function(x){
   vector<-sub("^(DR .|Dr .|dr .|DR\\. .|Dr\\. .|Mr .|MR .|Mr\\. .|MR\\. .|Md .|MD .|Md\\. .|MD\\. .|Prof .|Prof\\. .)", "", vector)
   # Delete at the end
   vector<-sub(" +(DR|Dr|dr|DR\\.|Dr\\.|Mr|MR|Mr\\.|MR\\.|Md|MD|Md\\.|MD\\.|Prof|Prof\\.)$", "", vector)
-  
+  # Letters with accents: (4682)
+  vector<-gsub("acute;+", "", vector)
+  vector<-gsub("&", "", vector)
+
+  # ç
+  vector<-gsub("Ã§", "ç", vector)
+  # ú 27985
+  vector<-gsub("Ãº", "ú", vector)
+  # é 27418
+  vector<-gsub("Ã©", "é", vector)
+
+
   # Delete characters between blanks if Upper Case
-  vector<-sub("* [[:upper:]] +", " ", vector)
+  vector<-gsub("* [[:upper:]] +", " ", vector)
   # Delete extra espaces
   vector<-sub("\\s+", " ", str_trim(vector))
-  
-  # Delete leters after space 
-  
-  
-
+  # Delete II, III or IV, V, VI
+  vector<-sub(" +(II|III|IV|V)$", "", vector)
+  # All after "; c/o " 26693, 7783
+  vector<-sub(";?\\s?(c/o|C/o|C/O|c/O|c/c|C/C)+(.*)", "", vector)
+  # All after legal, 4890
+  vector<-sub(";?\\s?(legal|Legal|LEGAL|IBM |Universität|University|Universiteit|Universiteit|Lund Institute|Hewlett-Packard|QUALCOMM|Ludwig Ins|Division |Department|Research|The\\s+|the\\s+|Pfizer|PFIZER|EASTMAN KODAK|Eastman Kodak|Microsfot|Microsoft|Univ |Dept |Office|Management|Massachusetts|National|Apartment|SmithKline|Pharm Res|Unilever|)+(.*)", "", vector)
+  # Delete extra espaces
+  vector<-sub("\\s+", " ", str_trim(vector))
   # Deleting again single characters
   vector[stri_length(vector)<2]<-""
 
   return(vector)
 }
 
-#cleanstring("Srivatsan")
+#cleanstring("Kari	C/OMolecular/Cancer Biology Laboratory")
+
+
 
 cleannames_one<-function(query, filename=NULL){
   df<-dbGetQuery(patstat, query)
