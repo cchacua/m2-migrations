@@ -179,7 +179,6 @@ part4_c<-as.data.frame(part4.list[1])
 
 
 part4_c_res<-reshape(transform(part4_c, time=ave(full, finalID, FUN=seq_along)), idvar="finalID", direction="wide")
-
 part4_c_unique<-part4_c_res[is.na(part4_c_res$full.2),]
 length(unique(part4_c_unique$finalID))
 #123482
@@ -262,18 +261,27 @@ DROP TABLE IF EXISTS christian.idnames_a03;
 ###################
 
 part5.list<-cleannames_one(query="SELECT DISTINCT a.name, a.finalID 
-                           FROM (SELECT MAX(b.name) AS name, b.finalID, MAX(b.ncommas) AS ncommas, MAX(b.ncharac) AS ncharac, MAX(b.nblanks) AS nblanks, MAX(b.ncommasblanksright) AS ncommasblanksright, MAX(b.hnumber) AS hnumber, MAX(b.ndots) AS ndots 
-                                  FROM christian.idnames_a03 b GROUP BY b.finalID HAVING COUNT(b.finalID)=1 ) a 
-                           WHERE a.ncommas='1' AND a.ncommasblanksright='1'
-                           ORDER BY a.finalID",
+                        FROM christian.idnames_a04 a 
+                        WHERE a.ncommas='1' AND a.ncharac<='20' AND a.ncommasblanksright='1' AND a.hnumber='0' 
+                        ORDER BY a.finalID",
                            filename = "part5.csv")
 # Attention to companies
-part5_c<-as.data.frame(part5.list[1])
-part5_c<-part5_c[order(nchar(part5_c$full), decreasing = TRUE),]
-
-write.csv(unique(part5_c$full), paste0("../output/nationality/", "part5_onlynames.csv"))
-
 part5_nc<-as.data.frame(part5.list[2])
+part5_c<-as.data.frame(part5.list[1])
+
+part5_c_res<-reshape(transform(part5_c, time=ave(full, finalID, FUN=seq_along)), idvar="finalID", direction="wide")
+part5_c_unique<-part5_c_res[is.na(part5_c_res$full.2),]
+# ATTENTION: TO CHANGE IN FUNCTION: CHANGE BLANKS BY -, BY FIRST AND LAST NAME, SO AS TO BETTER DEAL WITH MULTIPLE FIRST/LAST NAMES, AND THEN CREATE THE FULL NAME STRING
+length(unique(part5_c_unique$finalID))
+#68221
+length(unique(part5_c_unique$full.1))
+#65302
+write.csv(unique(part5_c_unique$full.1), paste0("../output/nationality/", "part5_onlynames_unique.csv"))
+
+part5_c_dupl<-part5_c_res[!is.na(part5_c_res$full.2),]
+write.csv(part5_c_dupl, paste0("../output/nationality/", "part5_onlynames_duplicates.csv"))
+
+
 
 
 
@@ -325,7 +333,75 @@ DROP TABLE IF EXISTS christian.idnames_a04;
 "
 
 
+###################
+# Part 6
+###################
+
+part6.list<-cleannames_one(query="SELECT DISTINCT a.name, a.finalID 
+                           FROM (SELECT MAX(b.name) AS name, b.finalID, MAX(b.ncommas) AS ncommas, MAX(b.ncharac) AS ncharac, MAX(b.nblanks) AS nblanks, MAX(b.ncommasblanksright) AS ncommasblanksright, MAX(b.hnumber) AS hnumber, MAX(b.ndots) AS ndots 
+                           FROM christian.idnames_a03 b GROUP BY b.finalID HAVING COUNT(b.finalID)=1 ) a 
+                           WHERE a.ncommas='1' AND a.ncommasblanksright='1'
+                           ORDER BY a.finalID",
+                           filename = "part6.csv")
+# Attention to companies
+part6_c<-as.data.frame(part6.list[1])
+part6_c<-part6_c[order(nchar(part6_c$full), decreasing = TRUE),]
+
+write.csv(unique(part6_c$full), paste0("../output/nationality/", "part6_onlynames.csv"))
+
+part6_nc<-as.data.frame(part6.list[2])
+
+
+
+
+"
+SELECT COUNT(DISTINCT a.finalID)       
+FROM christian.idnames_a05 a;
+/*
+
+
+*/
+
+DROP TABLE IF EXISTS christian.idnames_part06;
+CREATE TABLE christian.idnames_part06 AS
+SELECT DISTINCT a.name, a.finalID 
+FROM (SELECT MAX(b.name) AS name, b.finalID, MAX(b.ncommas) AS ncommas, MAX(b.ncharac) AS ncharac, MAX(b.nblanks) AS nblanks, MAX(b.ncommasblanksright) AS ncommasblanksright, MAX(b.hnumber) AS hnumber, MAX(b.ndots) AS ndots 
+FROM christian.idnames_a05 b GROUP BY b.finalID HAVING COUNT(b.finalID)=1 ) a 
+WHERE a.ncommas='1' AND a.ncharac<='20' AND a.ncommasblanksright='1' AND a.hnumber='0' 
+ORDER BY a.finalID;
+/*
+
+*/
+
+
+SHOW INDEX FROM christian.idnames_part06; 
+ALTER TABLE christian.idnames_part06 ADD INDEX(finalID);
+
+DROP TABLE IF EXISTS christian.idnames_a06;
+CREATE TABLE christian.idnames_a06 AS
+SELECT a.*
+FROM christian.idnames_a05 a
+LEFT JOIN christian.idnames_part06 b
+ON a.finalID=b.finalID
+WHERE b.finalID IS NULL;
+/*
+
+
+*/
+
+SHOW INDEX FROM christian.idnames_a06; 
+ALTER TABLE christian.idnames_a06 ADD INDEX(finalID);
+
+DROP TABLE IF EXISTS christian.idnames_a05;
+"
+
+
 ################
+
+
+################
+
+
 
 
 
