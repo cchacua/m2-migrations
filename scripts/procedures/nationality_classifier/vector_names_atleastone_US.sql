@@ -151,6 +151,14 @@ SELECT COUNT(DISTINCT a.pat)
 1 row in set (1,90 sec)
 */
 
+SELECT DISTINCT a.pat       
+      FROM riccaboni.t01_allclasses_as_t08_us_atleastone a
+      INTO OUTFILE '/var/lib/mysql-files/patt01ast08.csv'
+            FIELDS TERMINATED BY ','
+            ENCLOSED BY '"'
+            LINES TERMINATED BY '\n';
+
+
 SELECT COUNT(DISTINCT a.localInventor)       
       FROM riccaboni.t01_allclasses_as_t08_us_atleastone a;
 /*

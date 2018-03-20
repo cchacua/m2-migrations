@@ -84,6 +84,9 @@ cleanstring<-function(x){
   vector<-sub("^\\-", "", vector)
   # Delete all after a sequence of numbers
   vector<-gsub("[[:digit:]]{2,}(.*)", "", vector)
+  
+
+  
   # Change 0 by O
   vector<-gsub("0", "O", vector)
   # Change 1 by I
@@ -118,19 +121,25 @@ cleanstring<-function(x){
   # Delete Jr at the end
   vector<-sub(" +(JR|Jr|jr|JR\\.|Jr\\.|SR|Sr|sr|SR\\.|Sr\\.)$", "", vector)
 
+ 
+  
   # # Delete Sr (106361)
   # vector<-sub("* +()", "", vector)
   # # Delete Sr at the begining
   # vector<-sub("^()", "", vector)
   # Delete Dr,
   vector<-sub("* +(DR .|Dr.|dr .|DR\\. .|Dr\\. .|Mr .|MR .|Mr\\. .|MR\\. .|Md .|MD .|Md\\. .|MD\\. .|Prof .|Prof\\. .)", "", vector)
+  #print(vector)
   # Delete Dr at the begining
   vector<-sub("^(DR .|Dr .|dr .|DR\\. .|Dr\\. .|Mr .|MR .|Mr\\. .|MR\\. .|Md .|MD .|Md\\. .|MD\\. .|Prof .|Prof\\. .)", "", vector)
+  #print(vector)
   # Delete at the end
   vector<-sub(" +(DR|Dr|dr|DR\\.|Dr\\.|Mr|MR|Mr\\.|MR\\.|Md|MD|Md\\.|MD\\.|Prof|Prof\\.)$", "", vector)
+  
   # Letters with accents: (4682)
   vector<-gsub("acute;+", "", vector)
   vector<-gsub("&", "", vector)
+  
   
   # UTF 8: http://www.e-bancel.com/codes_utf8_caracteres_accentues.php
   # ç
@@ -140,9 +149,10 @@ cleanstring<-function(x){
 
   # á 29260
   vector<-gsub("Ã¡", "á", vector)
-  #
   vector<-gsub("Ã ", "à", vector)
   vector<-gsub("Ã¢", "â", vector)
+  vector<-gsub("Ã£", "ã", vector)
+  
   # é 27418
   vector<-gsub("Ã©", "é", vector)
   vector<-gsub("Ã¨", "è", vector)
@@ -151,14 +161,27 @@ cleanstring<-function(x){
   # i
   vector<-gsub("Ã®", "î", vector)
   vector<-gsub("Ã¯", "ï", vector)
+
+  
   # o
   vector<-gsub("Ã´", "ô", vector)
   vector<-gsub("Ã¶", "ö", vector)
+  vector<-gsub("Ã³", "ó", vector)
+  vector<-gsub("Ã¸", "ø", vector)
 
   # u
   vector<-gsub("Ã¹", "ù", vector)
   vector<-gsub("Ã»", "û", vector)
   vector<-gsub("Ã¼", "ü", vector)
+  vector<-gsub("Ãœ", "Ü", vector)
+  
+  # ß
+  vector<-gsub("ÃŸ", "ß", vector)
+  
+  #
+  vector<-gsub("Ã¥", "å", vector)
+
+ 
   
   # Delete characters between blanks if Upper Case
   vector<-gsub("* [[:upper:]] +", " ", vector)
@@ -169,10 +192,13 @@ cleanstring<-function(x){
   # All after "; c/o " 26693, 7783
   vector<-sub(";?\\s?(c/o|C/o|C/O|c/O|c/c|C/C)+(.*)", "", vector)
   # All after legal, 4890
-  vector<-sub(";?\\s?(legal|Legal|LEGAL|IBM |Universität|University|Universiteit|Universiteit|Lund Institute|Hewlett-Packard|QUALCOMM|Ludwig Ins|Division |Department|Research|The\\s+|the\\s+|Pfizer|PFIZER|EASTMAN KODAK|Eastman Kodak|Microsfot|Microsoft|Univ |Uni |Dept |Dep |Inst |Ins |Office|Management|Massachusetts|National|Apartment|SmithKline|Pharm Res|Unilever)+(.*)", "", vector)
+  vector<-sub(";?\\s?(legal|Legal|LEGAL|IBM |Universität|University|Universiteit|Universiteit|Lund Institute|Hewlett-Packard|QUALCOMM|Ludwig Ins|Division |Department|Research|The\\s+|the\\s+|THE\\s+|Pfizer|PFIZER|EASTMAN KODAK|Eastman Kodak|Microsfot|Microsoft|Univ |Uni |Dept |Dep |Inst |Ins |Office|Management|Massachusetts|National|Apartment|SmithKline|Pharm Res|Unilever)+(.*)", "", vector)
   vector<-sub(";?\\s?(EMULEX|Honeywell Inte|Neuroscience|CITRIX|Children|Hospital|Laboratory|Ctr f|LAB |Lab |Tokyo|Graduate|United|Plant|Institute|Institut|UTSW|Glaxo |Chiron Corp|Syngenta|Swedish Medical|Syngenta|Lsu Medical|MBG Business|School|Pioneer |Sony|Boehringer|Orthopedics|Pharmacia|Rhone-Poulenc|Kyowa|RICOH|European|MINNESOTA|Minnesota|Molecular|Ribo Targets|Public|Pharmaceutical|Corporate|VaxGen)+(.*)", "", vector)
-  vector<-sub(";?\\s?(Qualcomm|Clinical|Orion Cor|Orb Net|Inc|INC|Ricoh|Mobay Ch|GlaxoSm|Bio-Defense|Novartis|FUJITSU|MIT Tec|;|Toshiba|Bio |Celartem|DuPont Ag|MENICON |Vestel Elektro|Pennsylvania|Panasonic|Rensselaer Polytec|Lilly Forsc|Organon|Pennsylvania)+(.*)", "", vector)
-  
+  #31831
+  vector<-sub(";?\\s?(Qualcomm|Clinical|Orion Cor|Orb Net|Ricoh|Mobay Ch|GlaxoSm|Bio-Defense|Novartis|FUJITSU|Kirin Beer|American Expr|Hatfield Marine|Cent\\s+for\\s+Imm|Embarcadero Sys|Southwestern|Pres\\s+Fellow|LAURA\\s+DUPRIEST|NTT DoCoMo|Pysician|Postech|NCR Corpo|Imperial Canc|Chron\\s+Corp)+(.*)", "", vector)
+  #print(vector)
+  vector<-sub(";?\\s?(MIT Tec|Toshiba|Bio |Celartem|DuPont Ag|MENICON |Vestel Elektro|Pennsylvania|Panasonic|Rensselaer Polytec|Lilly Forsc|Organon|Pennsylvania|College|Istituto|Westar\\s+BioEng|Universitet|Malaria\\s+Vacci|Pres\\s+Fel|Shanghai Ge|Dow Global|LLC\\s+|INC\\s+|Inc\\s+|Corporation)+(.*)", "", vector)
+  #print(vector)
   # Delete extra espaces
   vector<-sub("\\s+", " ", str_trim(vector))
   # Deleting again single characters
@@ -185,7 +211,7 @@ cleanstring<-function(x){
   return(vector)
 }
 
-#cleanstring("Kari	C/OMolecular/Cancer Biology Laboratory")
+cleanstring("VINCENT")
 
 
 
@@ -303,7 +329,9 @@ mergeinvpat<-function(pnumber, ep.df=eqpat.df, e8.df=eq08.df){
   result<-merge(one,matches,by.x="PERSON_NAME",by.y='raw.x',all.x=T)
   # Merge two with match
   result<-merge(result,two,by.x='raw.y',by.y="name",all.x=T)
-  return(result)
+  write.csv(result, paste0("../output/matched_names/", pnumber, ".csv"))
+  
+  return("Done")
 }
 
 

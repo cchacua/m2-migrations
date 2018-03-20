@@ -56,6 +56,13 @@ SELECT COUNT(DISTINCT a.ID) FROM christian.inv_pat_allclasses_equalcounting_t08 
 
 SELECT  * FROM riccaboni.t08 a WHERE a.pat='EP0012207';
 SELECT  * FROM riccaboni.t08 a WHERE a.ID='HI1000251';
+
+SELECT * FROM christian.inv_pat_allclasses_equalcounting_t08
+      INTO OUTFILE '/var/lib/mysql-files/inv_equal_t08.csv'
+            FIELDS TERMINATED BY ','
+            ENCLOSED BY '"'
+            LINES TERMINATED BY '\n';
+
  
 -- patstat
 DROP TABLE IF EXISTS christian.inv_pat_allclasses_equalcounting_patstat;
@@ -73,6 +80,12 @@ Records: 6697272  Duplicates: 0  Warnings: 0
 SHOW INDEX FROM christian.inv_pat_allclasses_equalcounting_patstat;
 ALTER TABLE christian.inv_pat_allclasses_equalcounting_patstat ADD INDEX(pat);
 
+
+SELECT * FROM christian.inv_pat_allclasses_equalcounting_patstat
+      INTO OUTFILE '/var/lib/mysql-files/inv_equal_patstat.csv'
+            FIELDS TERMINATED BY ','
+            ENCLOSED BY '"'
+            LINES TERMINATED BY '\n';
 
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
