@@ -84,7 +84,8 @@ cleanstring<-function(x){
   vector<-sub("^\\-", "", vector)
   # Delete all after a sequence of numbers
   vector<-gsub("[[:digit:]]{2,}(.*)", "", vector)
-  
+  # Delete begining -
+  vector<-sub("\\:", "", vector)
 
   
   # Change 0 by O
@@ -99,12 +100,26 @@ cleanstring<-function(x){
   vector<-sub("* [[:upper:]]$", "", vector)
   # á
   vector<-gsub("\\{acute\\s+over\\s+\\(α\\)\\}", "á", vector)
+  vector<-gsub("\\{dot\\s+over\\s+\\(a\\)\\}", "Ȧ", vector)
   # ñ
   vector<-gsub("\\{hacek\\s+over\\s+\\(n\\)\\}", "ñ", vector)
+  vector<-gsub("\\{overscore\\s+\\(n\\)\\}", "ñ", vector)
+  
+  vector<-gsub("\\{hacek\\s+over\\s+\\(o\\)\\}", "o", vector)
+  vector<-gsub("\\{hacek\\s+over\\s+\\(g\\)\\}", "ǧ", vector)
+  vector<-gsub("\\{hacek\\s+over\\s+\\(c\\)\\}", "č", vector)
+  vector<-gsub("\\{hacek\\s+over\\s+\\(z\\)\\}", "ž", vector)
+  vector<-gsub("\\{hacek\\s+over\\s+\\(S\\)\\}", "š", vector)
+  vector<-gsub("\\{hacek\\s+over\\s+\\(r\\)\\}", "ř", vector)
   # r
   vector<-gsub("\\{grave\\s+over\\s+\\(r\\)\\}", "r̀", vector)
+  vector<-gsub("\\{grave\\s+over\\s+\\(s\\)\\}", "s̀", vector)
   #
   vector<-gsub("\\{grave\\s+over\\s+\\(D\\)\\}", "D", vector)
+  
+  vector<-gsub("\\{umlaut\\s+over\\s+\\(w\\)\\}", "ẅ", vector)
+
+  
   # Delete text between parenthesis (106691)
   vector<-sub("\\s*\\([^\\)]+\\)", "", vector) 
   
@@ -134,7 +149,12 @@ cleanstring<-function(x){
   vector<-sub("^(DR .|Dr .|dr .|DR\\. .|Dr\\. .|Mr .|MR .|Mr\\. .|MR\\. .|Md .|MD .|Md\\. .|MD\\. .|Prof .|Prof\\. .)", "", vector)
   #print(vector)
   # Delete at the end
-  vector<-sub(" +(DR|Dr|dr|DR\\.|Dr\\.|Mr|MR|Mr\\.|MR\\.|Md|MD|Md\\.|MD\\.|Prof|Prof\\.)$", "", vector)
+  vector<-sub(" +(DR|Dr|dr|DR\\.|Dr\\.|Mr|MR|Mr\\.|MR\\.|Md|MD|Md\\.|MD\\.|Prof|Prof\\.|Mrs\\.|MRS\\.|MRs\\.)$", "", vector)
+  vector<-gsub("&Oslash;", "Ø", vector)
+  vector<-gsub("OSLASHED\\s", "Ø", vector)
+  
+  vector<-sub(";?\\s?(Johnson\\s+&\\s+Johnson)+(.*)", "", vector)
+  
   
   # Letters with accents: (4682)
   vector<-gsub("acute;+", "", vector)
@@ -152,12 +172,17 @@ cleanstring<-function(x){
   vector<-gsub("Ã ", "à", vector)
   vector<-gsub("Ã¢", "â", vector)
   vector<-gsub("Ã£", "ã", vector)
+  vector<-gsub("Ã„", "Ä", vector)
+  vector<-gsub("Ã¤", "ä", vector)
+  vector<-gsub("Ã€", "À", vector)
   
   # é 27418
   vector<-gsub("Ã©", "é", vector)
   vector<-gsub("Ã¨", "è", vector)
   vector<-gsub("Ãª", "ê", vector)
   vector<-gsub("Ã«", "ë", vector)
+  vector<-gsub("Ã‰", "É", vector)
+  
   # i
   vector<-gsub("Ã®", "î", vector)
   vector<-gsub("Ã¯", "ï", vector)
@@ -168,6 +193,10 @@ cleanstring<-function(x){
   vector<-gsub("Ã¶", "ö", vector)
   vector<-gsub("Ã³", "ó", vector)
   vector<-gsub("Ã¸", "ø", vector)
+  vector<-gsub("Ã“", "Ó", vector)
+  vector<-gsub("Ã˜", "Ø", vector)
+  vector<-gsub("Ã’", "Ò", vector)
+  vector<-gsub("Ã–", "Ö", vector)
 
   # u
   vector<-gsub("Ã¹", "ù", vector)
@@ -178,6 +207,7 @@ cleanstring<-function(x){
   # ß
   vector<-gsub("ÃŸ", "ß", vector)
   
+  vector<-gsub("Ã‘", "Ñ", vector)
   #
   vector<-gsub("Ã¥", "å", vector)
 
@@ -190,28 +220,32 @@ cleanstring<-function(x){
   # Delete II, III or IV, V, VI
   vector<-sub(" +(II|III|IV|V)$", "", vector)
   # All after "; c/o " 26693, 7783
-  vector<-sub(";?\\s?(c/o|C/o|C/O|c/O|c/c|C/C)+(.*)", "", vector)
+  vector<-sub(";?\\s?(c/o|C/o|C/O|c/O|c/c|C/C|c/|C/O)+(.*)", "", vector)
   # All after legal, 4890
-  vector<-sub(";?\\s?(legal|Legal|LEGAL|IBM |Universität|University|Universiteit|Universiteit|Lund Institute|Hewlett-Packard|QUALCOMM|Ludwig Ins|Division |Department|Research|The\\s+|the\\s+|THE\\s+|Pfizer|PFIZER|EASTMAN KODAK|Eastman Kodak|Microsfot|Microsoft|Univ |Uni |Dept |Dep |Inst |Ins |Office|Management|Massachusetts|National|Apartment|SmithKline|Pharm Res|Unilever)+(.*)", "", vector)
-  vector<-sub(";?\\s?(EMULEX|Honeywell Inte|Neuroscience|CITRIX|Children|Hospital|Laboratory|Ctr f|LAB |Lab |Tokyo|Graduate|United|Plant|Institute|Institut|UTSW|Glaxo |Chiron Corp|Syngenta|Swedish Medical|Syngenta|Lsu Medical|MBG Business|School|Pioneer |Sony|Boehringer|Orthopedics|Pharmacia|Rhone-Poulenc|Kyowa|RICOH|European|MINNESOTA|Minnesota|Molecular|Ribo Targets|Public|Pharmaceutical|Corporate|VaxGen)+(.*)", "", vector)
+  vector<-sub(";?\\s?(legal|Legal|LEGAL|IBM |Universität|University|Universiteit|Universiteit|Lund Institute|Hewlett-Packard|QUALCOMM|Ludwig Ins|Division |Department|Research|The\\s+|the\\s+|THE\\s+|Pfizer|PFIZER|EASTMAN KODAK|Eastman Kodak|Microsfot|Microsoft|Univ |Uni |Dept |Dep |Inst |Ins |Office|Management|Massachusetts|National|Apartment|SmithKline|Pharm Res|Unilever|Université)+(.*)", "", vector)
+  vector<-sub(";?\\s?(EMULEX|Honeywell Inte|Neuroscience|CITRIX|Children|Hospital|Laboratory|Ctr f|LAB |Lab |Tokyo|Graduate|United|Plant|Institute|Institut|UTSW|Glaxo |Chiron Corp|Syngenta|Swedish Medical|Syngenta|Lsu Medical|MBG Business|School|Pioneer |Sony|Boehringer|Orthopedics|Pharmacia|Rhone-Poulenc|Kyowa|RICOH|European|MINNESOTA|Minnesota|Molecular|Ribo Targets|Public|Pharmaceutical|Corporate|VaxGen|BMFZ\\s+und|Facildade\\s+de|Custom\\s+|OSI\\s+Pharma|ALBERT\\s+EINSTEIN\\s+COLL|CORPORATION|ADMINISTRATOR|OLD\\s+NATION)+(.*)", "", vector)
   #31831
-  vector<-sub(";?\\s?(Qualcomm|Clinical|Orion Cor|Orb Net|Ricoh|Mobay Ch|GlaxoSm|Bio-Defense|Novartis|FUJITSU|Kirin Beer|American Expr|Hatfield Marine|Cent\\s+for\\s+Imm|Embarcadero Sys|Southwestern|Pres\\s+Fellow|LAURA\\s+DUPRIEST|NTT DoCoMo|Pysician|Postech|NCR Corpo|Imperial Canc|Chron\\s+Corp)+(.*)", "", vector)
+  vector<-sub(";?\\s?(Qualcomm|Clinical|Orion Cor|Orb Net|Ricoh|Mobay Ch|GlaxoSm|Bio-Defense|Novartis|FUJITSU|Kirin Beer|American Expr|Hatfield Marine|Cent\\s+for\\s+Imm|Embarcadero Sys|Southwestern|Pres\\s+Fellow|LAURA\\s+DUPRIEST|NTT DoCoMo|Pysician|Postech|NCR Corpo|Imperial Canc|Chron\\s+Corp|JP\\s+Morgan\\s+Chas|Systems\\s+|4th|Quality\\s+Met|Alister\\s+Bioco|Clinical|UOP\\s+LLC|Vestek\\s+Elek|AstraZeneca|Segretaria|GlaxoSmit|Fachrichtung|Prosidion|Emulex\\s+De|DBLive|AOP\\s+LLC|ASTON\\s+LANE|INV\\s+BIOMEDICAS|Faculty|International|Motorola|Société|Neurog\\s+)+(.*)", "", vector)
   #print(vector)
-  vector<-sub(";?\\s?(MIT Tec|Toshiba|Bio |Celartem|DuPont Ag|MENICON |Vestel Elektro|Pennsylvania|Panasonic|Rensselaer Polytec|Lilly Forsc|Organon|Pennsylvania|College|Istituto|Westar\\s+BioEng|Universitet|Malaria\\s+Vacci|Pres\\s+Fel|Shanghai Ge|Dow Global|LLC\\s+|INC\\s+|Inc\\s+|Corporation)+(.*)", "", vector)
+  vector<-sub(";?\\s?(MIT Tec|Toshiba|Bio |Celartem|DuPont Ag|MENICON |Vestel Elektro|Pennsylvania|Panasonic|Rensselaer Polytec|Lilly Forsc|Organon|Pennsylvania|College|Istituto|Westar\\s+BioEng|Universitet|Malaria\\s+Vacci|Pres\\s+Fel|Shanghai Ge|Dow Global|LLC\\s+|INC\\s+|Inc\\s+|Corporation|Healthcare|HP\\s+Compan|Flat\\s+|Kanebo\\s+Cos|Univalid\\s+Bio|Amersham\\s+He|Pharma\\s+M|Solvay\\s+Pha|2|Eisai\\s+Inc|HGM-McMaster|Deaconess\\s+Me|Wisconsin|Russian\\s+Aca|Cancer\\s+Res|BAE\\s+SYSTE|TETREL\\s+TECH|PHYSICANS|MICROBIOLOGICAL|ARIZONA\\s+CAN|YALE\\s+CAN)+(.*)", "", vector)
+  vector<-sub(";?\\s?(Falk\\s+Cardiovascular|Biovail\\s+Techn|Micro-Integration|Mircrosoft|Huntsman\\s+Cancer|Mount\\s+Sinai\\s+School|Datascope|International|DOW\\s+CORNING|PETROBAS\\s+|Hewlett\\s+Packard|Alistair\\s+British|Fujitsu\\s+Lim|Intellectual\\s+Property|Synaptics|Oxford\\s+BioMedica)+(.*)", "", vector)
+  
   #print(vector)
+  vector<-gsub("\\s+DE$", "", vector)
+
   # Delete extra espaces
   vector<-sub("\\s+", " ", str_trim(vector))
   # Deleting again single characters
   vector[stri_length(vector)<2]<-""
 
-  
+  #vector<-sub("\\s", "\\-", vector)
   # FUTURE WORK
   # To define later: information in parenthesis can help to identify same person
   # Née, Born, can be useful to identify married women
   return(vector)
 }
 
-cleanstring("VINCENT")
+#cleanstring("VINCENT")
 
 
 
@@ -240,7 +274,33 @@ cleannames_one<-function(query, filename=NULL){
   return(list(df_c, df_nc))
 }
 
-
+cleannames_two<-function(query, filename=NULL){
+  df<-dbGetQuery(patstat, query)
+  print(paste("Number of rows:", nrow(df)))
+  print(paste("Distinct IDs:",length(unique(df$finalID))))
+  
+  df.m<-str_split(df$name, ", ",  simplify=TRUE)
+  df.m<-as.data.frame(df.m)
+  df$firstname<-as.character(df.m[,2])
+  df$lastname<-as.character(df.m[,1])
+  df$complement<-as.character(df.m[,3])
+  
+  df_c<-df[toupper(df$firstname)!='INC.' & toupper(df$firstname)!='INC' & toupper(df$firstname)!='LLC.' & toupper(df$firstname)!='LLC' & toupper(df$firstname)!='LTD.' & toupper(df$firstname)!='LTD' & toupper(df$lastname)!='INC.' & toupper(df$lastname)!='INC' & toupper(df$lastname)!='LLC.' & toupper(df$lastname)!='LLC' & toupper(df$lastname)!='LTD.' & toupper(df$lastname)!='LTD' & toupper(df$complement)=='INC.' & toupper(df$complement)=='INC' & toupper(df$complement)=='LLC.' & toupper(df$complement)=='LLC' & toupper(df$complement)=='LTD.' & toupper(df$complement)=='LTD',]
+  # df_c<-df_c[toupper(df_c$lastname)!='INC.' & toupper(df_c$lastname)!='LLC.' & toupper(df_c$lastname)!='LTD.',]
+  
+  df_nc<-df[toupper(df$firstname)=='INC.' | toupper(df$firstname)=='INC' | toupper(df$firstname)=='LLC.' | toupper(df$firstname)=='LLC' | toupper(df$firstname)=='LTD.' | toupper(df$firstname)=='LTD' | toupper(df$lastname)=='INC.' | toupper(df$lastname)=='INC' | toupper(df$lastname)=='LLC.' | toupper(df$lastname)=='LLC' | toupper(df$lastname)=='LTD.' | toupper(df$lastname)=='LTD'| toupper(df$complement)=='INC.' | toupper(df$complement)=='INC' | toupper(df$complement)=='LLC.' | toupper(df$complement)=='LLC' | toupper(df$complement)=='LTD.' | toupper(df$complement)=='LTD',]
+  
+  df_c$firstname<-cleanstring(df_c$firstname)
+  df_c$lastname<-cleanstring(df_c$lastname)
+  df_c$complement<-cleanstring(df_c$complement)
+  
+  
+  df_c$full<-as.character(paste0(ifelse(df_c$firstname=="", "",paste0(df_c$firstname, " ")), df_c$lastname))
+  
+  write.csv(df_c, paste0("../output/nationality/", filename, "_c.csv"))
+  write.csv(df_nc, paste0("../output/nationality/", filename, "_nc.csv"))
+  return(list(df_c, df_nc))
+}
 
 ##Partial Matching Function
 
@@ -332,6 +392,18 @@ mergeinvpat<-function(pnumber, ep.df=eqpat.df, e8.df=eq08.df){
   write.csv(result, paste0("../output/matched_names/", pnumber, ".csv"))
   
   return("Done")
+}
+
+mergeinvpat_fast<-function(one=eqpat.df, two=eq08.df){
+  one$PERSON_NAME<-paste(one$pat, toupper(one$PERSON_NAME))
+  two$name<-paste(two$pat, toupper(two$name))
+  matches<-partialMatch(one$PERSON_NAME, two$name, levDist=0.1)
+  # Merge one with match
+  result<-merge(one,matches,by.x="PERSON_NAME",by.y='raw.x',all.x=T)
+  # Merge two with match
+  result<-merge(result,two,by.x='raw.y',by.y="name",all.x=T)
+  
+  return(result)
 }
 
 

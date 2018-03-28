@@ -33,6 +33,7 @@ DELETE FROM christian.inv_pat_allclasses_equalcounting_t08 WHERE pat='WO20061301
 
 SHOW INDEX FROM christian.inv_pat_allclasses_equalcounting_t08;
 ALTER TABLE christian.inv_pat_allclasses_equalcounting_t08 ADD INDEX(pat);
+ALTER TABLE christian.inv_pat_allclasses_equalcounting_t08 ADD INDEX(ID);
 
 SELECT COUNT(*) FROM christian.inv_pat_allclasses_equalcounting_t08;
 /*
