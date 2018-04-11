@@ -345,33 +345,30 @@ SELECT * FROM riccaboni.t08 WHERE ID='HI2061832';
 -- riccaboni.t08_names_allclasses_us_mob_atleastone
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
+SHOW INDEX FROM riccaboni.t08_names_allclasses_us_atleastone;
 
 SHOW INDEX FROM riccaboni.t09;                                     
 ALTER TABLE riccaboni.t09 ADD INDEX(localID);
 
-SHOW INDEX FROM riccaboni.t01_allclasses_appid_patstat_us_family;
+SHOW INDEX FROM riccaboni.t01_allclasses_appid_patstat_us_atleastone;
 
 
 DROP TABLE IF EXISTS riccaboni.t08_names_allclasses_us_mob_atleastone;
 CREATE TABLE riccaboni.t08_names_allclasses_us_mob_atleastone AS
-SELECT a.*, b.mobileID, d.APPLN_ID, d.DOCDB_FAMILY_ID
+SELECT a.*, IFNULL(b.mobileID, a.ID) AS finalID
       FROM riccaboni.t08_names_allclasses_us_atleastone a 
       LEFT JOIN riccaboni.t09 b
       ON a.ID=b.localID
       INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_atleastone c 
-      ON a.pat=c.pat
-      INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_family d
-      ON c.APPLN_ID = d.APPLN_ID;
+      ON a.pat=c.pat;
 /*
-Query OK, 3122408 rows affected (2 min 6,72 sec)
+Query OK, 3122408 rows affected (2 min 0,04 sec)
 Records: 3122408  Duplicates: 0  Warnings: 0
 */
 
 SHOW INDEX FROM riccaboni.t08_names_allclasses_us_mob_atleastone;
-ALTER TABLE riccaboni.t08_names_allclasses_us_mob_atleastone ADD INDEX(DOCDB_FAMILY_ID);
-ALTER TABLE riccaboni.t08_names_allclasses_us_mob_atleastone ADD INDEX(APPLN_ID);
-ALTER TABLE riccaboni.t08_names_allclasses_us_mob_atleastone ADD INDEX(ID);
 ALTER TABLE riccaboni.t08_names_allclasses_us_mob_atleastone ADD INDEX(pat);
+ALTER TABLE riccaboni.t08_names_allclasses_us_mob_atleastone ADD INDEX(finalID);
 
 SELECT COUNT(DISTINCT a.ID)       
       FROM riccaboni.t08_names_allclasses_us_mob_atleastone a
@@ -386,17 +383,31 @@ SELECT COUNT(DISTINCT a.ID)
 
 */
 
-SELECT COUNT(DISTINCT a.mobileID)       
+SELECT COUNT(DISTINCT a.ID)       
       FROM riccaboni.t08_names_allclasses_us_mob_atleastone a;
 /*
-+----------------------------+
-| COUNT(DISTINCT a.mobileID) |
-+----------------------------+
-|                     105256 |
-+----------------------------+
-1 row in set (3,57 sec)
++----------------------+
+| COUNT(DISTINCT a.ID) |
++----------------------+
+|               743534 |
++----------------------+
+1 row in set (6,96 sec)
+*/
 
+
+SELECT COUNT(DISTINCT a.finalID)       
+      FROM riccaboni.t08_names_allclasses_us_mob_atleastone a;
+/*
++---------------------------+
+| COUNT(DISTINCT a.finalID) |
++---------------------------+
+|                    669243 |
++---------------------------+
+1 row in set (4,37 sec)
+
+743534-669243
 So, there are 74.291 less IDS, when using the mobile inventor links
+
 
 SELECT COUNT(DISTINCT b.mobileID), CHAR_LENGTH(b.mobileID) AS Nchar
                               FROM riccaboni.t08_names_allclasses_us_mob_atleastone b

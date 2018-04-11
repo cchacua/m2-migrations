@@ -49,13 +49,24 @@ print(table.latex, include.rownames = FALSE, booktabs = TRUE)
 # Merge multiple files
 merge.csv = function(mypath){
   filenames=list.files(path=mypath, full.names=TRUE)
-  datalist = lapply(filenames, read.csv)
+  datalist = lapply(filenames, read.csv, stringsAsFactors = FALSE)
   datalist = do.call("rbind", datalist)  
   datalist<-unique(datalist)
   #datalist[datalist== ""] <- NA
   datalist
 }
 
+
+setnatdf<-function(output){
+df<-data.frame(full_name=output[,2])
+df$nationality<-colnames(output[,5:43])[apply(output[,5:43], 1, which.max)]
+df$probability<-apply(output[,5:43], 1, max)
+df<-df[,c("full_name", "nationality", "probability")]
+df<-as.data.frame(list(df, output))
+# Replace Hispanic-Portguguese to Hispanic-Portuguese
+
+return(df)
+}
 
 cleanstring<-function(x){
   vector<-as.character(x)
@@ -135,9 +146,10 @@ cleanstring<-function(x){
   vector<-sub("^(JR .|Jr .|jr .|JR\\. .|Jr\\. .|SR .|Sr .|sr .|SR\\. .|Sr\\. .)", "", vector)
   # Delete Jr at the end
   vector<-sub(" +(JR|Jr|jr|JR\\.|Jr\\.|SR|Sr|sr|SR\\.|Sr\\.)$", "", vector)
-
- 
+  # Delete only
+  vector<-sub("^(JR|Jr|jr|JR\\.|Jr\\.|SR|Sr|sr|SR\\.|Sr\\.|INC|IN|In|Inc)$", "", vector)
   
+ 
   # # Delete Sr (106361)
   # vector<-sub("* +()", "", vector)
   # # Delete Sr at the begining
@@ -150,6 +162,9 @@ cleanstring<-function(x){
   #print(vector)
   # Delete at the end
   vector<-sub(" +(DR|Dr|dr|DR\\.|Dr\\.|Mr|MR|Mr\\.|MR\\.|Md|MD|Md\\.|MD\\.|Prof|Prof\\.|Mrs\\.|MRS\\.|MRs\\.)$", "", vector)
+  # Delete only case
+  vector<-sub("^(DR|Dr|dr|DR\\.|Dr\\.|Mr|MR|Mr\\.|MR\\.|Md|MD|Md\\.|MD\\.|Prof|Prof\\.|Mrs\\.|MRS\\.|MRs\\.)$", "", vector)
+  
   vector<-gsub("&Oslash;", "Ø", vector)
   vector<-gsub("OSLASHED\\s", "Ø", vector)
   
@@ -219,16 +234,23 @@ cleanstring<-function(x){
   vector<-sub("\\s+", " ", str_trim(vector))
   # Delete II, III or IV, V, VI
   vector<-sub(" +(II|III|IV|V)$", "", vector)
+  vector<-sub("^(I|II|III|IV|V|VI|i|ii|iii|iv|v|vi|Ii|Iii|Iv|Vi|nny|S-|SRL|Uop\\s+Llc)$", "", vector)
   # All after "; c/o " 26693, 7783
   vector<-sub(";?\\s?(c/o|C/o|C/O|c/O|c/c|C/C|c/|C/O)+(.*)", "", vector)
   # All after legal, 4890
-  vector<-sub(";?\\s?(legal|Legal|LEGAL|IBM |Universität|University|Universiteit|Universiteit|Lund Institute|Hewlett-Packard|QUALCOMM|Ludwig Ins|Division |Department|Research|The\\s+|the\\s+|THE\\s+|Pfizer|PFIZER|EASTMAN KODAK|Eastman Kodak|Microsfot|Microsoft|Univ |Uni |Dept |Dep |Inst |Ins |Office|Management|Massachusetts|National|Apartment|SmithKline|Pharm Res|Unilever|Université)+(.*)", "", vector)
+  vector<-sub(";?\\s?(Newcastle|Duke\\s+University|Johnson&Johnson|Coop\\s+Res|Rhône-Poul|California|du\\s+Sacre|SONY|Depart\\s+|ACS\\s+Dob|Imperial|Epoch\\s+Medical|NV\\s+Organon|Tsukuba\\s+Hisamitsu|Osaca|Glaxo|UCLA\\s+|Duke\\s+U|Sygen\\s+Inte|Ecole\\s+Sup|Agouron\\s+Pha|KULeuven|KU\\s+Leuven|Centre\\s+fo|Advanced|Ca\\s+Lab|Solvay|Northrop|Div\\s+Bioeng|Wellman\\s+Lab|Rush-Presbyterian|Japan\\s+Tobacco|Niigata\\s+Uni|GE\\s+Healthcar|Electrical\\s+En|SmithKl\\s+Bee|Conopco|Memorial\\s+Sloan|New\\s+York|Dpt\\s+of|Walter\\s+Reed\\s+Ar|Celera\\s+Geno|IntraMedical\\s+Imag|Alliance\\s+Prot|SM\\s+Chemicals|MRC\\s+Human|Emisphere\\s+Tec|Rua\\s+Onze)+(.*)", "", vector)
+  vector<-sub(";?\\s?(Montana\\s+State|Yale\\s+University|RWTH\\s+Aachen|Laban\\s+Inter|Osaka\\s+Un|Hanoi\\s+Colle|Indian\\s+Stati|JohnsonJohnson|Southend\\s+Main\\s+Ro|Oxford\\s+Glyc|NATIONAL|Corner\\s+of|Scynexis|Cntr\\s+Dis|ITT\\s+Automotive|CA\\s+Lab|Tsukuba\\s+HISAMITSU|JP\\s+Tabacco|Japan|Manugistics|Computer|Chugai\\s+Bioph|UECKER\\s+ASSO|Aston\\s+Lane|Saratoga\\s+Garden|Eli\\s+Lilly\\s+an|Belcan\\s+Corp|Résidence|Smithkline|Western\\s+General|State\\s+Oceanic|Dreamhouse\\s+Software|Uhlig\\s+LLC|San\\s+Franci|Award\\s+Software|Top\\s+Global|Signature\\s+Control|Kobo\\s+Products|Sajjaingadh\\s+Housing|Broadcom|Dow\\s+Agrosci|Internat\\s+Paten|Janssen\\s+Pharm)+(.*)", "", vector)
+  
+  vector<-sub(";?\\s?(legal|Legal|LEGAL|IBM |Universität|University|Universiteit|Universiteit|Lund Institute|Hewlett-Packard|QUALCOMM|Ludwig Ins|Division |Department|Research|The\\s+|the\\s+|THE\\s+|Pfizer|PFIZER|EASTMAN KODAK|Eastman Kodak|Microsfot|Microsoft|Univ |Uni |Dept |Dep |Inst |Ins |Office|Management|Massachusetts|National|Apartment|SmithKline|Pharm Res|Unilever|Université|LG\\s+Life\\+sScie|Iatron\\s+Labora)+(.*)", "", vector)
   vector<-sub(";?\\s?(EMULEX|Honeywell Inte|Neuroscience|CITRIX|Children|Hospital|Laboratory|Ctr f|LAB |Lab |Tokyo|Graduate|United|Plant|Institute|Institut|UTSW|Glaxo |Chiron Corp|Syngenta|Swedish Medical|Syngenta|Lsu Medical|MBG Business|School|Pioneer |Sony|Boehringer|Orthopedics|Pharmacia|Rhone-Poulenc|Kyowa|RICOH|European|MINNESOTA|Minnesota|Molecular|Ribo Targets|Public|Pharmaceutical|Corporate|VaxGen|BMFZ\\s+und|Facildade\\s+de|Custom\\s+|OSI\\s+Pharma|ALBERT\\s+EINSTEIN\\s+COLL|CORPORATION|ADMINISTRATOR|OLD\\s+NATION)+(.*)", "", vector)
   #31831
   vector<-sub(";?\\s?(Qualcomm|Clinical|Orion Cor|Orb Net|Ricoh|Mobay Ch|GlaxoSm|Bio-Defense|Novartis|FUJITSU|Kirin Beer|American Expr|Hatfield Marine|Cent\\s+for\\s+Imm|Embarcadero Sys|Southwestern|Pres\\s+Fellow|LAURA\\s+DUPRIEST|NTT DoCoMo|Pysician|Postech|NCR Corpo|Imperial Canc|Chron\\s+Corp|JP\\s+Morgan\\s+Chas|Systems\\s+|4th|Quality\\s+Met|Alister\\s+Bioco|Clinical|UOP\\s+LLC|Vestek\\s+Elek|AstraZeneca|Segretaria|GlaxoSmit|Fachrichtung|Prosidion|Emulex\\s+De|DBLive|AOP\\s+LLC|ASTON\\s+LANE|INV\\s+BIOMEDICAS|Faculty|International|Motorola|Société|Neurog\\s+)+(.*)", "", vector)
   #print(vector)
   vector<-sub(";?\\s?(MIT Tec|Toshiba|Bio |Celartem|DuPont Ag|MENICON |Vestel Elektro|Pennsylvania|Panasonic|Rensselaer Polytec|Lilly Forsc|Organon|Pennsylvania|College|Istituto|Westar\\s+BioEng|Universitet|Malaria\\s+Vacci|Pres\\s+Fel|Shanghai Ge|Dow Global|LLC\\s+|INC\\s+|Inc\\s+|Corporation|Healthcare|HP\\s+Compan|Flat\\s+|Kanebo\\s+Cos|Univalid\\s+Bio|Amersham\\s+He|Pharma\\s+M|Solvay\\s+Pha|2|Eisai\\s+Inc|HGM-McMaster|Deaconess\\s+Me|Wisconsin|Russian\\s+Aca|Cancer\\s+Res|BAE\\s+SYSTE|TETREL\\s+TECH|PHYSICANS|MICROBIOLOGICAL|ARIZONA\\s+CAN|YALE\\s+CAN)+(.*)", "", vector)
-  vector<-sub(";?\\s?(Falk\\s+Cardiovascular|Biovail\\s+Techn|Micro-Integration|Mircrosoft|Huntsman\\s+Cancer|Mount\\s+Sinai\\s+School|Datascope|International|DOW\\s+CORNING|PETROBAS\\s+|Hewlett\\s+Packard|Alistair\\s+British|Fujitsu\\s+Lim|Intellectual\\s+Property|Synaptics|Oxford\\s+BioMedica)+(.*)", "", vector)
+  vector<-sub(";?\\s?(Falk\\s+Cardiovascular|Biovail\\s+Techn|Micro-Integration|Mircrosoft|Huntsman\\s+Cancer|Mount\\s+Sinai\\s+School|Datascope|International|DOW\\s+CORNING|PETROBAS\\s+|Hewlett\\s+Packard|Alistair\\s+British|Fujitsu\\s+Lim|Intellectual\\s+Property|Synaptics|Oxford\\s+BioMedica|CareerBuilder|Xicor|Pharmanex|Asynchrony|Ribapharm|ADSI|Genetech)+(.*)", "", vector)
+
+  
+  
   
   #print(vector)
   vector<-gsub("\\s+DE$", "", vector)
@@ -278,28 +300,33 @@ cleannames_two<-function(query, filename=NULL){
   df<-dbGetQuery(patstat, query)
   print(paste("Number of rows:", nrow(df)))
   print(paste("Distinct IDs:",length(unique(df$finalID))))
-  
-  df.m<-str_split(df$name, ", ",  simplify=TRUE)
+  # 
+  df.m<-str_split(df$name, ", ", n=3, simplify=TRUE)
   df.m<-as.data.frame(df.m)
   df$firstname<-as.character(df.m[,2])
   df$lastname<-as.character(df.m[,1])
   df$complement<-as.character(df.m[,3])
+  # 
+  # df_c<-df[toupper(df$firstname)!='INC.' & toupper(df$firstname)!='INC' & toupper(df$firstname)!='LLC.' & toupper(df$firstname)!='LLC' & toupper(df$firstname)!='LTD.' & toupper(df$firstname)!='LTD' & toupper(df$lastname)!='INC.' & toupper(df$lastname)!='INC' & toupper(df$lastname)!='LLC.' & toupper(df$lastname)!='LLC' & toupper(df$lastname)!='LTD.' & toupper(df$lastname)!='LTD' & toupper(df$complement)!='INC.' & toupper(df$complement)!='INC' & toupper(df$complement)!='LLC.' & toupper(df$complement)!='LLC' & toupper(df$complement)!='LTD.' & toupper(df$complement)!='LTD',]
+  # # df_c<-df_c[toupper(df_c$lastname)!='INC.' & toupper(df_c$lastname)!='LLC.' & toupper(df_c$lastname)!='LTD.',]
+  # 
+  # df_nc<-df[toupper(df$firstname)=='INC.' | toupper(df$firstname)=='INC' | toupper(df$firstname)=='LLC.' | toupper(df$firstname)=='LLC' | toupper(df$firstname)=='LTD.' | toupper(df$firstname)=='LTD' | toupper(df$lastname)=='INC.' | toupper(df$lastname)=='INC' | toupper(df$lastname)=='LLC.' | toupper(df$lastname)=='LLC' | toupper(df$lastname)=='LTD.' | toupper(df$lastname)=='LTD'| toupper(df$complement)=='INC.' | toupper(df$complement)=='INC' | toupper(df$complement)=='LLC.' | toupper(df$complement)=='LLC' | toupper(df$complement)=='LTD.' | toupper(df$complement)=='LTD',]
+
+  df_c<-df[toupper(df$firstname)!='INC.' & toupper(df$firstname)!='INC' & toupper(df$firstname)!='LLC.' & toupper(df$firstname)!='LLC' & toupper(df$firstname)!='LTD.' & toupper(df$firstname)!='LTD' & toupper(df$lastname)!='INC.' & toupper(df$lastname)!='INC' & toupper(df$lastname)!='LLC.' & toupper(df$lastname)!='LLC' & toupper(df$lastname)!='LTD.' & toupper(df$lastname)!='LTD',]
+  df_nc<-df[toupper(df$firstname)=='INC.' | toupper(df$firstname)=='INC' | toupper(df$firstname)=='LLC.' | toupper(df$firstname)=='LLC' | toupper(df$firstname)=='LTD.' | toupper(df$firstname)=='LTD' | toupper(df$lastname)=='INC.' | toupper(df$lastname)=='INC' | toupper(df$lastname)=='LLC.' | toupper(df$lastname)=='LLC' | toupper(df$lastname)=='LTD.' | toupper(df$lastname)=='LTD',]
   
-  df_c<-df[toupper(df$firstname)!='INC.' & toupper(df$firstname)!='INC' & toupper(df$firstname)!='LLC.' & toupper(df$firstname)!='LLC' & toupper(df$firstname)!='LTD.' & toupper(df$firstname)!='LTD' & toupper(df$lastname)!='INC.' & toupper(df$lastname)!='INC' & toupper(df$lastname)!='LLC.' & toupper(df$lastname)!='LLC' & toupper(df$lastname)!='LTD.' & toupper(df$lastname)!='LTD' & toupper(df$complement)=='INC.' & toupper(df$complement)=='INC' & toupper(df$complement)=='LLC.' & toupper(df$complement)=='LLC' & toupper(df$complement)=='LTD.' & toupper(df$complement)=='LTD',]
-  # df_c<-df_c[toupper(df_c$lastname)!='INC.' & toupper(df_c$lastname)!='LLC.' & toupper(df_c$lastname)!='LTD.',]
-  
-  df_nc<-df[toupper(df$firstname)=='INC.' | toupper(df$firstname)=='INC' | toupper(df$firstname)=='LLC.' | toupper(df$firstname)=='LLC' | toupper(df$firstname)=='LTD.' | toupper(df$firstname)=='LTD' | toupper(df$lastname)=='INC.' | toupper(df$lastname)=='INC' | toupper(df$lastname)=='LLC.' | toupper(df$lastname)=='LLC' | toupper(df$lastname)=='LTD.' | toupper(df$lastname)=='LTD'| toupper(df$complement)=='INC.' | toupper(df$complement)=='INC' | toupper(df$complement)=='LLC.' | toupper(df$complement)=='LLC' | toupper(df$complement)=='LTD.' | toupper(df$complement)=='LTD',]
   
   df_c$firstname<-cleanstring(df_c$firstname)
   df_c$lastname<-cleanstring(df_c$lastname)
   df_c$complement<-cleanstring(df_c$complement)
-  
-  
-  df_c$full<-as.character(paste0(ifelse(df_c$firstname=="", "",paste0(df_c$firstname, " ")), df_c$lastname))
-  
+
+
+  df_c$full<-as.character(paste0(ifelse(df_c$firstname=="", "",paste0(df_c$firstname, " ")), ifelse(df_c$complement=="", "",paste0(df_c$complement, " ")), df_c$lastname))
+
   write.csv(df_c, paste0("../output/nationality/", filename, "_c.csv"))
   write.csv(df_nc, paste0("../output/nationality/", filename, "_nc.csv"))
   return(list(df_c, df_nc))
+
 }
 
 ##Partial Matching Function

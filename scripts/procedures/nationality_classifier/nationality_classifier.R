@@ -206,7 +206,19 @@ write.csv(unique(part4_c$full), paste0("../output/nationality/", "part4_onlyname
 part4_nc<-as.data.frame(part4.list[2])
 
 
+part4_c<-read.csv("../output/nationality/part4/TO MERGE IDS part4.csv_c.csv")
+colnames(part4_c)
+View(part4_c[1:10,2:ncol(part4_c)])
+part4_c<-part4_c[,2:ncol(part4_c)]
+part4_c_res<-reshape(transform(part4_c, time=ave(full, finalID, FUN=seq_along)), idvar="finalID", direction="wide")
 
+part4_c_unique<-part4_c_res[is.na(part4_c_res$full.2),]
+part4_c_unique$full1_UPPER<-toupper(part4_c_unique$full.1)
+length(unique(part4_c_unique$finalID))
+#123482
+length(unique(part4_c_unique$full.1))
+
+write.csv(part4_c_unique,paste0("../output/nationality/", "part4a.csv"))
 
 "
 SELECT COUNT(DISTINCT a.finalID)       
@@ -512,6 +524,431 @@ DROP TABLE IF EXISTS christian.idnames_a06;
 "
 
 ###################
+# Part 9
+###################
+
+part9.list<-cleannames_two(query="SELECT DISTINCT a.name, a.finalID 
+                        FROM christian.idnames_a07 a 
+                        WHERE a.ncommas='2' AND a.ncharac<='40' AND a.nblanks='2'AND a.ncommasblanksright='2' AND a.hnumber='0' AND a.ndots='0'
+                        ORDER BY a.finalID",
+                           filename = "part9.csv")
+part9_nc<-as.data.frame(part9.list[2])
+part9_c<-as.data.frame(part9.list[1])
+
+part9_c_res<-reshape(transform(part9_c, time=ave(full, finalID, FUN=seq_along)), idvar="finalID", direction="wide")
+part9_c_unique<-part9_c_res[is.na(part9_c_res$full.2),]
+part9_c_unique$full1_UPPER<-toupper(part9_c_unique$full.1)
+write.csv(part9_c_unique,paste0("../output/nationality/", "part9a.csv"))
+length(unique(part9_c_unique$finalID))
+# 10124
+length(unique(part9_c_unique$full.1))
+#10088
+length(unique(part9_c_unique$full1_UPPER))
+#10086
+write.csv(unique(part9_c_unique$full1_UPPER), paste0("../output/nationality/", "part9a_onlynames_unique.csv"))
+
+part9_c_dupl<-part9_c_res[!is.na(part9_c_res$full.2),]
+nrow(part9_c_dupl)
+# 39
+part9_c_dupl$full_big<-ifelse(stri_length(part9_c_dupl$full.1)>=stri_length(part9_c_dupl$full.2), part9_c_dupl$full.1, part9_c_dupl$full.2)
+part9_c_dupl$full_big<-toupper(part9_c_dupl$full_big)
+write.csv(part9_c_dupl, paste0("../output/nationality/", "part9_duplicates.csv"))
+write.csv(unique(part9_c_dupl$full_big), paste0("../output/nationality/", "part9_onlynames_duplicates.csv"))
+length(unique(part9_c_dupl$full_big))
+# 39
+
+"
+SELECT COUNT(DISTINCT a.finalID)       
+FROM christian.idnames_a07 a;
+/*
++---------------------------+
+| COUNT(DISTINCT a.finalID) |
++---------------------------+
+|                     42056 |
++---------------------------+
+1 row in set (0,05 sec)
+*/
+
+DROP TABLE IF EXISTS christian.idnames_part09;
+CREATE TABLE christian.idnames_part09 AS
+SELECT DISTINCT a.name, a.finalID 
+                        FROM christian.idnames_a07 a 
+                        WHERE a.ncommas='2' AND a.ncharac<='40' AND a.nblanks='2'AND a.ncommasblanksright='2' AND a.hnumber='0' AND a.ndots='0'
+                        ORDER BY a.finalID;
+/*
+Query OK, 10203 rows affected (0,50 sec)
+Records: 10203  Duplicates: 0  Warnings: 0
+*/
+
+
+SHOW INDEX FROM christian.idnames_part09; 
+ALTER TABLE christian.idnames_part09 ADD INDEX(finalID);
+
+DROP TABLE IF EXISTS christian.idnames_a09;
+CREATE TABLE christian.idnames_a09 AS
+SELECT a.*
+FROM christian.idnames_a07 a
+LEFT JOIN christian.idnames_part09 b
+ON a.finalID=b.finalID
+WHERE b.finalID IS NULL;
+/*
+Query OK, 35803 rows affected (0,86 sec)
+Records: 35803  Duplicates: 0  Warnings: 0
+*/
+
+SHOW INDEX FROM christian.idnames_a09; 
+ALTER TABLE christian.idnames_a09 ADD INDEX(finalID);
+
+DROP TABLE IF EXISTS christian.idnames_a07;
+"
+
+###################
+# Part 10
+###################
+
+part10.list<-cleannames_two(query="SELECT DISTINCT a.name, a.finalID 
+                            FROM christian.idnames_a09 a 
+                            WHERE a.ncommas='2' AND a.ncharac<='40' AND a.nblanks='2'AND a.ncommasblanksright='2'
+                            ORDER BY a.finalID",
+                            filename = "part10.csv")
+part10_nc<-as.data.frame(part10.list[2])
+part10_nc$full<-paste(cleanstring(part10_nc$firstname),part10_nc$lastname)
+write.csv(part10_nc, paste0("../output/nationality/", "part10a_nc_merge.csv"))
+write.csv(unique(part10_nc$full), paste0("../output/nationality/", "part10a_onlynames_nc.csv"))
+
+
+
+part10_c<-as.data.frame(part10.list[1])
+
+part10_c_res<-reshape(transform(part10_c, time=ave(full, finalID, FUN=seq_along)), idvar="finalID", direction="wide")
+part10_c_unique<-part10_c_res[is.na(part10_c_res$full.2),]
+part10_c_unique$full1_UPPER<-toupper(part10_c_unique$full.1)
+write.csv(part10_c_unique,paste0("../output/nationality/", "part10a.csv"))
+length(unique(part10_c_unique$finalID))
+# 22964
+length(unique(part10_c_unique$full.1))
+# 22217
+length(unique(part10_c_unique$full1_UPPER))
+# 22201
+write.csv(unique(part10_c_unique$full1_UPPER), paste0("../output/nationality/", "part10a_onlynames_unique.csv"))
+
+part10_c_dupl<-part10_c_res[!is.na(part10_c_res$full.2),]
+nrow(part10_c_dupl)
+# 76
+part10_c_dupl$full_big<-ifelse(stri_length(part10_c_dupl$full.1)>=stri_length(part10_c_dupl$full.2), part10_c_dupl$full.1, part10_c_dupl$full.2)
+part10_c_dupl$full_big<-toupper(part10_c_dupl$full_big)
+write.csv(part10_c_dupl, paste0("../output/nationality/", "part10_duplicates.csv"))
+write.csv(unique(part10_c_dupl$full_big), paste0("../output/nationality/", "part10_onlynames_duplicates.csv"))
+length(unique(part10_c_dupl$full_big))
+# 76
+
+"
+SELECT COUNT(DISTINCT a.finalID)       
+FROM christian.idnames_a09 a;
+/*
++---------------------------+
+| COUNT(DISTINCT a.finalID) |
++---------------------------+
+|                     31893 |
++---------------------------+
+1 row in set (0,04 sec)
+
+*/
+
+DROP TABLE IF EXISTS christian.idnames_part010;
+CREATE TABLE christian.idnames_part010 AS
+SELECT DISTINCT a.name, a.finalID 
+                            FROM christian.idnames_a09 a 
+                            WHERE a.ncommas='2' AND a.ncharac<='40' AND a.nblanks='2'AND a.ncommasblanksright='2'
+                            ORDER BY a.finalID;
+/*
+Query OK, 23129 rows affected (0,78 sec)
+Records: 23129  Duplicates: 0  Warnings: 0
+*/
+
+
+SHOW INDEX FROM christian.idnames_part010; 
+ALTER TABLE christian.idnames_part010 ADD INDEX(finalID);
+
+DROP TABLE IF EXISTS christian.idnames_a010;
+CREATE TABLE christian.idnames_a010 AS
+SELECT a.*
+FROM christian.idnames_a09 a
+LEFT JOIN christian.idnames_part010 b
+ON a.finalID=b.finalID
+WHERE b.finalID IS NULL;
+/*
+Query OK, 11684 rows affected (0,52 sec)
+Records: 11684  Duplicates: 0  Warnings: 0
+*/
+
+SHOW INDEX FROM christian.idnames_a010; 
+ALTER TABLE christian.idnames_a010 ADD INDEX(finalID);
+
+DROP TABLE IF EXISTS christian.idnames_a09;
+"
+
+###################
+# Part 11
+###################
+
+part11.list<-cleannames_two(query="SELECT DISTINCT a.name, a.finalID 
+                            FROM christian.idnames_a010 a 
+                            WHERE a.ncommas='2' AND a.ncommasblanksright='2'
+                            ORDER BY a.finalID",
+                            filename = "part11.csv")
+part11_nc<-as.data.frame(part11.list[2])
+part11_c<-as.data.frame(part11.list[1])
+
+part11_c_res<-reshape(transform(part11_c, time=ave(full, finalID, FUN=seq_along)), idvar="finalID", direction="wide")
+part11_c_unique<-part11_c_res[is.na(part11_c_res$full.2),]
+part11_c_unique$full.1<-as.character(paste0(ifelse(part11_c_unique$firstname.1=="", ifelse(part11_c_unique$complement.1=="", "", paste0(part11_c_unique$complement.1," ")), paste0(part11_c_unique$firstname.1, " ")), part11_c_unique$lastname.1))
+part11_c_unique$full1_UPPER<-toupper(part11_c_unique$full.1)
+write.csv(part11_c_unique,paste0("../output/nationality/", "part11a.csv"))
+length(unique(part11_c_unique$finalID))
+# 3901
+length(unique(part11_c_unique$full.1))
+# 3749
+length(unique(part11_c_unique$full1_UPPER))
+# 3726
+write.csv(unique(part11_c_unique$full1_UPPER), paste0("../output/nationality/", "part11a_onlynames_unique.csv"))
+
+part11_c_dupl<-part11_c_res[!is.na(part11_c_res$full.2),]
+nrow(part11_c_dupl)
+# 423
+View(part11_c_dupl[part11_c_dupl$firstname.1=="" & part11_c_dupl$complement.1!="",])
+#part11_c_dupl$full_big<-ifelse(stri_length(part11_c_dupl$full.1)>=stri_length(part11_c_dupl$full.2), part11_c_dupl$full.1, part11_c_dupl$full.2)
+part11_c_dupl$full_big<-toupper(part11_c_dupl$full.1)
+write.csv(part11_c_dupl, paste0("../output/nationality/", "part11_duplicates.csv"))
+write.csv(unique(part11_c_dupl$full_big), paste0("../output/nationality/", "part11_onlynames_duplicates.csv"))
+length(unique(part11_c_dupl$full_big))
+# 420
+
+"
+SELECT COUNT(DISTINCT a.finalID)       
+FROM christian.idnames_a010 a;
+/*
++---------------------------+
+| COUNT(DISTINCT a.finalID) |
++---------------------------+
+|                      8843 |
++---------------------------+
+1 row in set (0,01 sec)
+*/
+
+DROP TABLE IF EXISTS christian.idnames_part011;
+CREATE TABLE christian.idnames_part011 AS
+SELECT DISTINCT a.name, a.finalID 
+                            FROM christian.idnames_a010 a 
+                            WHERE a.ncommas='2' AND a.ncommasblanksright='2'
+                            ORDER BY a.finalID;
+/*
+Query OK, 4815 rows affected (0,17 sec)
+Records: 4815  Duplicates: 0  Warnings: 0
+*/
+
+
+SHOW INDEX FROM christian.idnames_part011; 
+ALTER TABLE christian.idnames_part011 ADD INDEX(finalID);
+
+DROP TABLE IF EXISTS christian.idnames_a011;
+CREATE TABLE christian.idnames_a011 AS
+SELECT a.*
+FROM christian.idnames_a010 a
+LEFT JOIN christian.idnames_part011 b
+ON a.finalID=b.finalID
+WHERE b.finalID IS NULL;
+/*
+Query OK, 5182 rows affected (0,31 sec)
+Records: 5182  Duplicates: 0  Warnings: 0
+*/
+
+SHOW INDEX FROM christian.idnames_a011; 
+ALTER TABLE christian.idnames_a011 ADD INDEX(finalID);
+
+DROP TABLE IF EXISTS christian.idnames_a010;
+"
+
+
+###################
+# Part 12
+###################
+
+part12.list<-cleannames_two(query="SELECT DISTINCT a.name, a.finalID 
+                            FROM christian.idnames_a011 a 
+                            WHERE a.ncommas='3' AND a.ncommasblanksright>='2'
+                            ORDER BY a.finalID",
+                            filename = "part12.csv")
+part12_nc<-as.data.frame(part12.list[2])
+part12_c<-as.data.frame(part12.list[1])
+
+part12_c_res<-reshape(transform(part12_c, time=ave(full, finalID, FUN=seq_along)), idvar="finalID", direction="wide")
+part12_c_unique<-part12_c_res[is.na(part12_c_res$full.2),]
+part12_c_unique$full.1<-as.character(paste0(ifelse(part12_c_unique$firstname.1=="", ifelse(part12_c_unique$complement.1=="", "", paste0(part12_c_unique$complement.1," ")), paste0(part12_c_unique$firstname.1, " ")), part12_c_unique$lastname.1))
+part12_c_unique$full1_UPPER<-toupper(part12_c_unique$full.1)
+part12_c_unique$full1_UPPER<-gsub(",", " ", part12_c_unique$full1_UPPER)
+write.csv(part12_c_unique,paste0("../output/nationality/", "part12a.csv"))
+length(unique(part12_c_unique$finalID))
+# 3901
+length(unique(part12_c_unique$full.1))
+# 2201
+length(unique(part12_c_unique$full1_UPPER))
+# 2199
+write.csv(unique(part12_c_unique$full1_UPPER), paste0("../output/nationality/", "part12a_onlynames_unique.csv"))
+
+part12_c_dupl<-part12_c_res[!is.na(part12_c_res$full.2),]
+nrow(part12_c_dupl)
+# 400
+View(part12_c_dupl[part12_c_dupl$firstname.1=="" & part12_c_dupl$complement.1!="",])
+#part12_c_dupl$full_big<-ifelse(stri_length(part12_c_dupl$full.1)>=stri_length(part12_c_dupl$full.2), part12_c_dupl$full.1, part12_c_dupl$full.2)
+part12_c_dupl$full_big<-toupper(part12_c_dupl$full.1)
+part12_c_dupl$full_big<-gsub(",", " ", part12_c_dupl$full_big)
+
+write.csv(part12_c_dupl, paste0("../output/nationality/", "part12_duplicates.csv"))
+write.csv(unique(part12_c_dupl$full_big), paste0("../output/nationality/", "part12_onlynames_duplicates.csv"))
+length(unique(part12_c_dupl$full_big))
+# 400
+
+"
+SELECT COUNT(DISTINCT a.finalID)       
+FROM christian.idnames_a011 a;
+/*
++---------------------------+
+| COUNT(DISTINCT a.finalID) |
++---------------------------+
+|                      4519 |
++---------------------------+
+1 row in set (0,01 sec)
+
+*/
+
+DROP TABLE IF EXISTS christian.idnames_part012;
+CREATE TABLE christian.idnames_part012 AS
+SELECT DISTINCT a.name, a.finalID 
+                            FROM christian.idnames_a011 a 
+                            WHERE a.ncommas='3' AND a.ncommasblanksright>='2'
+                            ORDER BY a.finalID;
+/*
+Query OK, 3065 rows affected (0,14 sec)
+Records: 3065  Duplicates: 0  Warnings: 0
+*/
+
+
+SHOW INDEX FROM christian.idnames_part012; 
+ALTER TABLE christian.idnames_part012 ADD INDEX(finalID);
+
+DROP TABLE IF EXISTS christian.idnames_a012;
+CREATE TABLE christian.idnames_a012 AS
+SELECT a.*
+FROM christian.idnames_a011 a
+LEFT JOIN christian.idnames_part012 b
+ON a.finalID=b.finalID
+WHERE b.finalID IS NULL;
+/*
+Query OK, 1987 rows affected (0,12 sec)
+Records: 1987  Duplicates: 0  Warnings: 0
+
+*/
+
+SHOW INDEX FROM christian.idnames_a012; 
+ALTER TABLE christian.idnames_a012 ADD INDEX(finalID);
+
+DROP TABLE IF EXISTS christian.idnames_a011;
+"
+
+
+###################
+# Part 13
+###################
+
+part13.list<-cleannames_two(query="SELECT DISTINCT a.name, a.finalID 
+                            FROM christian.idnames_a012 a 
+                            ORDER BY a.finalID",
+                            filename = "part13.csv")
+part13_nc<-as.data.frame(part13.list[2])
+part13_c<-as.data.frame(part13.list[1])
+
+part13_c$full<-gsub(",", " ", part13_c$full)
+part13_c$full<-gsub("\\.", " ", part13_c$full)
+part13_c$full<-gsub("/", " ", part13_c$full)
+part13_c$full<-sub("\\s+", " ", str_trim(part13_c$full))
+
+part13_c_res<-reshape(transform(part13_c, time=ave(full, finalID, FUN=seq_along)), idvar="finalID", direction="wide")
+part13_c_unique<-part13_c_res[is.na(part13_c_res$full.2),]
+part13_c_unique$full.1<-as.character(paste0(ifelse(part13_c_unique$firstname.1=="", ifelse(part13_c_unique$complement.1=="", "", paste0(part13_c_unique$complement.1," ")), paste0(part13_c_unique$firstname.1, " ")), part13_c_unique$lastname.1))
+part13_c_unique$full1_UPPER<-toupper(part13_c_unique$full.1)
+part13_c_unique$full1_UPPER<-gsub(",", " ", part13_c_unique$full1_UPPER)
+write.csv(part13_c_unique,paste0("../output/nationality/", "part13a.csv"))
+length(unique(part13_c_unique$finalID))
+#1776
+length(unique(part13_c_unique$full.1))
+#1577
+length(unique(part13_c_unique$full1_UPPER))
+# 1575
+write.csv(unique(part13_c_unique$full1_UPPER), paste0("../output/nationality/", "part13a_onlynames_unique.csv"))
+
+part13_c_dupl<-part13_c_res[!is.na(part13_c_res$full.2),]
+nrow(part13_c_dupl)
+# 98
+View(part13_c_dupl[part13_c_dupl$firstname.1=="" & part13_c_dupl$complement.1!="",])
+#part13_c_dupl$full_big<-ifelse(stri_length(part13_c_dupl$full.1)>=stri_length(part13_c_dupl$full.2), part13_c_dupl$full.1, part13_c_dupl$full.2)
+part13_c_dupl$full_big<-toupper(part13_c_dupl$full.1)
+part13_c_dupl$full_big<-gsub(",", " ", part13_c_dupl$full_big)
+
+write.csv(part13_c_dupl, paste0("../output/nationality/", "part13_duplicates.csv"))
+write.csv(unique(part13_c_dupl$full_big), paste0("../output/nationality/", "part13_onlynames_duplicates.csv"))
+length(unique(part13_c_dupl$full_big))
+# 95
+
+"
+SELECT COUNT(DISTINCT a.finalID)       
+FROM christian.idnames_a012 a;
+/*
++---------------------------+
+| COUNT(DISTINCT a.finalID) |
++---------------------------+
+|                      4519 |
++---------------------------+
+1 row in set (0,01 sec)
+
+*/
+
+DROP TABLE IF EXISTS christian.idnames_part013;
+CREATE TABLE christian.idnames_part013 AS
+SELECT DISTINCT a.name, a.finalID 
+FROM christian.idnames_a012 a 
+WHERE a.ncommas='3' AND a.ncommasblanksright>='2'
+ORDER BY a.finalID;
+/*
+Query OK, 3065 rows affected (0,14 sec)
+Records: 3065  Duplicates: 0  Warnings: 0
+*/
+
+
+SHOW INDEX FROM christian.idnames_part013; 
+ALTER TABLE christian.idnames_part013 ADD INDEX(finalID);
+
+DROP TABLE IF EXISTS christian.idnames_a013;
+CREATE TABLE christian.idnames_a013 AS
+SELECT a.*
+FROM christian.idnames_a012 a
+LEFT JOIN christian.idnames_part013 b
+ON a.finalID=b.finalID
+WHERE b.finalID IS NULL;
+/*
+Query OK, 1987 rows affected (0,13 sec)
+Records: 1987  Duplicates: 0  Warnings: 0
+
+*/
+
+SHOW INDEX FROM christian.idnames_a013; 
+ALTER TABLE christian.idnames_a013 ADD INDEX(finalID);
+
+DROP TABLE IF EXISTS christian.idnames_a012;
+"
+
+
+###################
 # Part 8
 ###################
 #52874
@@ -642,8 +1079,22 @@ write.csv2(match4, "../output/matched_names/match4.csv")
 
 matchall<-merge.list(list(match1, match2, match3, match4))
 write.csv2(matchall, "../output/matched_names/matchall.csv")
+matchall<-read.csv2("../output/matched_names/matchall.csv")
+
+part8.no<-dbGetQuery(patstat, "SELECT DISTINCT a.name, a.finalID 
+                        FROM christian.idnames_a011 a 
+                        WHERE a.name='The designation of the inventor has not yet been filed'
+                        ORDER BY a.finalID")
+# "There are 155 rows with no inventor"
+
+part8.listids<-dbGetQuery(patstat, "SELECT DISTINCT a.ID FROM christian.idnames_a011 a WHERE a.name!='The designation of the inventor has not yet been filed' ORDER BY a.ID")
+part8.found<-merge(matchall, part8.listids, by = "ID")
+length(unique(part8.found$ID))
+# 2985
+View(part8.found[part8.found$ID=="HI2544735",])
 
 
+part8.found.unique<-unique(part8.found$ID)
 
 
 
