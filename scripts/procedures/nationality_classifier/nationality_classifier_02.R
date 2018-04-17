@@ -251,15 +251,27 @@ filesab<-rbind(filesab,fm7)
 
 fm8<-read.csv(finallist.manual[8], stringsAsFactors = FALSE)
 colnames(fm8)
-fm8<-fm8[,c(1,2,1,48,49,3:47)]
+fm8<-fm8[,c(1,2,1,50,51,3:47)]
 colnames(fm8)<-colnames(filesab)
 filesab<-rbind(filesab,fm8)
 rm(filesa, filesb, fm1,fm2,fm3,fm4,fm5,fm6,fm7,fm8)
 
-write.csv(filesab, "../output/nationality/final_output/nationality_all_names.csv")
-
-
+#write.csv(filesab, "../output/nationality/final_output/nationality_all_names.csv")
 table(filesab$nationality)
+
+#nationality<-read.csv("../output/nationality/final_output/nationality_all_names.csv")
+nationality<-filesab
+colnames(nationality)
+nationality<-nationality[,c("finalID", "nationality", "probability", "full_big", "name.1" )]
+nationality<-unique(nationality)
+nationality<-nationality[order(nationality$finalID),]
+nationality$nationality<-ifelse(nationality$nationality=="Hispanic.Portguguese", "Hispanic.Portuguese", nationality$nationality)
+length(unique(nationality$finalID))
+# 668835-668823=12
+# 668823-668731=92
+write.csv(nationality, "../output/nationality/final_output/nationality_all_names_only.csv" )
+table(nationality$nationality)
+
 
 
 

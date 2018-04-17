@@ -38,3 +38,4 @@ install.packages("sf")
 install.packages("mapview")
 
 install.packages("stringi")
+install.packages("igraph")

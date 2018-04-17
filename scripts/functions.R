@@ -440,3 +440,47 @@ merge.list = function(datalist){
   #datalist[datalist== ""] <- NA
   datalist
 }
+
+distances_aslist<-function(graph_element){
+  distance<-distances(graph_element)
+  distance.l<-melt(distance)
+  distance.l<-distance.l[distance.l$value!=0,]
+  return(distance.l)
+}
+
+ugraphinv_dis<-function(endyear, withplot=FALSE){
+  inityear<-endyear-4
+  linkyear<-endyear+1
+  print(paste("Beginning year:", inityear))
+  print(paste("Ending year:", endyear))
+  print(paste("Link year:", linkyear))
+  uedges<-dbGetQuery(patstat, paste0("SELECT finalID_, finalID__
+                                        FROM riccaboni.edges_undir_pyr 
+                                        WHERE EARLIEST_FILING_YEAR>=",inityear," AND EARLIEST_FILING_YEAR<=",endyear,"
+                                        ORDER BY EARLIEST_FILING_YEAR"))
+  print("Data has been loaded")
+  print(paste("Number of edges",nrow(uedges)))
+  uedges<-as.matrix(uedges)
+  graph<-graph_from_edgelist(uedges, directed = FALSE)
+  rm(uedges)
+  save(graph, file=paste0("../output/graphs/networks/",inityear,"-",endyear, "_network", ".RData"))
+  print("Graph has been done and saved")
+  
+  components<-decompose.graph(graph, min.vertices=1)
+  distances_outlist<-lapply(components, distances_aslist)
+  distances_outdf<-merge.list(distances_outlist)
+  distances_outdf$lyear<-linkyear
+  write.csv(distances_outdf, paste0("../output/graphs/distance_list/",inityear,"-",endyear, "_list", ".csv"))
+  
+  if(withplot==TRUE){
+    graph.l<-layout_with_drl(graph, options=list(simmer.attraction=0))
+    print("Layout has been done")
+    pdf(paste0("../output/graphs/images/",inityear,"-",endyear, "_plot", ".pdf"))
+    plot(graph, layout=graph.l, vertex.label=NA, vertex.frame.color=NA, vertex.size=0.7, edge.width=0.4)
+    dev.off()
+    print("Plot has been done")
+  }
+  
+  #return(list(graph, distance))
+  return("Done")
+}

@@ -353,8 +353,8 @@ ALTER TABLE riccaboni.t09 ADD INDEX(localID);
 SHOW INDEX FROM riccaboni.t01_allclasses_appid_patstat_us_atleastone;
 
 
-DROP TABLE IF EXISTS riccaboni.t08_names_allclasses_us_mob_atleastone;
-CREATE TABLE riccaboni.t08_names_allclasses_us_mob_atleastone AS
+DROP TABLE IF EXISTS riccaboni.t08_names_allclasses_us_mob_atleastone_one;
+CREATE TABLE riccaboni.t08_names_allclasses_us_mob_atleastone_one AS
 SELECT a.*, IFNULL(b.mobileID, a.ID) AS finalID
       FROM riccaboni.t08_names_allclasses_us_atleastone a 
       LEFT JOIN riccaboni.t09 b
@@ -366,14 +366,40 @@ Query OK, 3122408 rows affected (2 min 0,04 sec)
 Records: 3122408  Duplicates: 0  Warnings: 0
 */
 
+SHOW INDEX FROM riccaboni.t08_names_allclasses_us_mob_atleastone_one;
+ALTER TABLE riccaboni.t08_names_allclasses_us_mob_atleastone_one ADD INDEX(finalID);
+
+SHOW INDEX FROM christian.id_nat;
+ALTER TABLE christian.id_nat ADD INDEX(finalID);
+
+---------------------------------------------------------------------------------------------------
+-- Only the IDS of the name-analysis that correspond to inventors (no firms)
+---------------------------------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS riccaboni.t08_names_allclasses_us_mob_atleastone;
+CREATE TABLE riccaboni.t08_names_allclasses_us_mob_atleastone AS
+SELECT a.*, b.nation, b.prob, b.cname
+      FROM riccaboni.t08_names_allclasses_us_mob_atleastone_one a 
+      INNER JOIN christian.id_nat b
+      ON a.finalID=b.finalID;
+/*
+Query OK, 3121763 rows affected (1 min 48,13 sec)
+Records: 3121763  Duplicates: 0  Warnings: 0
+
+3122408-3121763=645
+*/
+
+
 SHOW INDEX FROM riccaboni.t08_names_allclasses_us_mob_atleastone;
 ALTER TABLE riccaboni.t08_names_allclasses_us_mob_atleastone ADD INDEX(pat);
 ALTER TABLE riccaboni.t08_names_allclasses_us_mob_atleastone ADD INDEX(finalID);
 
+
+/*
 SELECT COUNT(DISTINCT a.ID)       
       FROM riccaboni.t08_names_allclasses_us_mob_atleastone a
       WHERE a.mobileID IS NOT NULL;
-/*
+
 +----------------------+
 | COUNT(DISTINCT a.ID) |
 +----------------------+
@@ -389,15 +415,23 @@ SELECT COUNT(DISTINCT a.ID)
 +----------------------+
 | COUNT(DISTINCT a.ID) |
 +----------------------+
-|               743534 |
+|               743015 |
 +----------------------+
-1 row in set (6,96 sec)
+1 row in set (7,21 sec)
 */
 
 
 SELECT COUNT(DISTINCT a.finalID)       
       FROM riccaboni.t08_names_allclasses_us_mob_atleastone a;
 /*
++---------------------------+
+| COUNT(DISTINCT a.finalID) |
++---------------------------+
+|                    668731 |
++---------------------------+
+1 row in set (4,74 sec)
+
+OLD
 +---------------------------+
 | COUNT(DISTINCT a.finalID) |
 +---------------------------+
@@ -426,6 +460,40 @@ SELECT COUNT(DISTINCT b.mobileID), CHAR_LENGTH(b.mobileID) AS Nchar
 7 rows in set (3,71 sec)
 
 */
+
+
+
+---------------------------------------------------------------------------------------------------
+-- Only the IDS of the name-analysis that correspond to inventors (no firms), with dates, patent family, etc
+---------------------------------------------------------------------------------------------------
+
+SHOW INDEX FROM riccaboni.t08_names_allclasses_us_mob_atleastone;
+SHOW INDEX FROM riccaboni.t01_allclasses_appid_patstat_us_atleastone;
+SHOW INDEX FROM patstat2016b.TLS201_APPLN;
+SHOW INDEX FROM riccaboni.t01_allclasses;
+
+DROP TABLE IF EXISTS christian.t08_class_at1us_date_fam;
+CREATE TABLE christian.t08_class_at1us_date_fam AS
+SELECT a.*, b.APPLN_ID, c.DOCDB_FAMILY_ID, c.APPLN_FILING_YEAR, c.EARLIEST_FILING_YEAR, c.EARLIEST_PUBLN_YEAR, d.yr, d.classes, d.wasComplete
+      FROM riccaboni.t08_names_allclasses_us_mob_atleastone a 
+      INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_atleastone b
+      ON a.pat=b.pat
+      INNER JOIN patstat2016b.TLS201_APPLN c
+      ON b.APPLN_ID=c.APPLN_ID
+INNER JOIN riccaboni.t01_allclasses d
+      ON a.pat=d.pat;
+/*
+Query OK, 3121763 rows affected (2 min 41,15 sec)
+Records: 3121763  Duplicates: 0  Warnings: 0
+
+*/
+
+SELECT * FROM christian.t08_class_at1us_date_fam LIMIT 0,10;
+
+SHOW INDEX FROM christian.t08_class_at1us_date_fam;
+ALTER TABLE christian.t08_class_at1us_date_fam ADD INDEX(pat);
+ALTER TABLE christian.t08_class_at1us_date_fam ADD INDEX(finalID);
+
 
 
 ---------------------------------------------------------------------------------------------------
