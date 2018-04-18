@@ -484,3 +484,22 @@ ugraphinv_dis<-function(endyear, withplot=FALSE){
   #return(list(graph, distance))
   return("Done")
 }
+
+ugraphinv_files<-function(endyear){
+  inityear<-endyear-4
+  linkyear<-endyear+1
+  print(paste("Beginning year:", inityear))
+  print(paste("Ending year:", endyear))
+  print(paste("Link year:", linkyear))
+  uedges<-dbGetQuery(patstat, paste0("SELECT finalID_, finalID__
+                                     FROM riccaboni.edges_undir_pyr 
+                                     WHERE EARLIEST_FILING_YEAR>=",inityear," AND EARLIEST_FILING_YEAR<=",endyear,"
+                                     ORDER BY EARLIEST_FILING_YEAR"))
+  print("Data has been loaded")
+  print(paste("Number of edges",nrow(uedges)))
+  uedges<-as.matrix(uedges)
+  graph<-graph_from_edgelist(uedges, directed = FALSE)
+  rm(uedges)
+  save(graph, file=paste0("../output/graphs/networks/",inityear,"-",endyear, "_network", ".RData"))
+  return("Done")
+}
