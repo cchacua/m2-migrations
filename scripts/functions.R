@@ -456,7 +456,7 @@ distanceoneline<-function(onerow, graph_element){
   return(dline)
 }
 
-ugraphinv_dis<-function(endyear, withplot=FALSE){
+ugraphinv_dis_line<-function(endyear, withplot=FALSE){
   inityear<-endyear-4
   linkyear<-endyear+1
   print(paste("Beginning year (t-5):", inityear))
@@ -480,7 +480,6 @@ ugraphinv_dis<-function(endyear, withplot=FALSE){
 
 
   distances_outdf<-apply(dedges, 1, distanceoneline, graph_element=graph)
-  #distances_outdf<-merge.list(distances_outlist)
   print("Distances have been computed")
   distances_outdf<-merge.list(distances_outdf)
   distances_outdf$lyear<-linkyear
@@ -499,9 +498,58 @@ ugraphinv_dis<-function(endyear, withplot=FALSE){
     print("Plot has been done")
   }
   
-  #return(list(graph, distance))
   return("Done")
 }
+
+ugraphinv_dis_bulk<-function(endyear, withplot=FALSE){
+  inityear<-endyear-4
+  linkyear<-endyear+1
+  print(paste("Beginning year (t-5):", inityear))
+  print(paste("Ending year (t-1):", endyear))
+  print(paste("Link year (t0):", linkyear))
+  uedges<-dbGetQuery(patstat, paste0("SELECT finalID_, finalID__
+                                     FROM riccaboni.edges_undir_pyr 
+                                     WHERE EARLIEST_FILING_YEAR>=",inityear," AND EARLIEST_FILING_YEAR<=",endyear,"
+                                     ORDER BY EARLIEST_FILING_YEAR"))
+  dedges<-dbGetQuery(patstat, paste0("SELECT finalID_, finalID__, undid
+                                     FROM riccaboni.edges_undid_ud
+                                     WHERE EARLIEST_FILING_YEAR=",linkyear))
+  print("Data has been loaded")
+  print(paste("Number of total edges",nrow(uedges)))
+  print(paste("Number of edges to find",nrow(dedges), nrow(dedges)/nrow(uedges)))
+  uedges<-as.matrix(uedges)
+  graph<-graph_from_edgelist(uedges, directed = FALSE)
+  rm(uedges)
+  save(graph, file=paste0("../output/graphs/networks/",inityear,"-",endyear, "_network", ".RData"))
+  print("Graph has been done and saved")
+  
+  vfrom<-V(graph)[V(graph)$name %in% dedges$finalID_]
+  vto<-V(graph)[V(graph)$name %in% dedges$finalID__]
+  dline<-distances(graph, v=vfrom, to=vto, weights = NULL)
+  dline<-melt(dline)
+  #dline<-dline[dline$value!=0,]
+  dline<-dline[dline$value!=0 & dline$value!="Inf",]
+  print("Distances have been computed")
+  gc()
+  dline$undid<-paste0(linkyear, dline$Var1, dline$Var2)
+  dline<-merge(dline,dedges,by="undid")
+  #dline<-dline[dline$undid %in% dedges$undid,]
+  dline$lyear<-linkyear
+
+  write.csv(dline, paste0("../output/graphs/distance_list/",inityear,"-",endyear, "_list", ".csv"))
+  
+  if(withplot==TRUE){
+    graph.l<-layout_with_drl(graph, options=list(simmer.attraction=0))
+    print("Layout has been done")
+    pdf(paste0("../output/graphs/images/",inityear,"-",endyear, "_plot", ".pdf"))
+    plot(graph, layout=graph.l, vertex.label=NA, vertex.frame.color=NA, vertex.size=0.7, edge.width=0.4)
+    dev.off()
+    print("Plot has been done")
+  }
+  gc()
+  return("Done")
+}
+
 
 ugraphinv_files<-function(endyear){
   inityear<-endyear-4

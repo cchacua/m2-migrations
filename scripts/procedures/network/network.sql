@@ -76,6 +76,8 @@ SELECT a.*, c.EARLIEST_FILING_YEAR, CONCAT(c.EARLIEST_FILING_YEAR, a.finalID, a.
 /*
 Query OK, 7417084 rows affected (5 min 29,10 sec)
 Records: 7417084  Duplicates: 0  Warnings: 0
+
+Ask if keep links Celtic-English, Celtic-English, if they belong to a patent with one inventor of foreign origin
 */
 
 SHOW INDEX FROM  riccaboni.edges_dir_aus_pyr;                                     
