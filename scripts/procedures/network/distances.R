@@ -8,6 +8,6 @@ rs <- dbSendQuery(patstat, 'SET CHARACTER SET "UTF8"')
 ynumbers<-seq(1988, 2013, 1)
 lapply(ynumbers, ugraphinv_files)
 
-
+ugraphinv_dis(1988)
 time<-Sys.time()
 gsub("(\\:|\\s+|-)","",Sys.time())

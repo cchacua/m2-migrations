@@ -448,28 +448,46 @@ distances_aslist<-function(graph_element){
   return(distance.l)
 }
 
+distanceoneline<-function(onerow, graph_element){
+  vfrom<-V(graph_element)[V(graph_element)$name == onerow[1]]
+  vto<-V(graph_element)[V(graph_element)$name == onerow[2]]
+  dline<-distances(graph_element, v=vfrom, to=vto, weights = NULL)
+  dline<-melt(dline)
+  return(dline)
+}
+
 ugraphinv_dis<-function(endyear, withplot=FALSE){
   inityear<-endyear-4
   linkyear<-endyear+1
-  print(paste("Beginning year:", inityear))
-  print(paste("Ending year:", endyear))
-  print(paste("Link year:", linkyear))
+  print(paste("Beginning year (t-5):", inityear))
+  print(paste("Ending year (t-1):", endyear))
+  print(paste("Link year (t0):", linkyear))
   uedges<-dbGetQuery(patstat, paste0("SELECT finalID_, finalID__
                                         FROM riccaboni.edges_undir_pyr 
                                         WHERE EARLIEST_FILING_YEAR>=",inityear," AND EARLIEST_FILING_YEAR<=",endyear,"
                                         ORDER BY EARLIEST_FILING_YEAR"))
+  dedges<-dbGetQuery(patstat, paste0("SELECT finalID_, finalID__
+                                        FROM riccaboni.edges_undid_ud
+                                        WHERE EARLIEST_FILING_YEAR=",linkyear))
   print("Data has been loaded")
-  print(paste("Number of edges",nrow(uedges)))
+  print(paste("Number of total edges",nrow(uedges)))
+  print(paste("Number of edges to find",nrow(dedges), nrow(dedges)/nrow(uedges)))
   uedges<-as.matrix(uedges)
   graph<-graph_from_edgelist(uedges, directed = FALSE)
   rm(uedges)
   save(graph, file=paste0("../output/graphs/networks/",inityear,"-",endyear, "_network", ".RData"))
   print("Graph has been done and saved")
-  
-  components<-decompose.graph(graph, min.vertices=1)
-  distances_outlist<-lapply(components, distances_aslist)
-  distances_outdf<-merge.list(distances_outlist)
+
+
+  distances_outdf<-apply(dedges, 1, distanceoneline, graph_element=graph)
+  #distances_outdf<-merge.list(distances_outlist)
+  print("Distances have been computed")
+  distances_outdf<-merge.list(distances_outdf)
   distances_outdf$lyear<-linkyear
+  # components<-decompose.graph(graph, min.vertices=1)
+  # distances_outlist<-lapply(components, distances_aslist)
+  # distances_outdf<-merge.list(distances_outlist)
+  # distances_outdf$lyear<-linkyear
   write.csv(distances_outdf, paste0("../output/graphs/distance_list/",inityear,"-",endyear, "_list", ".csv"))
   
   if(withplot==TRUE){

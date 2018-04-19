@@ -1,154 +1,69 @@
 --------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
--- TABLE WITH AUTHORS' NAMES FOR THE SELECTED CLASSES
+-- TABLE T08 EXTENDED, ONLY PATENTS WHERE ALL THE INVENTORS LIVE IN THE US, AND THERE IS AT LEAST ONE OF NON-CELTIC ORIGIN
+-- FINAL TABLE: christian.t08_class_at1us_date_fam_for
+
+-- ATTENTION: THIS REQUIRES: vector_names_atleastone_US
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
-SHOW INDEX FROM riccaboni.t08;                                     
-ALTER TABLE riccaboni.t08 ADD INDEX(pat);
+SHOW INDEX FROM christian.t08_class_at1us_date_fam;                                     
+SHOW INDEX FROM riccaboni.t01_allclasses_appid_patstat_us_allteam;  
 
 
 ---------------------------------------------------------------------------------------------------
--- Merge and new table
+-- 1 - T08 No-Celtic rows, all team members are US residents
 ---------------------------------------------------------------------------------------------------
-DROP TABLE IF EXISTS riccaboni.t08_names_allclasses_us_allteam;
-CREATE TABLE riccaboni.t08_names_allclasses_us_allteam AS
+DROP TABLE IF EXISTS christian.t08_class_at1us_date_fam_nceltic;
+CREATE TABLE christian.t08_class_at1us_date_fam_nceltic AS
 SELECT a.*
-      FROM riccaboni.t01_allclasses_appid_patstat_us_allteam b 
-      INNER JOIN riccaboni.t08 a
-      ON b.pat=a.pat;
-
-
+      FROM christian.t08_class_at1us_date_fam a 
+      INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_allteam b
+      ON a.pat=b.pat
+      WHERE a.nation!='CelticEnglish';
 
 /*
 
-Query OK, 2.673.214 rows affected (1 min 34,29 sec)
-Records: 2.673.214  Duplicates: 0  Warnings: 0
-
+Query OK, 1171779 rows affected (41,08 sec)
+Records: 1171779  Duplicates: 0  Warnings: 0
 */
 
-SHOW INDEX FROM riccaboni.t08_names_allclasses_us_allteam;                                     
-ALTER TABLE riccaboni.t08_names_allclasses_us_allteam ADD INDEX(pat);
-ALTER TABLE riccaboni.t08_names_allclasses_us_allteam ADD INDEX(ID);
----------------------------------------------------------------------------------------------------
--- Countings
----------------------------------------------------------------------------------------------------
+SELECT * FROM christian.t08_class_at1us_date_fam_nceltic LIMIT 0,10;
 
-
-SELECT COUNT(DISTINCT UPPER(a.name))       
-      FROM riccaboni.t08_names_allclasses_us_allteam a;
-/*
-+-------------------------------+
-| COUNT(DISTINCT UPPER(a.name)) |
-+-------------------------------+
-|                        820570 |
-+-------------------------------+
-1 row in set (16,24 sec)
-
-
-*/
-
-
-SELECT COUNT(DISTINCT a.ID)       
-      FROM riccaboni.t08_names_allclasses_us_allteam a;
-/*
-+----------------------+
-| COUNT(DISTINCT a.ID) |
-+----------------------+
-|               626797 |
-+----------------------+
-1 row in set (5,02 sec)
-
-
-
-*/
-
-
-SELECT COUNT(DISTINCT a.ID, UPPER(a.name))       
-      FROM riccaboni.t08_names_allclasses_us_allteam a;
-/*
-+-------------------------------------+
-| COUNT(DISTINCT a.ID, UPPER(a.name)) |
-+-------------------------------------+
-|                              918678 |
-+-------------------------------------+
-1 row in set (16,75 sec)
-
-
-*/
-
+SHOW INDEX FROM christian.t08_class_at1us_date_fam_nceltic;                                     
+ALTER TABLE christian.t08_class_at1us_date_fam_nceltic ADD INDEX(pat);
+ALTER TABLE christian.t08_class_at1us_date_fam_nceltic ADD INDEX(ID);
 
 ---------------------------------------------------------------------------------------------------
----------------------------------------------------------------------------------------------------
--- TABLE WITH AUTHORS' NAMES FOR THE SELECTED CLASSES, WITH MOBILITY LINKS
--- FINAL TABLE: riccaboni.t08_names_allclasses_us_mob_allteam
----------------------------------------------------------------------------------------------------
+-- 2- Only pat of patents with at least one non-celtic inventor, when all the inventors are US residents
 ---------------------------------------------------------------------------------------------------
 
-DROP TABLE IF EXISTS riccaboni.t08_names_allclasses_us_mob_allteam;
-CREATE TABLE riccaboni.t08_names_allclasses_us_mob_allteam AS
-SELECT a.*, b.mobileID, d.APPLN_ID, d.DOCDB_FAMILY_ID
-      FROM riccaboni.t08_names_allclasses_us_allteam a 
-      LEFT JOIN riccaboni.t09 b
-      ON a.ID=b.localID
-      INNER JOIN riccaboni.t01_allclasses_appid_patstat_us c 
-      ON a.pat=c.pat
-      INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_family d
-      ON c.APPLN_ID = d.APPLN_ID;
+DROP TABLE IF EXISTS christian.pat_nceltic_allus;
+CREATE TABLE christian.pat_nceltic_allus AS
+SELECT DISTINCT a.pat, a.APPLN_ID
+      FROM christian.t08_class_at1us_date_fam_nceltic a ;
 /*
-Query OK, 2465653 rows affected (1 min 59,83 sec)
-Records: 2465653  Duplicates: 0  Warnings: 0
-
+Query OK, 638801 rows affected (9,62 sec)
+Records: 638801  Duplicates: 0  Warnings: 0
 
 */
 
-SHOW INDEX FROM riccaboni.t08_names_allclasses_us_mob_allteam;
-ALTER TABLE riccaboni.t08_names_allclasses_us_mob_allteam ADD INDEX(DOCDB_FAMILY_ID);
-ALTER TABLE riccaboni.t08_names_allclasses_us_mob_allteam ADD INDEX(APPLN_ID);
-ALTER TABLE riccaboni.t08_names_allclasses_us_mob_allteam ADD INDEX(ID);
-ALTER TABLE riccaboni.t08_names_allclasses_us_mob_allteam ADD INDEX(pat);
-
-SELECT COUNT(DISTINCT a.ID)       
-      FROM riccaboni.t08_names_allclasses_us_mob_allteam a
-      WHERE a.mobileID IS NOT NULL;
-/*
-+----------------------+
-| COUNT(DISTINCT a.ID) |
-+----------------------+
-|               135854 |
-+----------------------+
-1 row in set (2,89 sec)
-
-*/
-
-SELECT COUNT(DISTINCT a.mobileID)       
-      FROM riccaboni.t08_names_allclasses_us_mob_allteam a;
-/*
-
-+----------------------------+
-| COUNT(DISTINCT a.mobileID) |
-+----------------------------+
-|                      81671 |
-+----------------------------+
-1 row in set (2,58 sec)
-
- 135854-81671 
-So, there are 54.183 less IDS, when using the mobile inventor links
-
-*/
-
+SHOW INDEX FROM  christian.pat_nceltic_allus;                                     
+ALTER TABLE  christian.pat_nceltic_allus ADD INDEX(pat);
+ALTER TABLE  christian.pat_nceltic_allus ADD INDEX(APPLN_ID);
 
 ---------------------------------------------------------------------------------------------------
--- File
----------------------------------------------------------------------------------------------------  
+-- 3 - T08 rows, if at least one member is non-celtic, all team members are US residents
+---------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS christian.t08_class_at1us_date_fam_for;
+CREATE TABLE christian.t08_class_at1us_date_fam_for AS
+SELECT a.*
+      FROM christian.t08_class_at1us_date_fam a 
+      INNER JOIN christian.pat_nceltic_allus b
+      ON a.pat=b.pat;
 
-SELECT DISTINCT a.ID, a.name, a.mobileID       
-      FROM riccaboni.t08_names_allclasses_us_mob_allteam a
-      INTO OUTFILE '/var/lib/mysql-files/Names_ID_Mobile_Classes_allteam_us.csv'
-            FIELDS TERMINATED BY ','
-            ENCLOSED BY '"'
-            LINES TERMINATED BY '\n';
 /*
-
-Query OK, 877722 rows affected (15,84 sec)
-
+Query OK, 2036168 rows affected (50,10 sec)
+Records: 2036168  Duplicates: 0  Warnings: 0
 */
+
+

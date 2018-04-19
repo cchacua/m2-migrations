@@ -43,26 +43,44 @@ SELECT * FROM riccaboni.edges_dir LIMIT 0,30;
 
 
 
--- SELECT ONLY LINKS WHOSE PATENTS CONTAIN ONLY US RESIDENTS:
-SHOW INDEX FROM riccaboni.t01_allclasses_appid_patstat_us_allteam;                                     
+-- SELECT ONLY LINKS WHOSE PATENTS CONTAIN ONLY US RESIDENTS, AND AT LEAST ONE OF THE TEAM MEMBERS IS NON-CELTIC:
+SHOW INDEX FROM  christian.pat_nceltic_allus; 
 
 DROP TABLE IF EXISTS riccaboni.edges_dir_aus;
 CREATE TABLE riccaboni.edges_dir_aus AS
 SELECT DISTINCT a.*
       FROM riccaboni.edges_dir a
-      INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_allteam b
+      INNER JOIN christian.pat_nceltic_allus b
       ON a.pat=b.pat;
 
 /*
-Query OK, 8212510 rows affected (4 min 29,76 sec)
-Records: 8.212.510  Duplicates: 0  Warnings: 0
-
-TO DO: 
-DELETE PATENTS WHERE ALL INVENTORS ARE CELTIC ENGLISH. 
+Query OK, 7.417.084 rows affected (3 min 34,15 sec)
+Records: 7.417.084  Duplicates: 0  Warnings: 0
 
 */
+SHOW INDEX FROM  riccaboni.edges_dir_aus;                                     
+ALTER TABLE  riccaboni.edges_dir_aus ADD INDEX(pat);
 
+SHOW INDEX FROM  riccaboni.t01_allclasses_appid_patstat_us_atleastone; 
+SHOW INDEX FROM  patstat2016b.TLS201_APPLN; 
 
+-- Add priority year, type of patent
+DROP TABLE IF EXISTS riccaboni.edges_dir_aus_pyr;
+CREATE TABLE riccaboni.edges_dir_aus_pyr AS
+SELECT a.*, c.EARLIEST_FILING_YEAR, CONCAT(c.EARLIEST_FILING_YEAR, a.finalID, a.finalID_) AS undid
+      FROM riccaboni.edges_dir_aus a
+      INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_atleastone b
+      ON a.pat=b.pat
+      INNER JOIN patstat2016b.TLS201_APPLN c
+      ON b.APPLN_ID=c.APPLN_ID;
+/*
+Query OK, 7417084 rows affected (5 min 29,10 sec)
+Records: 7417084  Duplicates: 0  Warnings: 0
+*/
+
+SHOW INDEX FROM  riccaboni.edges_dir_aus_pyr;                                     
+ALTER TABLE riccaboni.edges_dir_aus_pyr ADD INDEX(pat);
+ALTER TABLE riccaboni.edges_dir_aus_pyr ADD INDEX(undid);
 
 ---------------------------------------------------------------------------------------------------
 -- UNDIRECTED EDGE LIST
@@ -87,6 +105,7 @@ ALTER TABLE riccaboni.edges_undir_pat ADD INDEX(pat);
 
 SHOW INDEX FROM christian.t08_class_at1us_date_fam;   
 
+/*
 -- Undirected list using priority year: the one for calculating distances: riccaboni.edges_undir_pyr
 DROP TABLE IF EXISTS riccaboni.edges_undir_pyr;
 CREATE TABLE riccaboni.edges_undir_pyr AS
@@ -94,17 +113,70 @@ SELECT DISTINCT a.finalID_, a.finalID__, b.EARLIEST_FILING_YEAR
       FROM riccaboni.edges_undir_pat a
       INNER JOIN christian.t08_class_at1us_date_fam b
       ON a.pat=b.pat;
-/*
+
 Query OK, 2389267 rows affected (9 min 20,14 sec)
 Records: 2389267  Duplicates: 0  Warnings: 0
-*/
 
 SELECT * FROM riccaboni.edges_undir_pyr LIMIT 0,30;
+*/
+
+
+-- Undirected list using priority year: the one for calculating distances: riccaboni.edges_undir_pyr
+DROP TABLE IF EXISTS riccaboni.edges_undir_pyr;
+CREATE TABLE riccaboni.edges_undir_pyr AS
+SELECT DISTINCT a.finalID_, a.finalID__, c.EARLIEST_FILING_YEAR, CONCAT(c.EARLIEST_FILING_YEAR, a.finalID_, a.finalID__) AS undid
+      FROM riccaboni.edges_undir_pat a
+      INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_atleastone b
+      ON a.pat=b.pat
+      INNER JOIN patstat2016b.TLS201_APPLN c
+      ON b.APPLN_ID=c.APPLN_ID;
+/*
+Query OK, 2389267 rows affected (2 min 31,95 sec)
+Records: 2.389.267  Duplicates: 0  Warnings: 0
+*/
+
+SHOW INDEX FROM riccaboni.edges_undir_pyr;                                     
+ALTER TABLE riccaboni.edges_undir_pyr ADD INDEX(undid);
+
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+-- Links that appear in both directed and undirected lists AND that should be estimated in the t-1,t-5
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS riccaboni.edges_undid_ud;
+CREATE TABLE riccaboni.edges_undid_ud AS
+SELECT DISTINCT a.*
+     FROM riccaboni.edges_undir_pyr a
+     INNER JOIN riccaboni.edges_dir_aus_pyr b
+     ON a.undid=b.undid
+     ORDER BY a.EARLIEST_FILING_YEAR;
+/*
+Query OK, 1664687 rows affected (38,40 sec)
+Records: 1664687  Duplicates: 0  Warnings: 0
+
+*/
+SHOW INDEX FROM riccaboni.edges_undid_ud;                                     
+ALTER TABLE riccaboni.edges_undid_ud ADD INDEX(undid);
+ALTER TABLE riccaboni.edges_undid_ud ADD INDEX(EARLIEST_FILING_YEAR);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
--- TABLE OF EDGES using IDS and priority year
+-- TABLE OF EDGES using IDS and priority year: THIS IS NOT USED IN THE MODEL, IT ONLY ALLOWS TO HAVE AN IDEA OF THE DATA
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 
