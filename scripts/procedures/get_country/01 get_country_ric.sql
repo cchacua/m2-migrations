@@ -29,7 +29,7 @@ SHOW INDEX FROM riccaboni.t08_names_allclasses_t01;
 ALTER TABLE riccaboni.t08_names_allclasses_t01 ADD INDEX(ID);
 ALTER TABLE riccaboni.t08_names_allclasses_t01 ADD INDEX(pat);
 
-
+SELECT * FROM riccaboni.t08_names_allclasses_t01 LIMIT 0,10;
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 -- COUNT NUMBER OF DIFFERENT INVENTORS AND IDS

@@ -123,22 +123,46 @@ SELECT * FROM riccaboni.edges_undir_pyr LIMIT 0,30;
 */
 
 
--- Undirected list using priority year: the one for calculating distances: riccaboni.edges_undir_pyr
-DROP TABLE IF EXISTS riccaboni.edges_undir_pyr;
-CREATE TABLE riccaboni.edges_undir_pyr AS
+-- Undirected list using priority year: Computer technology and telecommunications
+-- the one for calculating distances: riccaboni.edges_undir_pyrctt
+DROP TABLE IF EXISTS riccaboni.edges_undir_pyrctt;
+CREATE TABLE riccaboni.edges_undir_pyrctt AS
 SELECT DISTINCT a.finalID_, a.finalID__, c.EARLIEST_FILING_YEAR, CONCAT(c.EARLIEST_FILING_YEAR, a.finalID_, a.finalID__) AS undid
       FROM riccaboni.edges_undir_pat a
       INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_atleastone b
       ON a.pat=b.pat
       INNER JOIN patstat2016b.TLS201_APPLN c
-      ON b.APPLN_ID=c.APPLN_ID;
+      ON b.APPLN_ID=c.APPLN_ID
+      INNER JOIN riccaboni.t01_ctt_class d
+      ON a.pat=d.pat;
 /*
-Query OK, 2389267 rows affected (2 min 31,95 sec)
-Records: 2.389.267  Duplicates: 0  Warnings: 0
+Query OK, 1097993 rows affected (2 min 2,35 sec)
+Records: 1097993  Duplicates: 0  Warnings: 0
 */
 
-SHOW INDEX FROM riccaboni.edges_undir_pyr;                                     
-ALTER TABLE riccaboni.edges_undir_pyr ADD INDEX(undid);
+SHOW INDEX FROM riccaboni.edges_undir_pyrctt;                                     
+ALTER TABLE riccaboni.edges_undir_pyrctt ADD INDEX(undid);
+
+-- Undirected list using priority year: Pharmaceuticals, biotechnology and organic fine chemistry
+-- the one for calculating distances: riccaboni.edges_undir_pyrpboc
+
+DROP TABLE IF EXISTS riccaboni.edges_undir_pyrpboc;
+CREATE TABLE riccaboni.edges_undir_pyrpboc AS
+SELECT DISTINCT a.finalID_, a.finalID__, c.EARLIEST_FILING_YEAR, CONCAT(c.EARLIEST_FILING_YEAR, a.finalID_, a.finalID__) AS undid
+      FROM riccaboni.edges_undir_pat a
+      INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_atleastone b
+      ON a.pat=b.pat
+      INNER JOIN patstat2016b.TLS201_APPLN c
+      ON b.APPLN_ID=c.APPLN_ID
+      INNER JOIN riccaboni.t01_pboc_class d
+      ON a.pat=d.pat;
+/*
+Query OK, 1310279 rows affected (1 min 42,86 sec)
+Records: 1310279  Duplicates: 0  Warnings: 0
+*/
+
+SHOW INDEX FROM riccaboni.edges_undir_pyrpboc;                                     
+ALTER TABLE riccaboni.edges_undir_pyrpboc ADD INDEX(undid);
 
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
@@ -146,23 +170,38 @@ ALTER TABLE riccaboni.edges_undir_pyr ADD INDEX(undid);
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 
-DROP TABLE IF EXISTS riccaboni.edges_undid_ud;
-CREATE TABLE riccaboni.edges_undid_ud AS
+-- Computer technology and telecommunications: ctt
+DROP TABLE IF EXISTS riccaboni.edges_undid_ud_ctt;
+CREATE TABLE riccaboni.edges_undid_ud_ctt AS
 SELECT DISTINCT a.*
-     FROM riccaboni.edges_undir_pyr a
+     FROM riccaboni.edges_undir_pyrctt a
      INNER JOIN riccaboni.edges_dir_aus_pyr b
      ON a.undid=b.undid
      ORDER BY a.EARLIEST_FILING_YEAR;
 /*
-Query OK, 1664687 rows affected (38,40 sec)
-Records: 1664687  Duplicates: 0  Warnings: 0
-
+Query OK, 796513 rows affected (19,84 sec)
+Records: 796513  Duplicates: 0  Warnings: 0
 */
-SHOW INDEX FROM riccaboni.edges_undid_ud;                                     
-ALTER TABLE riccaboni.edges_undid_ud ADD INDEX(undid);
-ALTER TABLE riccaboni.edges_undid_ud ADD INDEX(EARLIEST_FILING_YEAR);
 
+SHOW INDEX FROM riccaboni.edges_undid_ud_ctt;                                     
+ALTER TABLE riccaboni.edges_undid_ud_ctt ADD INDEX(undid);
+ALTER TABLE riccaboni.edges_undid_ud_ctt ADD INDEX(EARLIEST_FILING_YEAR);
 
+-- Pharmaceuticals, biotechnology and organic fine chemistry: pboc
+DROP TABLE IF EXISTS riccaboni.edges_undid_ud_pboc;
+CREATE TABLE riccaboni.edges_undid_ud_pboc AS
+SELECT DISTINCT a.*
+     FROM riccaboni.edges_undir_pyrpboc a
+     INNER JOIN riccaboni.edges_dir_aus_pyr b
+     ON a.undid=b.undid
+     ORDER BY a.EARLIEST_FILING_YEAR;
+/*
+Query OK, 881403 rows affected (22,53 sec)
+Records: 881403  Duplicates: 0  Warnings: 0
+*/
+SHOW INDEX FROM riccaboni.edges_undid_ud_pboc;                                     
+ALTER TABLE riccaboni.edges_undid_ud_pboc ADD INDEX(undid);
+ALTER TABLE riccaboni.edges_undid_ud_pboc ADD INDEX(EARLIEST_FILING_YEAR);
 
 
 

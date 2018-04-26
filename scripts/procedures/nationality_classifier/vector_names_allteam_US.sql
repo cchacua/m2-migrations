@@ -22,7 +22,6 @@ SELECT a.*
       WHERE a.nation!='CelticEnglish';
 
 /*
-
 Query OK, 1171779 rows affected (41,08 sec)
 Records: 1171779  Duplicates: 0  Warnings: 0
 */
@@ -32,7 +31,7 @@ SELECT * FROM christian.t08_class_at1us_date_fam_nceltic LIMIT 0,10;
 SHOW INDEX FROM christian.t08_class_at1us_date_fam_nceltic;                                     
 ALTER TABLE christian.t08_class_at1us_date_fam_nceltic ADD INDEX(pat);
 ALTER TABLE christian.t08_class_at1us_date_fam_nceltic ADD INDEX(ID);
-
+ALTER TABLE christian.t08_class_at1us_date_fam_nceltic ADD INDEX(loc);
 ---------------------------------------------------------------------------------------------------
 -- 2- Only pat of patents with at least one non-celtic inventor, when all the inventors are US residents
 ---------------------------------------------------------------------------------------------------

@@ -132,13 +132,19 @@ CREATE TABLE riccaboni.t01_pboc_class AS
 SELECT * FROM riccaboni.t01 a WHERE CONCAT(',', a.classes, ',') LIKE '%,4,%'
                                      OR CONCAT(',', a.classes, ',') LIKE '%,9,%' 
                                      OR CONCAT(',', a.classes, ',') LIKE '%,3,%';
+
+
+SHOW INDEX FROM riccaboni.t01_pboc_class;                                     
+ALTER TABLE riccaboni.t01_pboc_class ADD INDEX(pat);   
 ---------------------------------------------------------------------------------------------------
 -- 2 - Computer technology and telecommunications
 ---------------------------------------------------------------------------------------------------
 CREATE TABLE riccaboni.t01_ctt_class AS
 SELECT * FROM riccaboni.t01 a WHERE CONCAT(',', a.classes, ',') LIKE '%,13,%'
                                      OR CONCAT(',', a.classes, ',') LIKE '%,29,%';
-                                     
+
+SHOW INDEX FROM riccaboni.t01_ctt_class;                                     
+ALTER TABLE riccaboni.t01_ctt_class ADD INDEX(pat);                                     
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 -- COUNTINGS (Detailed, by patent office)

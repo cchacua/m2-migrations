@@ -5,15 +5,19 @@ rs <- dbSendQuery(patstat, 'SET CHARACTER SET "UTF8"')
 # ynumbers<-seq(1975, 2013, 1)
 # lapply(ynumbers, ugraphinv_dis)
 
-ynumbers<-seq(2000, 2009, 1)
-lapply(ynumbers, ugraphinv_dis_bulk)
+ynumbers<-seq(2000, 2013, 1)
+lapply(ynumbers, ugraphinv_dis_bulk, sector="ctt")
 
-ugraphinv_dis_bulk(1999)
+ynumbers<-seq(1975, 2013, 1)
+lapply(ynumbers, ugraphinv_dis_bulk, sector="pboc")
+
+
+demo<-ugraphinv_dis_bulk(1999, sector="ctt") 
 
 
 ynumbersl<-c(1999)
 lapply(ynumbersl, ugraphinv_dis_line)
-
+# TO DO: CHANGE TO DATATABLE
 
 
 ugraphinv_dis_bulk(2010)
