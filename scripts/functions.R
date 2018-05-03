@@ -576,3 +576,17 @@ ugraphinv_files<-function(endyear){
   save(graph, file=paste0("../output/graphs/networks/",inityear,"-",endyear, "_network", ".RData"))
   return("Done")
 }
+
+
+count_invs<-function(query, metroid=FALSE){
+  df<-dbGetQuery(patstat, query)
+  df<-as.data.table(df)
+  if(metroid==TRUE){df$ID<-substr(df$ID,1,5)}
+  df<-df[order(df$nloc, decreasing = TRUE),]
+  df<-reshape(transform(df, time=ave(ID, finalID, EARLIEST_FILING_YEAR, FUN=seq_along)), idvar=c("finalID", "EARLIEST_FILING_YEAR"), direction="wide")
+  df<-df[,1:4]
+  colnames(df)<-c("finalID","EARLIEST_FILING_YEAR","ID","nloc")
+  df<-df[, j=list(ninventors = .N, nlocsum = sum(nloc)),by = list(ID,EARLIEST_FILING_YEAR)]
+  df$key<-paste0(df$EARLIEST_FILING_YEAR, df$ID)
+  return(as.data.frame(df))
+}

@@ -58,6 +58,21 @@ ALTER TABLE riccaboni.t08_allclasses_t01_loc_allteam ADD INDEX(pat);
 
 SHOW INDEX FROM riccaboni.t01_allclasses_appid_patstat_us_allteam; 
 
+-- at least one in US in both
+DROP TABLE IF EXISTS christian.ric_us_ao_both;
+CREATE TABLE christian.ric_us_ao_both AS
+SELECT DISTINCT a.pat
+      FROM riccaboni.t08_allclasses_t01_loc a 
+      INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_atleastone b
+      ON a.pat=b.pat;
+/*
+Query OK, 1055844 rows affected (22,90 sec)
+Records: 1055844  Duplicates: 0  Warnings: 0
+*/
+
+SHOW INDEX FROM christian.ric_us_ao_both; 
+ALTER TABLE christian.ric_us_ao_both ADD INDEX(pat);
+
 -- Compare with patstat: at least one in US
 DROP TABLE IF EXISTS christian.ric_us_ao_diff;
 CREATE TABLE christian.ric_us_ao_diff AS

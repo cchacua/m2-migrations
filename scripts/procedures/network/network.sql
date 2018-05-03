@@ -3,16 +3,31 @@
 -- TABLE OF EDGES using IDS and patents
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
+SHOW INDEX FROM christian.ric_us_ao_both;  
+SHOW INDEX FROM riccaboni.t08_names_allclasses_us_mob_atleastone;
 
 DROP TABLE IF EXISTS riccaboni.t_id_pat;
 CREATE TABLE riccaboni.t_id_pat AS
 SELECT DISTINCT a.finalID, a.pat
-      FROM riccaboni.t08_names_allclasses_us_mob_atleastone a;
+      FROM riccaboni.t08_names_allclasses_us_mob_atleastone a
+      INNER JOIN christian.ric_us_ao_both b
+      ON a.pat=b.pat;
 /*
-Query OK, 3038676 rows affected (39,40 sec)
-Records: 3038676  Duplicates: 0  Warnings: 0
+Query OK, 3015123 rows affected (2 min 1,25 sec)
+Records: 3015123  Duplicates: 0  Warnings: 0
 
 */
+
+SELECT COUNT(DISTINCT a.pat) from riccaboni.t_id_pat a; 
+/*
++-----------------------+
+| COUNT(DISTINCT a.pat) |
++-----------------------+
+|               1055517 |
++-----------------------+
+1 row in set (7,89 sec)
+*/
+
 
 SHOW INDEX FROM riccaboni.t_id_pat;                                     
 ALTER TABLE riccaboni.t_id_pat ADD INDEX(finalID);

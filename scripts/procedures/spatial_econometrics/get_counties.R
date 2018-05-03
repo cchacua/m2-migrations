@@ -4,7 +4,8 @@ require(maps)
 
 rs <- dbSendQuery(patstat, 'SET CHARACTER SET "UTF8"')
   # Read points with coordinates and turn it into a SpatialPointsDataFrame
-  file<-dbGetQuery(patstat, "SELECT DISTINCT a.loc FROM christian.t08_class_at1us_date_fam_nceltic a INNER JOIN riccaboni.t08_allclasses_t01_loc_allteam b ON a.pat=b.pat;")
+  #file<-dbGetQuery(patstat, "SELECT DISTINCT a.loc FROM christian.t08_class_at1us_date_fam_nceltic a INNER JOIN riccaboni.t08_allclasses_t01_loc_allteam b ON a.pat=b.pat;")
+  file<-dbGetQuery(patstat, "SELECT DISTINCT a.loc FROM riccaboni.t08 a INNER JOIN christian.ric_us_ao_both b ON a.pat=b.pat;")
   colnames(file)<-"loc"
   file$loc<-as.character(file$loc)
   file.df<-do.call("rbind", strsplit(file$loc, ","))
@@ -25,14 +26,7 @@ rs <- dbSendQuery(patstat, 'SET CHARACTER SET "UTF8"')
   output<-output[complete.cases(output),]
   output$loc<-paste0(output$lat,",",output$long)
   output$HASC_2<-as.character(output$HASC_2)
-  output$HASC_2[output$loc=="43.30735,-77.699921"]<-"US.NY.MR"
-  output$OBJECTID[output$loc=="43.30735,-77.699921"]<-"1859"
-  output$OBJECTID[output$loc=="43.30735,-77.699921"]
-  write.csv(output, "../output/spatial_eco/us_locations.csv")
-  # Remember line 8304	43.30735	-77.699921	1855	US.NY.MR	43.30735-77.699921
-  as.data.frame(mapusa[mapusa$NAME_2=="Monroe",])
-  mapusa[mapusa$NAME_1=="New York",]
-  as.data.frame(mapusa[mapusa$OBJECTID=="1855",])
-  as.data.frame(mapusa[mapusa$OBJECTID=="1856",])
-  as.data.frame(mapusa[mapusa$NAME_2=="Ontario",])
-  
+  output$HASC_2[output$OBJECTID=="1855"]
+  output$HASC_2[output$OBJECTID=="1855"]<-"US.NY.MR"
+  output$OBJECTID[output$OBJECTID=="1855"]<-"1859"
+  write.csv(output, "../output/spatial_eco/us_locations_counties.csv")

@@ -23,8 +23,8 @@ IGNORE 1 LINES ;
 SHOW WARNINGS;
 
 
-DROP TABLE IF EXISTS christian.ric_us_state;
-CREATE TABLE IF NOT EXISTS christian.ric_us_state
+DROP TABLE IF EXISTS christian.ric_us_cou;
+CREATE TABLE IF NOT EXISTS christian.ric_us_cou
 (
 nrow varchar(10),
 lati varchar(20),
@@ -37,20 +37,48 @@ ENGINE=MyISAM
 CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 
-LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/output/spatial_eco/us_locations.csv' INTO TABLE christian.ric_us_state
+LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/output/spatial_eco/us_locations_counties.csv' INTO TABLE christian.ric_us_cou
 FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  ESCAPED BY ''
 lines terminated by '\n'
 IGNORE 1 LINES ;
 SHOW WARNINGS;
 /*
-Query OK, 127918 rows affected (0,35 sec)
-Records: 127918  Deleted: 0  Skipped: 0  Warnings: 0
+Query OK, 297820 rows affected (0,67 sec)
+Records: 297820  Deleted: 0  Skipped: 0  Warnings: 0
 */
 
-SHOW INDEX FROM christian.ric_us_state; 
-ALTER TABLE christian.ric_us_state ADD INDEX(loc);
+SHOW INDEX FROM christian.ric_us_cou; 
+ALTER TABLE christian.ric_us_cou ADD INDEX(loc);
 
 
+------------------------------------------------------
+
+DROP TABLE IF EXISTS christian.ric_us_states;
+CREATE TABLE IF NOT EXISTS christian.ric_us_states
+(
+nrow varchar(10),
+lati varchar(20),
+longi VARCHAR(20),
+OBJECTID VARCHAR(20),
+HASC_1 VARCHAR(10),
+loc VARCHAR(50)
+)
+ENGINE=MyISAM
+CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+
+LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/output/spatial_eco/us_locations_states.csv' INTO TABLE christian.ric_us_states
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  ESCAPED BY ''
+lines terminated by '\n'
+IGNORE 1 LINES ;
+SHOW WARNINGS;
+/*
+Query OK, 297820 rows affected (0,67 sec)
+Records: 297820  Deleted: 0  Skipped: 0  Warnings: 0
+*/
+
+SHOW INDEX FROM christian.ric_us_states; 
+ALTER TABLE christian.ric_us_states ADD INDEX(loc);
 
 --------------------------------------------
 DROP TABLE IF EXISTS christian.ric_us_ma;
@@ -62,19 +90,21 @@ longi VARCHAR(20),
 OBJECTID VARCHAR(20),
 METRO CHAR(5),	
 NAME VARCHAR(100),
-loc VARCHAR(50)
+CORE CHAR(1),
+loc VARCHAR(50),
+METROID CHAR(6)
 )
 ENGINE=MyISAM
 CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 
-LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/output/spatial_eco/us_locations_MA.csv' INTO TABLE christian.ric_us_ma
+LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/output/spatial_eco/us_locations_MA_both.csv' INTO TABLE christian.ric_us_ma
 FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  ESCAPED BY ''
 lines terminated by '\n'
 IGNORE 1 LINES ;
 SHOW WARNINGS;
 /*
-Query OK, 92846 rows affected (0,30 sec)
+Query OK, 92846 rows affected (0,29 sec)
 Records: 92846  Deleted: 0  Skipped: 0  Warnings: 0
 */
 

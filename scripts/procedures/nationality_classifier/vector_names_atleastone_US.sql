@@ -465,6 +465,7 @@ SELECT COUNT(DISTINCT b.mobileID), CHAR_LENGTH(b.mobileID) AS Nchar
 
 ---------------------------------------------------------------------------------------------------
 -- Only the IDS of the name-analysis that correspond to inventors (no firms), with dates, patent family, etc
+-- TO use as new t08 with info on nationality t08_class_at1us_date_fam
 ---------------------------------------------------------------------------------------------------
 
 SHOW INDEX FROM riccaboni.t08_names_allclasses_us_mob_atleastone;
@@ -494,7 +495,9 @@ SHOW INDEX FROM christian.t08_class_at1us_date_fam;
 ALTER TABLE christian.t08_class_at1us_date_fam ADD INDEX(pat);
 ALTER TABLE christian.t08_class_at1us_date_fam ADD INDEX(finalID);
 
-
+SELECT COUNT(DISTINCT a.pat) from christian.t08_class_at1us_date_fam a; 
+SELECT COUNT(DISTINCT a.pat) from riccaboni.t01_allclasses_appid_patstat_us_atleastone a; 
+SELECT COUNT(DISTINCT a.pat) from riccaboni.t08_names_allclasses_us_mob_atleastone a; 
 
 ---------------------------------------------------------------------------------------------------
 -- File
