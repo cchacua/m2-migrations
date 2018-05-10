@@ -18,15 +18,7 @@ Records: 3015123  Duplicates: 0  Warnings: 0
 
 */
 
-SELECT COUNT(DISTINCT a.pat) from riccaboni.t_id_pat a; 
-/*
-+-----------------------+
-| COUNT(DISTINCT a.pat) |
-+-----------------------+
-|               1055517 |
-+-----------------------+
-1 row in set (7,89 sec)
-*/
+
 
 
 SHOW INDEX FROM riccaboni.t_id_pat;                                     
@@ -47,8 +39,9 @@ SELECT DISTINCT a.finalID, b.finalID AS finalID_, a.pat
       WHERE a.finalID!=b.finalID;
 /*
 WHERE a.ID!=b.ID IS TO AVOID LINKS TO THEMSELVES
-Query OK, 10710048 rows affected (6 min 3,01 sec)
-Records: 10.710.048  Duplicates: 0  Warnings: 0
+Query OK, 10632746 rows affected (5 min 48,28 sec)
+Records: 10632746  Duplicates: 0  Warnings: 0
+
 */
 
 SHOW INDEX FROM riccaboni.edges_dir;                                     
@@ -58,7 +51,7 @@ SELECT * FROM riccaboni.edges_dir LIMIT 0,30;
 
 
 
--- SELECT ONLY LINKS WHOSE PATENTS CONTAIN ONLY US RESIDENTS, AND AT LEAST ONE OF THE TEAM MEMBERS IS NON-CELTIC:
+-- SELECT ONLY LINKS WHOSE PATENTS CONTAIN ONLY US RESIDENTS, AND AT LEAST ONE OF THE TEAM MEMBERS BELONGS TO THE TEN CONSIDERED CEL GROUPS:
 SHOW INDEX FROM  christian.pat_nceltic_allus; 
 
 DROP TABLE IF EXISTS riccaboni.edges_dir_aus;
@@ -69,10 +62,10 @@ SELECT DISTINCT a.*
       ON a.pat=b.pat;
 
 /*
-Query OK, 7.417.084 rows affected (3 min 34,15 sec)
-Records: 7.417.084  Duplicates: 0  Warnings: 0
-
+Query OK, 6.313.178 rows affected (2 min 57,99 sec)
+Records: 6313178  Duplicates: 0  Warnings: 0
 */
+
 SHOW INDEX FROM  riccaboni.edges_dir_aus;                                     
 ALTER TABLE  riccaboni.edges_dir_aus ADD INDEX(pat);
 
@@ -89,8 +82,9 @@ SELECT a.*, c.EARLIEST_FILING_YEAR, CONCAT(c.EARLIEST_FILING_YEAR, a.finalID, a.
       INNER JOIN patstat2016b.TLS201_APPLN c
       ON b.APPLN_ID=c.APPLN_ID;
 /*
-Query OK, 7417084 rows affected (5 min 29,10 sec)
-Records: 7417084  Duplicates: 0  Warnings: 0
+Query OK, 6.313.178 rows affected (5 min 54,59 sec)
+Records: 6313178  Duplicates: 0  Warnings: 0
+
 
 Ask if keep links Celtic-English, Celtic-English, if they belong to a patent with one inventor of foreign origin
 */
@@ -113,8 +107,13 @@ SELECT DISTINCT LEAST(a.finalID, b.finalID) AS finalID_, GREATEST(a.finalID, b.f
       WHERE a.finalID!=b.finalID
       GROUP BY LEAST(a.finalID, b.finalID), GREATEST(a.finalID, b.finalID), a.pat;
 /*
-Query OK, 5355024 rows affected (5 min 10,18 sec)
-Records: 5355024  Duplicates: 0  Warnings: 0
+Query OK, 5316373 rows affected (4 min 51,73 sec)
+Records: 5316373  Duplicates: 0  Warnings: 0
+
+Query OK, 5316373 rows affected (5 min 19,34 sec)
+Records: 5316373  Duplicates: 0  Warnings: 0
+
+
 */
 SELECT * FROM riccaboni.edges_undir_pat LIMIT 0,30;
 SHOW INDEX FROM riccaboni.edges_undir_pat;                                     
@@ -151,8 +150,8 @@ SELECT DISTINCT a.finalID_, a.finalID__, c.EARLIEST_FILING_YEAR, CONCAT(c.EARLIE
       INNER JOIN riccaboni.t01_ctt_class d
       ON a.pat=d.pat;
 /*
-Query OK, 1097993 rows affected (2 min 2,35 sec)
-Records: 1097993  Duplicates: 0  Warnings: 0
+Query OK, 1092659 rows affected (1 min 46,90 sec)
+Records: 1092659  Duplicates: 0  Warnings: 0
 */
 
 SHOW INDEX FROM riccaboni.edges_undir_pyrctt;                                     
@@ -172,12 +171,67 @@ SELECT DISTINCT a.finalID_, a.finalID__, c.EARLIEST_FILING_YEAR, CONCAT(c.EARLIE
       INNER JOIN riccaboni.t01_pboc_class d
       ON a.pat=d.pat;
 /*
-Query OK, 1310279 rows affected (1 min 42,86 sec)
-Records: 1310279  Duplicates: 0  Warnings: 0
+Query OK, 1300831 rows affected (2 min 0,80 sec)
+Records: 1300831  Duplicates: 0  Warnings: 0
+
 */
 
 SHOW INDEX FROM riccaboni.edges_undir_pyrpboc;                                     
 ALTER TABLE riccaboni.edges_undir_pyrpboc ADD INDEX(undid);
+
+
+SELECT COUNT(DISTINCT a.pat) from riccaboni.edges_undir_pat a
+INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_atleastone b
+      ON a.pat=b.pat
+      INNER JOIN patstat2016b.TLS201_APPLN c
+      ON b.APPLN_ID=c.APPLN_ID
+      WHERE c.EARLIEST_FILING_YEAR>='1975' and c.EARLIEST_FILING_YEAR<='2013'; 
+/*
++-----------------------+
+| COUNT(DISTINCT a.pat) |
++-----------------------+
+|                766370 |
++-----------------------+
+1 row in set (33,33 sec)
+
+*/
+
+SELECT COUNT(DISTINCT a.pat) from riccaboni.edges_undir_pat a 
+      INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_atleastone b
+      ON a.pat=b.pat
+      INNER JOIN patstat2016b.TLS201_APPLN c
+      ON b.APPLN_ID=c.APPLN_ID
+      INNER JOIN riccaboni.t01_pboc_class d
+      ON a.pat=d.pat
+      WHERE c.EARLIEST_FILING_YEAR>='1975' and c.EARLIEST_FILING_YEAR<='2013'; 
+/*
++-----------------------+
+| COUNT(DISTINCT a.pat) |
++-----------------------+
+|                390491 |
++-----------------------+
+1 row in set (24,18 sec)
+
+*/
+
+SELECT COUNT(DISTINCT a.pat) from riccaboni.edges_undir_pat a
+      INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_atleastone b
+      ON a.pat=b.pat
+      INNER JOIN patstat2016b.TLS201_APPLN c
+      ON b.APPLN_ID=c.APPLN_ID
+      INNER JOIN riccaboni.t01_ctt_class d
+      ON a.pat=d.pat
+      WHERE c.EARLIEST_FILING_YEAR>='1975' and c.EARLIEST_FILING_YEAR<='2013';
+/*
++-----------------------+
+| COUNT(DISTINCT a.pat) |
++-----------------------+
+|                378817 |
++-----------------------+
+1 row in set (1 min 0,34 sec)
+
+*/
+
 
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
@@ -194,8 +248,8 @@ SELECT DISTINCT a.*
      ON a.undid=b.undid
      ORDER BY a.EARLIEST_FILING_YEAR;
 /*
-Query OK, 796513 rows affected (19,84 sec)
-Records: 796513  Duplicates: 0  Warnings: 0
+Query OK, 696594 rows affected (20,58 sec)
+Records: 696594  Duplicates: 0  Warnings: 0
 */
 
 SHOW INDEX FROM riccaboni.edges_undid_ud_ctt;                                     
@@ -211,8 +265,8 @@ SELECT DISTINCT a.*
      ON a.undid=b.undid
      ORDER BY a.EARLIEST_FILING_YEAR;
 /*
-Query OK, 881403 rows affected (22,53 sec)
-Records: 881403  Duplicates: 0  Warnings: 0
+Query OK, 784182 rows affected (23,05 sec)
+Records: 784182  Duplicates: 0  Warnings: 0
 */
 SHOW INDEX FROM riccaboni.edges_undid_ud_pboc;                                     
 ALTER TABLE riccaboni.edges_undid_ud_pboc ADD INDEX(undid);

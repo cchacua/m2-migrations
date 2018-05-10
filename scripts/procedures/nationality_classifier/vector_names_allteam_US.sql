@@ -11,19 +11,19 @@ SHOW INDEX FROM riccaboni.t01_allclasses_appid_patstat_us_allteam;
 
 
 ---------------------------------------------------------------------------------------------------
--- 1 - T08 No-Celtic rows, all team members are US residents
+-- 1 - T08 No-Celtic rows OF THE TEN CEL GROUPS, all team members are US residents IN BOTH PATSTAT AND RICCABONI
 ---------------------------------------------------------------------------------------------------
 DROP TABLE IF EXISTS christian.t08_class_at1us_date_fam_nceltic;
 CREATE TABLE christian.t08_class_at1us_date_fam_nceltic AS
 SELECT a.*
       FROM christian.t08_class_at1us_date_fam a 
-      INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_allteam b
+      INNER JOIN christian.ric_us_all_both b
       ON a.pat=b.pat
-      WHERE a.nation!='CelticEnglish';
+      WHERE a.nation='EastAsian.Chinese' OR a.nation='SouthAsian' OR a.nation='Muslim.Persian' OR a.nation='EastAsian.Japan' OR a.nation='EastAsian.South.Korea' OR a.nation='European.French' OR a.nation='European.German' OR a.nation='European.Italian.Italy' OR a.nation='European.EastEuropean' OR a.nation='European.Russian';
 
 /*
-Query OK, 1171779 rows affected (41,08 sec)
-Records: 1171779  Duplicates: 0  Warnings: 0
+Query OK, 884669 rows affected (26,91 sec)
+Records: 884669  Duplicates: 0  Warnings: 0
 */
 
 SELECT * FROM christian.t08_class_at1us_date_fam_nceltic LIMIT 0,10;
@@ -51,7 +51,7 @@ ALTER TABLE  christian.pat_nceltic_allus ADD INDEX(pat);
 ALTER TABLE  christian.pat_nceltic_allus ADD INDEX(APPLN_ID);
 
 ---------------------------------------------------------------------------------------------------
--- 3 - T08 rows, if at least one member is non-celtic, all team members are US residents
+-- 3 - T08 rows, if at least one member belong to the 10 CEL GROUPS, all team members are US residents
 ---------------------------------------------------------------------------------------------------
 DROP TABLE IF EXISTS christian.t08_class_at1us_date_fam_for;
 CREATE TABLE christian.t08_class_at1us_date_fam_for AS
@@ -61,8 +61,13 @@ SELECT a.*
       ON a.pat=b.pat;
 
 /*
-Query OK, 2036168 rows affected (50,10 sec)
-Records: 2036168  Duplicates: 0  Warnings: 0
+Query OK, 1695713 rows affected (36,27 sec)
+Records: 1695713  Duplicates: 0  Warnings: 0
 */
 
+SELECT * FROM christian.t08_class_at1us_date_fam_for LIMIT 0,10;
+
+SHOW INDEX FROM  christian.t08_class_at1us_date_fam_for;                                     
+ALTER TABLE  christian.t08_class_at1us_date_fam_for ADD INDEX(pat);
+ALTER TABLE  christian.t08_class_at1us_date_fam_for ADD INDEX(finalID);
 
