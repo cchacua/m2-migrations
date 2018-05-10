@@ -30,6 +30,13 @@ SELECT * FROM riccaboni.t08_names_allclasses_us_mob_atleastone LIMIT 0,30;
 ---------------------------------------------------------------------------------------------------
 -- DIRECTED EDGE LIST
 ---------------------------------------------------------------------------------------------------
+
+SHOW INDEX FROM riccaboni.t_id_pat;                                     
+ALTER TABLE riccaboni.t_id_pat ADD INDEX(finalID);
+ALTER TABLE riccaboni.t_id_pat ADD INDEX(pat);
+
+
+
 DROP TABLE IF EXISTS riccaboni.edges_dir;
 CREATE TABLE riccaboni.edges_dir AS
 SELECT DISTINCT a.finalID, b.finalID AS finalID_, a.pat
@@ -56,18 +63,96 @@ SHOW INDEX FROM  christian.pat_nceltic_allus;
 
 DROP TABLE IF EXISTS riccaboni.edges_dir_aus;
 CREATE TABLE riccaboni.edges_dir_aus AS
-SELECT DISTINCT a.*
+SELECT DISTINCT a.*, b.nation, c.nation AS nation_
       FROM riccaboni.edges_dir a
-      INNER JOIN christian.pat_nceltic_allus b
-      ON a.pat=b.pat;
+      INNER JOIN christian.finalid_10cel_allus b
+      ON a.finalID=b.finalID
+      INNER JOIN christian.finalid_cel_allus c
+      ON a.finalID_=c.finalID
+      INNER JOIN christian.pat_nceltic_allus d
+      ON a.pat=d.pat;
 
 /*
-Query OK, 6.313.178 rows affected (2 min 57,99 sec)
-Records: 6313178  Duplicates: 0  Warnings: 0
+Query OK, 2800151 rows affected (3 min 26,06 sec)
+Records: 2800151  Duplicates: 0  Warnings: 0
+
 */
 
 SHOW INDEX FROM  riccaboni.edges_dir_aus;                                     
 ALTER TABLE  riccaboni.edges_dir_aus ADD INDEX(pat);
+
+SELECT * FROM riccaboni.edges_dir_aus LIMIT 0,10;
+SELECT DISTINCT a.nation FROM riccaboni.edges_dir_aus a;
+/*
++-----------------------------+
+| nation                      |
++-----------------------------+
+| European.Italian.Italy      |
+| SouthAsian                  |
+| EastAsian.Indochina.Vietnam |
+| European.French             |
+| European.German             |
+| EastAsian.Chinese           |
+| EastAsian.South.Korea       |
+| European.EastEuropean       |
+| Muslim.Persian              |
+| EastAsian.Japan             |
+| EastAsian.Malay.Indonesia   |
+| European.Russian            |
++-----------------------------+
+12 rows in set (6,82 sec)
+*/
+
+SELECT DISTINCT a.nation_ FROM riccaboni.edges_dir_aus a;
+/*
++------------------------------+
+| nation_                      |
++------------------------------+
+| CelticEnglish                |
+| SouthAsian                   |
+| European.German              |
+| EastAsian.Chinese            |
+| Hispanic.Spanish             |
+| European.French              |
+| EastAsian.South.Korea        |
+| Muslim.Nubian                |
+| Hispanic.Portuguese          |
+| EastAsian.Indochina.Vietnam  |
+| European.SouthSlavs          |
+| Muslim.Persian               |
+| EastAsian.Japan              |
+| Hispanic.Philippines         |
+| EastAsian.Malay.Indonesia    |
+| European.Russian             |
+| Nordic.Scandavian.Denmark    |
+| Nordic.Finland               |
+| African.WestAfrican          |
+| EastAsian.Indochina.Thailand |
+| Muslim.ArabianPeninsula      |
+| Greek                        |
+| Muslim.Pakistanis.Pakistan   |
+| European.Italian.Italy       |
+| EastAsian.Indochina.Myanmar  |
+| Nordic.Scandinavian.Sweden   |
+| European.EastEuropean        |
+| EastAsian.Malay.Malaysia     |
+| African.EastAfrican          |
+| Jewish                       |
+| Muslim.Turkic.Turkey         |
+| European.Italian.Romania     |
+| Nordic.Scandinavian.Norway   |
+| European.Baltics             |
+| African.SouthAfrican         |
+| Muslim.Pakistanis.Bangladesh |
+| Muslim.Turkic.CentralAsian   |
+| Muslim.Maghreb               |
+| EastAsian.Indochina.Cambodia |
++------------------------------+
+39 rows in set (6,33 sec)
+*/
+
+
+SELECT COUNT(DISTINCT a.finalID), a.nation_ FROM riccaboni.edges_dir_aus a GROUP BY a.nation_ ORDER BY COUNT(DISTINCT a.finalID) DESC;
 
 SHOW INDEX FROM  riccaboni.t01_allclasses_appid_patstat_us_atleastone; 
 SHOW INDEX FROM  patstat2016b.TLS201_APPLN; 
@@ -82,16 +167,29 @@ SELECT a.*, c.EARLIEST_FILING_YEAR, CONCAT(c.EARLIEST_FILING_YEAR, a.finalID, a.
       INNER JOIN patstat2016b.TLS201_APPLN c
       ON b.APPLN_ID=c.APPLN_ID;
 /*
-Query OK, 6.313.178 rows affected (5 min 54,59 sec)
-Records: 6313178  Duplicates: 0  Warnings: 0
+Query OK, 2800151 rows affected (2 min 2,69 sec)
+Records: 2800151  Duplicates: 0  Warnings: 0
 
-
-Ask if keep links Celtic-English, Celtic-English, if they belong to a patent with one inventor of foreign origin
+Only keep links where at least one node belong to the ten considered groups
 */
 
 SHOW INDEX FROM  riccaboni.edges_dir_aus_pyr;                                     
 ALTER TABLE riccaboni.edges_dir_aus_pyr ADD INDEX(pat);
 ALTER TABLE riccaboni.edges_dir_aus_pyr ADD INDEX(undid);
+
+
+SELECT COUNT(DISTINCT a.pat) 
+FROM riccaboni.edges_dir_aus_pyr a 
+WHERE a.EARLIEST_FILING_YEAR>='1975' AND a.EARLIEST_FILING_YEAR<='2012';
+/*
++-----------------------+
+| COUNT(DISTINCT a.pat) |
++-----------------------+
+|                436566 |
++-----------------------+
+1 row in set (6,18 sec)
+*/
+
 
 ---------------------------------------------------------------------------------------------------
 -- UNDIRECTED EDGE LIST
@@ -185,15 +283,14 @@ INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_atleastone b
       ON a.pat=b.pat
       INNER JOIN patstat2016b.TLS201_APPLN c
       ON b.APPLN_ID=c.APPLN_ID
-      WHERE c.EARLIEST_FILING_YEAR>='1975' and c.EARLIEST_FILING_YEAR<='2013'; 
+      WHERE c.EARLIEST_FILING_YEAR>='1975' and c.EARLIEST_FILING_YEAR<='2012'; 
 /*
 +-----------------------+
 | COUNT(DISTINCT a.pat) |
 +-----------------------+
 |                766370 |
 +-----------------------+
-1 row in set (33,33 sec)
-
+1 row in set (40,63 sec)
 */
 
 SELECT COUNT(DISTINCT a.pat) from riccaboni.edges_undir_pat a 
@@ -203,14 +300,15 @@ SELECT COUNT(DISTINCT a.pat) from riccaboni.edges_undir_pat a
       ON b.APPLN_ID=c.APPLN_ID
       INNER JOIN riccaboni.t01_pboc_class d
       ON a.pat=d.pat
-      WHERE c.EARLIEST_FILING_YEAR>='1975' and c.EARLIEST_FILING_YEAR<='2013'; 
+      WHERE c.EARLIEST_FILING_YEAR>='1975' and c.EARLIEST_FILING_YEAR<='2012'; 
 /*
 +-----------------------+
 | COUNT(DISTINCT a.pat) |
 +-----------------------+
-|                390491 |
+|                390489 |
 +-----------------------+
-1 row in set (24,18 sec)
+1 row in set (45,38 sec)
+
 
 */
 
@@ -221,14 +319,16 @@ SELECT COUNT(DISTINCT a.pat) from riccaboni.edges_undir_pat a
       ON b.APPLN_ID=c.APPLN_ID
       INNER JOIN riccaboni.t01_ctt_class d
       ON a.pat=d.pat
-      WHERE c.EARLIEST_FILING_YEAR>='1975' and c.EARLIEST_FILING_YEAR<='2013';
+      WHERE c.EARLIEST_FILING_YEAR>='1975' and c.EARLIEST_FILING_YEAR<='2012';
 /*
 +-----------------------+
 | COUNT(DISTINCT a.pat) |
 +-----------------------+
-|                378817 |
+|                378815 |
 +-----------------------+
-1 row in set (1 min 0,34 sec)
+1 row in set (39,63 sec)
+
+
 
 */
 
@@ -248,8 +348,8 @@ SELECT DISTINCT a.*
      ON a.undid=b.undid
      ORDER BY a.EARLIEST_FILING_YEAR;
 /*
-Query OK, 696594 rows affected (20,58 sec)
-Records: 696594  Duplicates: 0  Warnings: 0
+Query OK, 306105 rows affected (12,39 sec)
+Records: 306105  Duplicates: 0  Warnings: 0
 */
 
 SHOW INDEX FROM riccaboni.edges_undid_ud_ctt;                                     
@@ -265,8 +365,8 @@ SELECT DISTINCT a.*
      ON a.undid=b.undid
      ORDER BY a.EARLIEST_FILING_YEAR;
 /*
-Query OK, 784182 rows affected (23,05 sec)
-Records: 784182  Duplicates: 0  Warnings: 0
+Query OK, 347545 rows affected (14,76 sec)
+Records: 347545  Duplicates: 0  Warnings: 0
 */
 SHOW INDEX FROM riccaboni.edges_undid_ud_pboc;                                     
 ALTER TABLE riccaboni.edges_undid_ud_pboc ADD INDEX(undid);

@@ -36,6 +36,6 @@ install.packages("maps")
 install.packages("udunits2")
 install.packages("sf")
 install.packages("mapview")
-
+install.packages("cem")
 install.packages("stringi")
 install.packages("igraph")
