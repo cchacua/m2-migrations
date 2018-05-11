@@ -37,3 +37,47 @@ SELECT COUNT(DISTINCT pat) FROM christian.pat_ipc;
 1 row in set (2,73 sec)
 */
 
+
+-- IPC 3-digit code per patent
+DROP TABLE IF EXISTS christian.pat_3ipc;
+CREATE TABLE christian.pat_3ipc AS
+SELECT DISTINCT a.pat, LEFT(a.class,3) AS class, c.EARLIEST_FILING_YEAR
+FROM christian.pat_ipc a
+      INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_atleastone b
+      ON a.pat=b.pat
+      INNER JOIN patstat2016b.TLS201_APPLN c
+      ON b.APPLN_ID=c.APPLN_ID;
+/*
+Query OK, 816085 rows affected (1 min 36,71 sec)
+Records: 816085  Duplicates: 0  Warnings: 0
+*/
+
+SHOW INDEX FROM christian.pat_3ipc;                                     
+ALTER TABLE christian.pat_3ipc ADD INDEX(pat);
+
+SELECT * FROM christian.pat_3ipc LIMIT 0,10;
+
+
+-- IPC 6-digit code per patent
+DROP TABLE IF EXISTS christian.pat_6ipc;
+CREATE TABLE christian.pat_6ipc AS
+SELECT DISTINCT a.pat, LEFT(a.class,6)  AS class, c.EARLIEST_FILING_YEAR
+FROM christian.pat_ipc a
+      INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_atleastone b
+      ON a.pat=b.pat
+      INNER JOIN patstat2016b.TLS201_APPLN c
+      ON b.APPLN_ID=c.APPLN_ID;
+/*
+Query OK, 1419762 rows affected (1 min 18,79 sec)
+Records: 1419762  Duplicates: 0  Warnings: 0
+*/
+
+SHOW INDEX FROM christian.pat_6ipc;                                     
+ALTER TABLE christian.pat_6ipc ADD INDEX(pat);
+
+SELECT * FROM christian.pat_6ipc LIMIT 0,10;
+
+
+
+
+

@@ -1,3 +1,4 @@
+rs <- dbSendQuery(patstat, 'SET CHARACTER SET "UTF8"')
 
 controls_bulk<-function(endyear, withplot=FALSE, sector="ctt"){
   print("Sector should be pboc or ctt")
@@ -17,40 +18,47 @@ controls_bulk<-function(endyear, withplot=FALSE, sector="ctt"){
   dedges<-dbGetQuery(patstat, paste0("SELECT finalID_, finalID__, undid
                                      FROM riccaboni.edges_undid_ud_", sector, 
                                      " WHERE EARLIEST_FILING_YEAR=",linkyear))
+  patipc3<-dbGetQuery(patstat, paste0("SELECT DISTINCT a.finalID, c.class
+                                     FROM christian.t08_class_at1us_date_fam_for a 
+                                     INNER JOIN riccaboni.t01_", sector, "_class b 
+                                     ON a.pat=b.pat 
+                                     INNER JOIN christian.pat_3ipc c
+                                     ON a.pat=c.pat 
+                                     WHERE a.EARLIEST_FILING_YEAR=",linkyear," AND c.EARLIEST_FILING_YEAR=",linkyear))
+ length(unique(patipc6$class))
   dedges$ipc<-substr(dedges$finalID_, 3,3)
-  dedges<-dedges[1:10,]
+  #dedges<-dedges[1:10,]
   dedges.nodes<-rbind(data.frame(finalID=unique(dedges$finalID_)),data.frame(finalID=unique(dedges$finalID__)))
   dedges.nodes<-data.frame(finalID=unique(dedges.nodes$finalID))
   dedges<-dedges[1:10,]
   dedges$ipc<-c("1","2","1","3","1","2","1","3","1","2")
   dedges2<-dedges
   rm(dedges)
-  
-  #ipcrow<-function(onerow, ncontrol=1,edges=dedges){
-  ipcrow<-function(ipcv, idv, ncontrol=1, edges){
 
-    # onerow<-as.vector(onerow)
-    # onerow<-data.frame(finalID_=onerow[1], finalID__=onerow[2], undid=onerow[3], ipc=onerow[4])
-    # setipc<-as.data.table(edges[edges$ipc==onerow$ipc,])
-    # setnei<-as.data.table(edges[edges$finalID_==onerow$finalID_,])
-    setipc<-as.data.table(edges[edges$ipc==ipcv,])
-    setnei<-as.data.table(edges[edges$finalID_==idv,])
-    
-    setkey(setipc,finalID__)
-    setkey(setnei,finalID__)
-    Result <- merge(setipc,setnei, all=TRUE)
-    Result <- Result[is.na(finalID_.y)]
-    Result<-Result[sample(nrow(Result), ncontrol),c(5,1,4)]
-    colnames(Result)<-c("finalID_", "finalID__", "ipc")
-    #Result$finalID_<-onerow$finalID_
-    Result$finalID_<-idv
-    return(Result)
+  ipcrow<-function(idv,id__, ncontrol=1, edges, ipcfile){
+  ipcclasses<-ipcfile[ipcfile$finalID==id__,]
+  print(ipcclasses)
+  setipc<-as.data.table(ipcfile[ipcfile$class %in% ipcclasses$class,])
+  print(setipc)
+  setnei<-as.data.table(edges[edges$finalID_==idv,])
+  print(setnei)
+  setnona<-setipc[!(setipc$finalID %in% setnei$finalID__),]
+  print(setnona)
+  setnona<-setnona[sample(nrow(setnona), ncontrol),]
+  print(setnona)
+  Result<-data.table(finalID_=idv, finalID__=setnona$finalID, counterof=id__,class=setnona$class, ncount=seq(1,ncontrol,1))
+  print(Result)
+  return(Result)
   }
   
   ipcrow(dedges[1,])
-  rr<-mapply(ipcrow, ipcv=dedges$ipc, idv=dedges$finalID_, MoreArgs = list(edges=dedges, ncontrol=1))
-  rr<-as.data.frame(t(rr))
-
+rr<-mapply(ipcrow, idv=dedges$finalID_, id__=dedges$finalID__, MoreArgs = list(edges=dedges, ncontrol=1, ipcfile=patipc3))
+rr<-as.data.frame(t(rr))
+  
+  rr<-mapply(ipcrow, ipcv=dedges$ipc, idv=dedges$finalID_, id__=dedges$finalID__, MoreArgs = list(edges=dedges, ncontrol=3, ipcfile=patipc3), SIMPLIFY = FALSE)
+  rr<-merge.list(rr)
+  
+  
   dedges.all<-expand.grid(dedges.nodes$finalID, dedges.nodes$finalID, KEEP.OUT.ATTRS = FALSE, stringsAsFactors = TRUE)
   colnames(dedges.all)<-c("finalID_", "finalID__")
   dedges.all<-as.data.table(dedges.all)

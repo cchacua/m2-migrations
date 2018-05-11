@@ -590,3 +590,31 @@ count_invs<-function(query, metroid=FALSE){
   df$key<-paste0(df$EARLIEST_FILING_YEAR, df$ID)
   return(as.data.frame(df))
 }
+
+ipcrow_one<-function(ipcv, idv, ncontrol=1, edges){
+  setipc<-as.data.table(edges[edges$ipc==ipcv,])
+  setnei<-as.data.table(edges[edges$finalID_==idv,])
+  setkey(setipc,finalID__)
+  setkey(setnei,finalID__)
+  Result <- merge(setipc,setnei, all=TRUE)
+  Result <- Result[is.na(finalID_.y)]
+  Result<-Result[sample(nrow(Result), ncontrol),c(5,1,4)]
+  colnames(Result)<-c("finalID_", "finalID__", "ipc")
+  Result$finalID_<-idv
+  return(Result)
+}
+
+ipcrow_onerow<-function(onerow, ncontrol=1,edges=dedges){
+  onerow<-as.vector(onerow)
+  onerow<-data.frame(finalID_=onerow[1], finalID__=onerow[2], undid=onerow[3], ipc=onerow[4])
+  setipc<-as.data.table(edges[edges$ipc==onerow$ipc,])
+  setnei<-as.data.table(edges[edges$finalID_==onerow$finalID_,])
+  setkey(setipc,finalID__)
+  setkey(setnei,finalID__)
+  Result <- merge(setipc,setnei, all=TRUE)
+  Result <- Result[is.na(finalID_.y)]
+  Result<-Result[sample(nrow(Result), ncontrol),c(5,1,4)]
+  colnames(Result)<-c("finalID_", "finalID__", "ipc")
+  Result$finalID_<-idv
+  return(Result)
+}
