@@ -110,3 +110,63 @@ Records: 92846  Deleted: 0  Skipped: 0  Warnings: 0
 
 SHOW INDEX FROM christian.ric_us_ma; 
 ALTER TABLE christian.ric_us_ma ADD INDEX(loc);
+
+
+--------------------------------------------
+DROP TABLE IF EXISTS christian.counter_pboc;
+CREATE TABLE IF NOT EXISTS christian.counter_pboc
+(
+finalID_ VARCHAR(15),
+finalID__ VARCHAR(15),
+year CHAR(4),	
+counterof VARCHAR(15),
+class CHAR(6),	
+ncount CHAR(1)
+)
+ENGINE=MyISAM
+CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+
+LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/data/sql/counterpboc.csv' INTO TABLE christian.counter_pboc
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  ESCAPED BY ''
+lines terminated by '\n'
+IGNORE 1 LINES ;
+SHOW WARNINGS;
+/*
+Query OK, 695.680 rows affected (1,21 sec)
+Records: 695680  Deleted: 0  Skipped: 0  Warnings: 0
+*/
+
+SHOW INDEX FROM christian.counter_pboc; 
+ALTER TABLE christian.counter_pboc ADD INDEX(finalID_);
+ALTER TABLE christian.counter_pboc ADD INDEX(finalID__);
+
+
+--------------------------------------------
+DROP TABLE IF EXISTS christian.counter_ctt;
+CREATE TABLE IF NOT EXISTS christian.counter_ctt
+(
+finalID_ VARCHAR(15),
+finalID__ VARCHAR(15),
+year CHAR(4),	
+counterof VARCHAR(15),
+class CHAR(6),	
+ncount CHAR(1)
+)
+ENGINE=MyISAM
+CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+
+LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/data/sql/counterctt.csv' INTO TABLE christian.counter_ctt
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  ESCAPED BY ''
+lines terminated by '\n'
+IGNORE 1 LINES ;
+SHOW WARNINGS;
+/*
+Query OK, 613468 rows affected (1,09 sec)
+Records: 613468  Deleted: 0  Skipped: 0  Warnings: 0
+*/
+
+SHOW INDEX FROM christian.counter_ctt; 
+ALTER TABLE christian.counter_ctt ADD INDEX(finalID_);
+ALTER TABLE christian.counter_ctt ADD INDEX(finalID__);

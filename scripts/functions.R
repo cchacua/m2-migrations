@@ -618,3 +618,49 @@ ipcrow_onerow<-function(onerow, ncontrol=1,edges=dedges){
   Result$finalID_<-idv
   return(Result)
 }
+
+ipcrow<-function(idv,id__, ncontrol=1, edges, ipcfile, lyear){
+  ipcclasses<-ipcfile[ipcfile$finalID==id__,]
+  setipc<-as.data.table(ipcfile[ipcfile$class %in% ipcclasses$class,])
+  setnei<-as.data.table(edges[edges$finalID_==idv,])
+  setnona<-setipc[!(setipc$finalID %in% setnei$finalID__),]
+  setnona<-setnona[sample(nrow(setnona), ncontrol),]
+  if(nrow(setnona)>0){
+    Result<-data.table(finalID_=idv, finalID__=setnona$finalID, year=lyear, counterof=id__,class=setnona$class, ncount=seq(1,ncontrol,1))
+  }
+  else {
+    setnona<-ipcfile[!(ipcfile$finalID %in% setnei$finalID__),]
+    setnona<-setnona[sample(nrow(setnona), ncontrol),]
+    Result<-data.table(finalID_=idv, finalID__=setnona$finalID, year=lyear, counterof=id__,class=NA, ncount=seq(1,ncontrol,1))
+  }
+  return(Result)
+}
+
+
+controls_bulk<-function(linkyear, numbercontrols=1, sector="ctt"){
+  print("Sector should be pboc or ctt")
+  print(paste("Link year (t0):", linkyear))
+  dedges<-dbGetQuery(patstat, paste0("SELECT DISTINCT finalID, finalID_
+                                     FROM riccaboni.edges_dir_aus_pyr a
+                                     INNER JOIN riccaboni.t01_", sector,"_class d
+                                     ON a.pat=d.pat
+                                     WHERE a.EARLIEST_FILING_YEAR=",linkyear))
+  patipc6<-dbGetQuery(patstat, paste0("SELECT DISTINCT a.finalID, c.class
+                                      FROM christian.t08_class_at1us_date_fam_for a 
+                                      INNER JOIN riccaboni.t01_", sector, "_class b 
+                                      ON a.pat=b.pat 
+                                      INNER JOIN christian.pat_6ipc c
+                                      ON a.pat=c.pat 
+                                      WHERE a.EARLIEST_FILING_YEAR=",linkyear," AND c.EARLIEST_FILING_YEAR=",linkyear))
+  if(numbercontrols==1){
+    rr<-mapply(ipcrow, idv=dedges$finalID, id__=dedges$finalID_, MoreArgs = list(edges=dedges, ncontrol=numbercontrols, ipcfile=patipc6, lyear=linkyear))
+    #rr<-mapply(ipcrow, idv=dedges$finalID, id__=dedges$finalID_, MoreArgs = list(edges=dedges, ncontrol=1, ipcfile=patipc3, lyear=linkyear))
+    rr<-as.data.frame(t(rr))
+  }
+  else{
+    rr<-mapply(ipcrow, idv=dedges$finalID, id__=dedges$finalID_, MoreArgs = list(edges=dedges, ncontrol=numbercontrols, ipcfile=patipc6, lyear=linkyear), SIMPLIFY = FALSE)
+    rr<-merge.list(rr)
+  }
+  fwrite(rr, paste0("../output/graphs/counterfactual/",sector, "_", linkyear, "_list", ".csv"))
+  return("done")
+}
