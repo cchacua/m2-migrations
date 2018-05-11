@@ -198,15 +198,15 @@ WHERE a.EARLIEST_FILING_YEAR>='1975' AND a.EARLIEST_FILING_YEAR<='2012';
 -- PBOC
 DROP TABLE IF EXISTS riccaboni.edges_dir_count_pboc;
 CREATE TABLE riccaboni.edges_dir_count_pboc AS
-SELECT DISTINCT a.finalID_ AS finalID, a.finalID__ AS finalID_, NULL AS pat, b.nation, c.nation AS nation_, a.year AS EARLIEST_FILING_YEAR, CONCAT(a.year, a.finalID_, a.finalID__) AS undid
+SELECT DISTINCT a.finalID_ AS finalID, a.finalID__ AS finalID_, counterof AS pat, b.nation, c.nation AS nation_, a.year AS EARLIEST_FILING_YEAR, CONCAT(a.year, a.finalID_, a.finalID__) AS undid
       FROM christian.counter_pboc a
       INNER JOIN christian.finalid_cel_allus b
       ON a.finalID_=b.finalID
       INNER JOIN christian.finalid_cel_allus c
       ON a.finalID__=c.finalID;
 /*
-Query OK, 694523 rows affected (25,13 sec)
-Records: 694523  Duplicates: 0  Warnings: 0
+Query OK, 695680 rows affected (30,07 sec)
+Records: 695680  Duplicates: 0  Warnings: 0
 */
 
 SHOW INDEX FROM  riccaboni.edges_dir_count_pboc;                                     
@@ -218,15 +218,16 @@ SELECT * FROM riccaboni.edges_dir_count_pboc LIMIT 0,10;
 -- CTT
 DROP TABLE IF EXISTS riccaboni.edges_dir_count_ctt;
 CREATE TABLE riccaboni.edges_dir_count_ctt AS
-SELECT DISTINCT a.finalID_ AS finalID, a.finalID__ AS finalID_, NULL AS pat, b.nation, c.nation AS nation_, a.year AS EARLIEST_FILING_YEAR, CONCAT(a.year, a.finalID_, a.finalID__) AS undid
+SELECT DISTINCT a.finalID_ AS finalID, a.finalID__ AS finalID_, counterof AS pat, b.nation, c.nation AS nation_, a.year AS EARLIEST_FILING_YEAR, CONCAT(a.year, a.finalID_, a.finalID__) AS undid
       FROM christian.counter_ctt a
       INNER JOIN christian.finalid_cel_allus b
       ON a.finalID_=b.finalID
       INNER JOIN christian.finalid_cel_allus c
       ON a.finalID__=c.finalID;
 /*
-Query OK, 612681 rows affected (23,53 sec)
-Records: 612681  Duplicates: 0  Warnings: 0
+Query OK, 613468 rows affected (27,46 sec)
+Records: 613468  Duplicates: 0  Warnings: 0
+
 */
 
 SHOW INDEX FROM  riccaboni.edges_dir_count_ctt;                                     
@@ -242,96 +243,113 @@ SELECT * FROM riccaboni.edges_dir_count_ctt LIMIT 0,10;
 -- PBOC
 DROP TABLE IF EXISTS riccaboni.count_edges_pboc;
 CREATE TABLE riccaboni.count_edges_pboc AS
-SELECT DISTINCT a.finalID, a.finalID_, 1 AS linked, a.nation, a.nation_, a.EARLIEST_FILING_YEAR, IF(a.nation = a.nation_, 1, 0) AS ethnic, a.undid
+SELECT DISTINCT a.finalID, a.finalID_, 1 AS linked, a.nation, a.nation_, a.EARLIEST_FILING_YEAR, IF(a.nation = a.nation_, 1, 0) AS ethnic, a.undid, CONCAT(a.EARLIEST_FILING_YEAR,a.finalID) AS yfinalID, CONCAT(a.EARLIEST_FILING_YEAR,a.finalID_) AS yfinalID_
 FROM riccaboni.edges_dir_aus_pyr a
 INNER JOIN  riccaboni.t01_pboc_class b
 ON a.pat=b.pat
+WHERE a.EARLIEST_FILING_YEAR>='1976' AND a.EARLIEST_FILING_YEAR<='2012'
 UNION ALL  
-SELECT DISTINCT c.finalID, c.finalID_, 0 AS linked, c.nation, c.nation_, c.EARLIEST_FILING_YEAR, IF(c.nation = c.nation_, 1, 0) AS ethnic, c.undid
+SELECT c.finalID, c.finalID_, 0 AS linked, c.nation, c.nation_, c.EARLIEST_FILING_YEAR, IF(c.nation = c.nation_, 1, 0) AS ethnic, c.undid, CONCAT(c.EARLIEST_FILING_YEAR,c.finalID) AS yfinalID, CONCAT(c.EARLIEST_FILING_YEAR,c.finalID_) AS yfinalID_
 FROM riccaboni.edges_dir_count_pboc c;  
 
 /*
-Query OK, 1391579 rows affected (49,75 sec)
-Records: 1391579  Duplicates: 0  Warnings: 0
+Query OK, 1391360 rows affected (1 min 2,23 sec)
+Records: 1391360  Duplicates: 0  Warnings: 0
 */
 
 SHOW INDEX FROM  riccaboni.count_edges_pboc;                                     
 ALTER TABLE riccaboni.count_edges_pboc ADD INDEX(finalID_);
 ALTER TABLE riccaboni.count_edges_pboc ADD INDEX(finalID);
+ALTER TABLE riccaboni.count_edges_pboc ADD INDEX(yfinalID_);
+ALTER TABLE riccaboni.count_edges_pboc ADD INDEX(yfinalID);
+ALTER TABLE riccaboni.count_edges_pboc ADD INDEX(undid);
+
 
 SELECT * FROM riccaboni.count_edges_pboc LIMIT 0,10;
 
 SELECT * FROM riccaboni.count_edges_pboc WHERE ethnic='1' AND linked='0' LIMIT 0,10;
 
-SELECT ethnic, count(*) FROM riccaboni.count_edges_pboc GROUP BY ethnic;
+SELECT ethnic, count(*) FROM riccaboni.count_edges_pboc 
+GROUP BY ethnic;
 /*
 +--------+----------+
 | ethnic | count(*) |
 +--------+----------+
-|      0 |  1229935 |
-|      1 |   161644 |
+|      0 |  1229713 |
+|      1 |   161647 |
 +--------+----------+
-2 rows in set (1,35 sec)
-1229935-161644
+2 rows in set (2,10 sec)
+
 */
 
-SELECT linked, count(*) FROM riccaboni.count_edges_pboc GROUP BY linked;
+SELECT linked, COUNT(*) 
+FROM riccaboni.count_edges_pboc 
+GROUP BY linked;
 /*
 +--------+----------+
-| linked | count(*) |
+| linked | COUNT(*) |
 +--------+----------+
-|      0 |   694523 |
-|      1 |   697056 |
+|      0 |   695680 |
+|      1 |   695680 |
 +--------+----------+
-2 rows in set (1,35 sec)
+2 rows in set (2,24 sec)
 */
+
 
 
 -- CTT
 DROP TABLE IF EXISTS riccaboni.count_edges_ctt;
 CREATE TABLE riccaboni.count_edges_ctt AS
-SELECT DISTINCT a.finalID, a.finalID_, 1 AS linked, a.nation, a.nation_, a.EARLIEST_FILING_YEAR, IF(a.nation = a.nation_, 1, 0) AS ethnic, a.undid
+SELECT DISTINCT a.finalID, a.finalID_, 1 AS linked, a.nation, a.nation_, a.EARLIEST_FILING_YEAR, IF(a.nation = a.nation_, 1, 0) AS ethnic, a.undid, CONCAT(a.EARLIEST_FILING_YEAR,a.finalID) AS yfinalID, CONCAT(a.EARLIEST_FILING_YEAR,a.finalID_) AS yfinalID_
 FROM riccaboni.edges_dir_aus_pyr a
 INNER JOIN  riccaboni.t01_ctt_class b
 ON a.pat=b.pat
+WHERE a.EARLIEST_FILING_YEAR>='1976' AND a.EARLIEST_FILING_YEAR<='2012'
 UNION ALL  
-SELECT DISTINCT c.finalID, c.finalID_, 0 AS linked, c.nation, c.nation_, c.EARLIEST_FILING_YEAR, IF(c.nation = c.nation_, 1, 0) AS ethnic, c.undid
+SELECT c.finalID, c.finalID_, 0 AS linked, c.nation, c.nation_, c.EARLIEST_FILING_YEAR, IF(c.nation = c.nation_, 1, 0) AS ethnic, c.undid, CONCAT(c.EARLIEST_FILING_YEAR,c.finalID) AS yfinalID, CONCAT(c.EARLIEST_FILING_YEAR,c.finalID_) AS yfinalID_
 FROM riccaboni.edges_dir_count_ctt c;  
 
 /*
-Query OK, 1226557 rows affected (46,03 sec)
-Records: 1226557  Duplicates: 0  Warnings: 0
+Query OK, 1226936 rows affected (56,35 sec)
+Records: 1226936  Duplicates: 0  Warnings: 0
+
 */
 
 SHOW INDEX FROM  riccaboni.count_edges_ctt;                                     
 ALTER TABLE riccaboni.count_edges_ctt ADD INDEX(finalID_);
 ALTER TABLE riccaboni.count_edges_ctt ADD INDEX(finalID);
+ALTER TABLE riccaboni.count_edges_ctt ADD INDEX(yfinalID_);
+ALTER TABLE riccaboni.count_edges_ctt ADD INDEX(yfinalID);
+ALTER TABLE riccaboni.count_edges_ctt ADD INDEX(undid);
 
 SELECT * FROM riccaboni.count_edges_ctt LIMIT 0,10;
 
 SELECT * FROM riccaboni.count_edges_ctt WHERE ethnic='1' AND linked='0' LIMIT 0,10;
 
-SELECT ethnic, count(*) FROM riccaboni.count_edges_ctt GROUP BY ethnic;
+SELECT ethnic, count(*) FROM riccaboni.count_edges_ctt 
+WHERE EARLIEST_FILING_YEAR>='1976' AND EARLIEST_FILING_YEAR<='2012'
+GROUP BY ethnic;
 /*
 +--------+----------+
 | ethnic | count(*) |
 +--------+----------+
-|      0 |  1066778 |
-|      1 |   159779 |
+|      0 |  1067101 |
+|      1 |   159835 |
 +--------+----------+
-2 rows in set (1,26 sec)
+2 rows in set (1,87 sec)
 */
 
-SELECT linked, count(*) FROM riccaboni.count_edges_ctt GROUP BY linked;
+SELECT linked, count(*) FROM riccaboni.count_edges_ctt 
+WHERE EARLIEST_FILING_YEAR>='1976' AND EARLIEST_FILING_YEAR<='2012'
+GROUP BY linked;
 /*
 +--------+----------+
 | linked | count(*) |
 +--------+----------+
-|      0 |   612681 |
-|      1 |   613876 |
+|      0 |   613468 |
+|      1 |   613468 |
 +--------+----------+
-2 rows in set (1,17 sec)
-
+2 rows in set (1,79 sec)
 */
 
 

@@ -170,3 +170,92 @@ Records: 613468  Deleted: 0  Skipped: 0  Warnings: 0
 SHOW INDEX FROM christian.counter_ctt; 
 ALTER TABLE christian.counter_ctt ADD INDEX(finalID_);
 ALTER TABLE christian.counter_ctt ADD INDEX(finalID__);
+
+
+
+
+--------------------------------------------
+DROP TABLE IF EXISTS christian.geo_onlyone;
+CREATE TABLE IF NOT EXISTS christian.geo_onlyone
+(
+yfinalID VARCHAR(20),
+loc VARCHAR(50),
+ncount VARCHAR(4)
+)
+ENGINE=MyISAM
+CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+
+LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/data/sql/geo_onlyone.csv' INTO TABLE christian.geo_onlyone
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  ESCAPED BY ''
+lines terminated by '\n'
+IGNORE 1 LINES ;
+SHOW WARNINGS;
+/*
+Query OK, 1060819 rows affected (1,40 sec)
+Records: 1060819  Deleted: 0  Skipped: 0  Warnings: 0
+*/
+
+SHOW INDEX FROM christian.geo_onlyone; 
+ALTER TABLE christian.geo_onlyone ADD INDEX(yfinalID);
+
+
+--------------------------------------------
+DROP TABLE IF EXISTS christian.socialdis_ctt;
+CREATE TABLE IF NOT EXISTS christian.socialdis_ctt
+(
+undid VARCHAR(50), 
+undid_ VARCHAR(50),
+socialdist VARCHAR(5),
+finalID VARCHAR(15), 
+finalID_ VARCHAR(15),
+EARLIEST_FILING_YEAR CHAR(4)
+)
+ENGINE=MyISAM
+CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+
+LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/data/sql/socialdis_ctt.csv' INTO TABLE christian.socialdis_ctt
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  ESCAPED BY ''
+lines terminated by '\n'
+IGNORE 1 LINES ;
+SHOW WARNINGS;
+/*
+Query OK, 196776 rows affected (0,90 sec)
+Records: 196776  Duplicates: 0  Warnings: 0
+*/
+
+SHOW INDEX FROM christian.socialdis_ctt; 
+ALTER TABLE christian.socialdis_ctt ADD INDEX(undid);
+ALTER TABLE christian.socialdis_ctt ADD INDEX(undid_);
+
+
+--------------------------------------------
+DROP TABLE IF EXISTS christian.socialdis_pboc;
+CREATE TABLE IF NOT EXISTS christian.socialdis_pboc
+(
+undid VARCHAR(50), 
+undid_ VARCHAR(50),
+socialdist VARCHAR(5),
+finalID VARCHAR(15), 
+finalID_ VARCHAR(15),
+EARLIEST_FILING_YEAR CHAR(4)
+)
+ENGINE=MyISAM
+CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+
+LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/data/sql/socialdis_pboc.csv' INTO TABLE christian.socialdis_pboc
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  ESCAPED BY ''
+lines terminated by '\n'
+IGNORE 1 LINES ;
+SHOW WARNINGS;
+/*
+Query OK, 435459 rows affected (0,95 sec)
+Records: 435459  Deleted: 0  Skipped: 0  Warnings: 0
+*/
+
+SHOW INDEX FROM christian.socialdis_pboc; 
+ALTER TABLE christian.socialdis_pboc ADD INDEX(undid);
+ALTER TABLE christian.socialdis_pboc ADD INDEX(undid_);
+

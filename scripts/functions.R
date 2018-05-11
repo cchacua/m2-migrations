@@ -513,9 +513,14 @@ ugraphinv_dis_bulk<-function(endyear, withplot=FALSE, sector="ctt"){
                                      FROM riccaboni.edges_undir_pyr", sector,
                                      " WHERE EARLIEST_FILING_YEAR>=",inityear," AND EARLIEST_FILING_YEAR<=",endyear,"
                                      ORDER BY EARLIEST_FILING_YEAR"))
-  dedges<-dbGetQuery(patstat, paste0("SELECT finalID_, finalID__, undid
-                                     FROM riccaboni.edges_undid_ud_", sector, 
+  dedges<-dbGetQuery(patstat, paste0("SELECT DISTINCT finalID AS finalID_, finalID_ AS finalID__, undid
+                                     FROM riccaboni.count_edges_", sector, 
                                      " WHERE EARLIEST_FILING_YEAR=",linkyear))
+  
+  # dedges<-dbGetQuery(patstat, paste0("SELECT finalID_, finalID__, undid
+  #                                    FROM riccaboni.edges_undid_ud_", sector, 
+  #                                    " WHERE EARLIEST_FILING_YEAR=",linkyear))
+  # 
   print("Data has been loaded")
   print(paste("Number of total edges",nrow(uedges)))
   print(paste("Number of edges to find",nrow(dedges), nrow(dedges)/nrow(uedges)))
@@ -543,7 +548,7 @@ ugraphinv_dis_bulk<-function(endyear, withplot=FALSE, sector="ctt"){
   #dline<-dline[dline$undid %in% dedges$undid,]
   dline$lyear<-linkyear
   
-  write.csv(dline, paste0("../output/graphs/distance_list/",sector, "_", inityear,"-",endyear, "_list", ".csv"))
+  fwrite(dline, paste0("../output/graphs/distance_list/",sector, "_", inityear,"-",endyear, "_list", ".csv"))
   
   if(withplot==TRUE){
     graph.l<-layout_with_drl(graph, options=list(simmer.attraction=0))
