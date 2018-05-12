@@ -18,3 +18,5 @@ library(igraph)
 source("scripts/functions.R")
 library(foreign)
 library(cem)
+library(geosphere)
+

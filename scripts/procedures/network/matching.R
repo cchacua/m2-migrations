@@ -1,10 +1,19 @@
 rs <- dbSendQuery(patstat, 'SET CHARACTER SET "UTF8"')
 
-ynumbers<-seq(1976, 2011, 1)
-lapply(ynumbers, controls_bulk, numbercontrols=1, sector="ctt")
-lapply(ynumbers, controls_bulk, numbercontrols=1, sector="pboc")
-controls_bulk(2012, numbercontrols=1, sector="pboc")
-#controls_bulk(2012, numbercontrols=1, sector="ctt")
+ynumbers<-seq(1976, 2012, 1)
+lapply(ynumbers, controls_bulk_three, numbercontrols=1, sector="ctt")
+lapply(ynumbers, controls_bulk_three, numbercontrols=1, sector="pboc")
+
+ynumbers<-seq(2006, 2012, 1)
+lapply(ynumbers, controls_bulk_three, numbercontrols=1, sector="pboc")
+controls_bulk_three(2003, numbercontrols=1, sector="pboc")
+
+
+ynumbers<-seq(2009, 2012, 1)
+lapply(ynumbers, controls_bulk_three, numbercontrols=1, sector="ctt")
+
+controls_bulk_three(1990, numbercontrols=1, sector="ctt")
+
 
 
 #View(rr[rr$class=='NA',])

@@ -509,13 +509,13 @@ ugraphinv_dis_bulk<-function(endyear, withplot=FALSE, sector="ctt"){
   print(paste("Beginning year (t-5):", inityear))
   print(paste("Ending year (t-1):", endyear))
   print(paste("Link year (t0):", linkyear))
-  uedges<-dbGetQuery(patstat, paste0("SELECT finalID_, finalID__
+  uedges<-as.data.table(dbGetQuery(patstat, paste0("SELECT finalID_, finalID__
                                      FROM riccaboni.edges_undir_pyr", sector,
                                      " WHERE EARLIEST_FILING_YEAR>=",inityear," AND EARLIEST_FILING_YEAR<=",endyear,"
-                                     ORDER BY EARLIEST_FILING_YEAR"))
-  dedges<-dbGetQuery(patstat, paste0("SELECT DISTINCT finalID AS finalID_, finalID_ AS finalID__, undid
+                                     ORDER BY EARLIEST_FILING_YEAR")))
+  dedges<-as.data.table(dbGetQuery(patstat, paste0("SELECT DISTINCT finalID AS finalID_, finalID_ AS finalID__, undid
                                      FROM riccaboni.count_edges_", sector, 
-                                     " WHERE EARLIEST_FILING_YEAR=",linkyear))
+                                     " WHERE EARLIEST_FILING_YEAR=",linkyear)))
   
   # dedges<-dbGetQuery(patstat, paste0("SELECT finalID_, finalID__, undid
   #                                    FROM riccaboni.edges_undid_ud_", sector, 
@@ -530,9 +530,27 @@ ugraphinv_dis_bulk<-function(endyear, withplot=FALSE, sector="ctt"){
   save(graph, file=paste0("../output/graphs/networks/",sector, "_", inityear,"-",endyear, "_network", ".RData"))
   print("Graph has been done and saved")
   
-  vfrom<-V(graph)[V(graph)$name %in% dedges$finalID_]
+  nodesdegree<-unique(rbind(data.frame(v1=dedges$finalID_),data.frame(v1=dedges$finalID__)))
+  vdegree<-V(graph)[V(graph)$name %in% nodesdegree$v1]
+  vdegree<-degree(graph, v =vdegree)
+  vdegree<-as.data.frame(vdegree)
+  vdegree$finalID<-rownames(vdegree)
+  vdegree$lyear<-linkyear
+  vdegree$yfinalID<-paste0(linkyear,vdegree$finalID)
+  fwrite(vdegree, paste0("../output/graphs/degree/d",sector, "_", inityear,"-",endyear, "_list", ".csv"))
+  vdegree<-as.data.table(vdegree)
+  
+  setkey(dedges,finalID_)
+  setkey(vdegree,finalID)
+  dedges<-dedges[vdegree, nomatch=0]
+  # Test the other side
+  setkey(dedges,finalID__)
+  dedges<-dedges[vdegree, nomatch=0]
+
+  vfrom<-V(graph)[V(graph)$name  %in% dedges$finalID_]
   vto<-V(graph)[V(graph)$name %in% dedges$finalID__]
   dline<-distances(graph, v=vfrom, to=vto, weights = NULL)
+
   #dline<-as.data.table(dline)
   dline<-melt(dline)
   dline<-dline[dline$value!=0 & dline$value!="Inf",]
@@ -543,12 +561,13 @@ ugraphinv_dis_bulk<-function(endyear, withplot=FALSE, sector="ctt"){
   # setkey(dline,undid)
   # setkey(dedges,undid)
   # dline<- dline[dedges, nomatch=0]
-  dline<-merge(dline,dedges,by="undid")
-
+  dline<-merge(dline,dedges[,1:3],by="undid")
+  
+  dline<-data.table(undid=dline$undid,undid_=paste0(linkyear,dline$finalID__, dline$finalID_), socialdist=dline$value, finalID_=dline$finalID_, finalID__=dline$finalID__, lyear=linkyear)
   #dline<-dline[dline$undid %in% dedges$undid,]
-  dline$lyear<-linkyear
   
   fwrite(dline, paste0("../output/graphs/distance_list/",sector, "_", inityear,"-",endyear, "_list", ".csv"))
+  
   
   if(withplot==TRUE){
     graph.l<-layout_with_drl(graph, options=list(simmer.attraction=0))
@@ -669,3 +688,184 @@ controls_bulk<-function(linkyear, numbercontrols=1, sector="ctt"){
   fwrite(rr, paste0("../output/graphs/counterfactual/",sector, "_", linkyear, "_list", ".csv"))
   return("done")
 }
+
+
+ipcrow_two<-function(idv,id__, ncontrol=1, edges, ipcfile, lyear, graphob){
+  ipcclasses<-ipcfile[ipcfile$finalID==id__,]
+  setipc<-as.data.table(ipcfile[ipcfile$class %in% ipcclasses$class,])
+  setnei<-as.data.table(edges[edges$finalID_==idv,])
+  node<-V(graphob)[V(graphob)$name %in% idv]
+  neib<- neighbors(graphob, node)
+  neib2<-V(graphob)[V(graphob)$name]
+  setnona<-setipc[!(setipc$finalID %in% setnei$finalID__),]
+  setnona<-setnona[!(setnona$finalID %in% neib2),]
+  setnona<-setnona[sample(nrow(setnona), ncontrol),]
+  if(nrow(setnona)>0){
+    Result<-data.table(finalID_=idv, finalID__=setnona$finalID, year=lyear, counterof=id__,class=setnona$class, ncount=seq(1,ncontrol,1))
+  }
+  else {
+    setnona<-ipcfile[!(ipcfile$finalID %in% setnei$finalID__),]
+    setnona<-setnona[!(setnona$finalID %in% neib2),]
+    setnona<-setnona[sample(nrow(setnona), ncontrol),]
+    Result<-data.table(finalID_=idv, finalID__=setnona$finalID, year=lyear, counterof=id__,class=NA, ncount=seq(1,ncontrol,1))
+  }
+  return(Result)
+}
+
+controls_bulk_two<-function(linkyear, numbercontrols=1, sector="ctt"){
+  inityear<-linkyear-5
+  endyear<-linkyear-1
+  print("Sector should be pboc or ctt")
+  print(paste("Beginning year (t-5):", inityear))
+  print(paste("Ending year (t-1):", endyear))
+  print(paste("Link year (t0):", linkyear))
+  dedges<-dbGetQuery(patstat, paste0("SELECT DISTINCT finalID, finalID_
+                                     FROM riccaboni.edges_dir_aus_pyr a
+                                     INNER JOIN riccaboni.t01_", sector,"_class d
+                                     ON a.pat=d.pat
+                                     WHERE a.EARLIEST_FILING_YEAR=",linkyear))
+  patipc6<-dbGetQuery(patstat, paste0("SELECT DISTINCT a.finalID, c.class
+                                      FROM christian.t08_class_at1us_date_fam_for a 
+                                      INNER JOIN riccaboni.t01_", sector, "_class b 
+                                      ON a.pat=b.pat 
+                                      INNER JOIN christian.pat_6ipc c
+                                      ON a.pat=c.pat 
+                                      WHERE a.EARLIEST_FILING_YEAR=",linkyear," AND c.EARLIEST_FILING_YEAR=",linkyear))
+  uedges<-dbGetQuery(patstat, paste0("SELECT finalID_, finalID__
+                                     FROM riccaboni.edges_undir_pyr", sector,
+                                     " WHERE EARLIEST_FILING_YEAR>=",inityear," AND EARLIEST_FILING_YEAR<=",endyear,"
+                                     ORDER BY EARLIEST_FILING_YEAR"))
+  uedges<-as.matrix(uedges)
+  graph<-graph_from_edgelist(uedges, directed = FALSE)
+  if(numbercontrols==1){
+    rr<-mapply(ipcrow_two, idv=dedges$finalID, id__=dedges$finalID_, MoreArgs = list(edges=dedges, ncontrol=numbercontrols, ipcfile=patipc6, lyear=linkyear, graphob=graph))
+    #rr<-mapply(ipcrow, idv=dedges$finalID, id__=dedges$finalID_, MoreArgs = list(edges=dedges, ncontrol=1, ipcfile=patipc3, lyear=linkyear))
+    rr<-as.data.frame(t(rr))
+  }
+  else{
+    rr<-mapply(ipcrow_two, idv=dedges$finalID, id__=dedges$finalID_, MoreArgs = list(edges=dedges, ncontrol=numbercontrols, ipcfile=patipc6, lyear=linkyear, graphob=graph), SIMPLIFY = FALSE)
+    rr<-merge.list(rr)
+  }
+  fwrite(rr, paste0("../output/graphs/counterfactual/",sector, "_", linkyear, "_list", ".csv"))
+  return("done")
+}
+
+ipcrow_three<-function(idv,id__, ncontrol=1, edges, ipcfile, lyear, aedges){
+  ipcfile<-as.data.table(ipcfile)
+  ipcclasses<-ipcfile[ipcfile$finalID==id__,]
+  setkey(ipcfile,class)
+  setkey(ipcclasses,class)
+  setipc<-ipcfile[ipcclasses, nomatch=0]
+  setipc<-setipc[,1:2]
+  # setipc<-as.data.table(ipcfile[ipcfile$class %in% ipcclasses$class,])
+  setnei<-as.data.table(edges[edges$finalID==idv,])
+  setnei2<-as.data.table(aedges[aedges$finalID==idv,])
+  if(nrow(setnei2)>0){
+    setnei<-rbind(setnei,setnei2)
+  }
+  setkey(setipc,finalID)
+  setkey(setnei,finalID_)
+  # setnona<-setipc[!(setipc$finalID %in% setnei$finalID_),]
+  # setnona<-setnona[!(setnona$finalID %in% setnei2$finalID_),]
+  setnona<-setipc[!setnei,]
+  setnona<-setnona[sample(nrow(setnona), ncontrol),]
+  if(nrow(setnona)>0){
+    Result<-data.table(finalID_=idv, finalID__=setnona$finalID, year=lyear, counterof=id__,class=setnona$class, ncount=seq(1,ncontrol,1))
+  }
+  else {
+    setkey(ipcfile,finalID)
+    setnona<-ipcfile[!setnei,]
+    # setnona<-ipcfile[!(ipcfile$finalID %in% setnei$finalID_),]
+    # setnona<-setnona[!(setnona$finalID %in% setnei2$finalID_),]
+    setnona<-setnona[sample(nrow(setnona), ncontrol),]
+    Result<-data.table(finalID_=idv, finalID__=setnona$finalID, year=lyear, counterof=id__,class=NA, ncount=seq(1,ncontrol,1))
+  }
+  return(Result)
+}
+
+controls_bulk_three<-function(linkyear, numbercontrols=1, sector="ctt"){
+  inityear<-linkyear-5
+  endyear<-linkyear-1
+  print("Sector should be pboc or ctt")
+  print(paste("Beginning year (t-5):", inityear))
+  print(paste("Ending year (t-1):", endyear))
+  print(paste("Link year (t0):", linkyear))
+  dedges<-dbGetQuery(patstat, paste0("SELECT DISTINCT finalID, finalID_
+                                     FROM riccaboni.edges_dir_aus_pyr a
+                                     INNER JOIN riccaboni.t01_", sector,"_class d
+                                     ON a.pat=d.pat
+                                     WHERE a.EARLIEST_FILING_YEAR=",linkyear))
+  patipc6<-dbGetQuery(patstat, paste0("SELECT DISTINCT a.finalID, c.class
+                                      FROM christian.t08_class_at1us_date_fam_for a 
+                                      INNER JOIN riccaboni.t01_", sector, "_class b 
+                                      ON a.pat=b.pat 
+                                      INNER JOIN christian.pat_6ipc c
+                                      ON a.pat=c.pat 
+                                      WHERE a.EARLIEST_FILING_YEAR=",linkyear," AND c.EARLIEST_FILING_YEAR=",linkyear))
+  adedges<-dbGetQuery(patstat, paste0("SELECT finalID, finalID_
+                                     FROM riccaboni.edges_diryr_", sector,
+                                     " WHERE EARLIEST_FILING_YEAR>=",inityear," AND EARLIEST_FILING_YEAR<=",endyear,"
+                                     ORDER BY EARLIEST_FILING_YEAR"))
+
+  if(numbercontrols==1){
+    rr<-mapply(ipcrow_three, idv=dedges$finalID, id__=dedges$finalID_, MoreArgs = list(edges=dedges, ncontrol=numbercontrols, ipcfile=patipc6, lyear=linkyear, aedges=adedges))
+    #rr<-mapply(ipcrow, idv=dedges$finalID, id__=dedges$finalID_, MoreArgs = list(edges=dedges, ncontrol=1, ipcfile=patipc3, lyear=linkyear))
+    rr<-as.data.frame(t(rr))
+  }
+  else{
+    rr<-mapply(ipcrow_three, idv=dedges$finalID, id__=dedges$finalID_, MoreArgs = list(edges=dedges, ncontrol=numbercontrols, ipcfile=patipc6, lyear=linkyear, aedges=adedges), SIMPLIFY = FALSE)
+    rr<-merge.list(rr)
+  }
+  fwrite(rr, paste0("../output/graphs/counterfactual/",sector, "_", linkyear, "_list", ".csv"))
+  return("done")
+}
+
+insdistance<-function(linkyear, sector="ctt"){
+  inityear<-linkyear-5
+  endyear<-linkyear-1
+  print("Sector should be pboc or ctt")
+  print(paste("Beginning year (t-5):", inityear))
+  print(paste("Ending year (t-1):", endyear))
+  print(paste("Link year (t0):", linkyear))
+  # Edges with counterfactual: to find
+  dedges<-as.data.table(dbGetQuery(patstat, paste0("SELECT DISTINCT a.finalID, a.finalID_
+                                                   FROM riccaboni.count_edges_", sector," a
+                                                   WHERE a.EARLIEST_FILING_YEAR=",linkyear)))
+  #Time window data
+  insti_win<-as.data.table(dbGetQuery(patstat, paste0("SELECT DISTINCT finalID, PSN_SECTOR 
+                                                      FROM christian.inv_institu
+                                                      WHERE EARLIEST_FILING_YEAR>=",inityear," AND EARLIEST_FILING_YEAR<=",endyear)))
+  # Test if the first side appears in the time windows. If not, and at least one of them do not appear, the institutional proximity is zero
+  setkey(dedges,finalID)
+  setkey(insti_win,finalID)
+  dedges<-dedges[insti_win, nomatch=0]
+  # Test the other side
+  setkey(dedges,finalID_)
+  dedges<-dedges[insti_win, nomatch=0]
+  
+  if(nrow(dedges)>0){
+    rr<-mapply(compare_psn, idv=dedges$finalID, id__=dedges$finalID_, MoreArgs = list(lyear=linkyear, instidata=insti_win))
+    rr<-as.data.frame(t(rr))
+    fwrite(rr, paste0("../output/graphs/insdistance/",sector, "_", linkyear, "_list", ".csv"))
+  }
+  
+  return("done")
+  
+}
+
+compare_psn<-function(idv,id__, lyear, instidata){
+  instidata<-as.data.table(instidata)
+  d1<-instidata[instidata$finalID==idv, 2]
+  d2<-instidata[instidata$finalID==id__, 2]
+  setkey(d1,PSN_SECTOR)
+  setkey(d2,PSN_SECTOR)
+  sharedins<-d1[d2, nomatch=0]
+  if(nrow(sharedins)>0){
+    result<-data.table(finalID_=idv, finalID__=id__, insprox=1, shareins=sharedins$PSN_SECTOR[1], year=lyear)
+  }
+  else{
+    result<-data.table(finalID_=idv, finalID__=id__, insprox=0, shareins=NA, year=lyear)
+  }
+  return(result)
+}
+

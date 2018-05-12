@@ -58,6 +58,50 @@ SELECT * FROM riccaboni.edges_dir LIMIT 0,30;
 
 
 
+-- Directed list using priority year: Computer technology and telecommunications
+-- only used for find neighbors to counterfactual: riccaboni.edges_diryr_ctt
+DROP TABLE IF EXISTS riccaboni.edges_diryr_ctt;
+CREATE TABLE riccaboni.edges_diryr_ctt AS
+SELECT DISTINCT a.finalID, a.finalID_, c.EARLIEST_FILING_YEAR, CONCAT(c.EARLIEST_FILING_YEAR, a.finalID, a.finalID_) AS undid
+      FROM riccaboni.edges_dir a
+      INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_atleastone b
+      ON a.pat=b.pat
+      INNER JOIN patstat2016b.TLS201_APPLN c
+      ON b.APPLN_ID=c.APPLN_ID
+      INNER JOIN riccaboni.t01_ctt_class d
+      ON a.pat=d.pat;
+/*
+Query OK, 2185318 rows affected (3 min 20,62 sec)
+Records: 2185318  Duplicates: 0  Warnings: 0
+
+*/
+
+SHOW INDEX FROM riccaboni.edges_diryr_ctt;                                     
+ALTER TABLE riccaboni.edges_diryr_ctt ADD INDEX(undid);
+
+-- Directed list using priority year: Pharmaceuticals, biotechnology and organic fine chemistry
+-- only used for find neighbors to counterfactual: riccaboni.edges_diryr_pboc
+
+DROP TABLE IF EXISTS riccaboni.edges_diryr_pboc;
+CREATE TABLE riccaboni.edges_diryr_pboc AS
+SELECT DISTINCT a.finalID, a.finalID_, c.EARLIEST_FILING_YEAR, CONCAT(c.EARLIEST_FILING_YEAR, a.finalID, a.finalID_) AS undid
+      FROM riccaboni.edges_dir a
+      INNER JOIN riccaboni.t01_allclasses_appid_patstat_us_atleastone b
+      ON a.pat=b.pat
+      INNER JOIN patstat2016b.TLS201_APPLN c
+      ON b.APPLN_ID=c.APPLN_ID
+      INNER JOIN riccaboni.t01_pboc_class d
+      ON a.pat=d.pat;
+/*
+Query OK, 1.300.831 rows affected (2 min 0,80 sec)
+Records: 1300831  Duplicates: 0  Warnings: 0
+
+*/
+
+SHOW INDEX FROM riccaboni.edges_diryr_pboc;                                     
+ALTER TABLE riccaboni.edges_diryr_pboc ADD INDEX(undid);
+
+
 -- SELECT ONLY LINKS WHOSE PATENTS CONTAIN ONLY US RESIDENTS, AND AT LEAST ONE OF THE TEAM MEMBERS BELONGS TO THE TEN CONSIDERED CEL GROUPS:
 SHOW INDEX FROM  christian.pat_nceltic_allus; 
 
@@ -192,8 +236,10 @@ WHERE a.EARLIEST_FILING_YEAR>='1975' AND a.EARLIEST_FILING_YEAR<='2012';
 1 row in set (6,18 sec)
 */
 
+SELECT * FROM riccaboni.edges_dir_aus_pyr WHERE finalID='HI107583' AND EARLIEST_FILING_YEAR='1990' ;
+
 ------------------------------
--- COUNTERFACTUAL: Add priority year, type of patent
+-- COUNTERFACTUAL: Add priority year, type of patent, ethnicity
 
 -- PBOC
 DROP TABLE IF EXISTS riccaboni.edges_dir_count_pboc;
@@ -236,20 +282,22 @@ ALTER TABLE riccaboni.edges_dir_count_ctt ADD INDEX(finalID);
 
 SELECT * FROM riccaboni.edges_dir_count_ctt LIMIT 0,10;
 
-
-------------------------------
+--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
 -- COUNTERFACTUAL AND EDGES BY FIELD
+--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
 
 -- PBOC
 DROP TABLE IF EXISTS riccaboni.count_edges_pboc;
 CREATE TABLE riccaboni.count_edges_pboc AS
-SELECT DISTINCT a.finalID, a.finalID_, 1 AS linked, a.nation, a.nation_, a.EARLIEST_FILING_YEAR, IF(a.nation = a.nation_, 1, 0) AS ethnic, a.undid, CONCAT(a.EARLIEST_FILING_YEAR,a.finalID) AS yfinalID, CONCAT(a.EARLIEST_FILING_YEAR,a.finalID_) AS yfinalID_
+SELECT DISTINCT a.finalID, a.finalID_, 1 AS linked, a.nation, a.nation_, a.EARLIEST_FILING_YEAR, IF(a.nation = a.nation_, 1, 0) AS ethnic, a.undid, CONCAT(a.EARLIEST_FILING_YEAR,a.finalID) AS yfinalID, CONCAT(a.EARLIEST_FILING_YEAR,a.finalID_) AS yfinalID_, NULL as counterof
 FROM riccaboni.edges_dir_aus_pyr a
 INNER JOIN  riccaboni.t01_pboc_class b
 ON a.pat=b.pat
 WHERE a.EARLIEST_FILING_YEAR>='1976' AND a.EARLIEST_FILING_YEAR<='2012'
 UNION ALL  
-SELECT c.finalID, c.finalID_, 0 AS linked, c.nation, c.nation_, c.EARLIEST_FILING_YEAR, IF(c.nation = c.nation_, 1, 0) AS ethnic, c.undid, CONCAT(c.EARLIEST_FILING_YEAR,c.finalID) AS yfinalID, CONCAT(c.EARLIEST_FILING_YEAR,c.finalID_) AS yfinalID_
+SELECT c.finalID, c.finalID_, 0 AS linked, c.nation, c.nation_, c.EARLIEST_FILING_YEAR, IF(c.nation = c.nation_, 1, 0) AS ethnic, c.undid, CONCAT(c.EARLIEST_FILING_YEAR,c.finalID) AS yfinalID, CONCAT(c.EARLIEST_FILING_YEAR,c.finalID_) AS yfinalID_, c.pat as counterof
 FROM riccaboni.edges_dir_count_pboc c;  
 
 /*
@@ -300,17 +348,17 @@ GROUP BY linked;
 -- CTT
 DROP TABLE IF EXISTS riccaboni.count_edges_ctt;
 CREATE TABLE riccaboni.count_edges_ctt AS
-SELECT DISTINCT a.finalID, a.finalID_, 1 AS linked, a.nation, a.nation_, a.EARLIEST_FILING_YEAR, IF(a.nation = a.nation_, 1, 0) AS ethnic, a.undid, CONCAT(a.EARLIEST_FILING_YEAR,a.finalID) AS yfinalID, CONCAT(a.EARLIEST_FILING_YEAR,a.finalID_) AS yfinalID_
+SELECT DISTINCT a.finalID, a.finalID_, 1 AS linked, a.nation, a.nation_, a.EARLIEST_FILING_YEAR, IF(a.nation = a.nation_, 1, 0) AS ethnic, a.undid, CONCAT(a.EARLIEST_FILING_YEAR,a.finalID) AS yfinalID, CONCAT(a.EARLIEST_FILING_YEAR,a.finalID_) AS yfinalID_, NULL as counterof
 FROM riccaboni.edges_dir_aus_pyr a
 INNER JOIN  riccaboni.t01_ctt_class b
 ON a.pat=b.pat
 WHERE a.EARLIEST_FILING_YEAR>='1976' AND a.EARLIEST_FILING_YEAR<='2012'
 UNION ALL  
-SELECT c.finalID, c.finalID_, 0 AS linked, c.nation, c.nation_, c.EARLIEST_FILING_YEAR, IF(c.nation = c.nation_, 1, 0) AS ethnic, c.undid, CONCAT(c.EARLIEST_FILING_YEAR,c.finalID) AS yfinalID, CONCAT(c.EARLIEST_FILING_YEAR,c.finalID_) AS yfinalID_
+SELECT c.finalID, c.finalID_, 0 AS linked, c.nation, c.nation_, c.EARLIEST_FILING_YEAR, IF(c.nation = c.nation_, 1, 0) AS ethnic, c.undid, CONCAT(c.EARLIEST_FILING_YEAR,c.finalID) AS yfinalID, CONCAT(c.EARLIEST_FILING_YEAR,c.finalID_) AS yfinalID_, c.pat as counterof
 FROM riccaboni.edges_dir_count_ctt c;  
 
 /*
-Query OK, 1226936 rows affected (56,35 sec)
+Query OK, 1226936 rows affected (56,60 sec)
 Records: 1226936  Duplicates: 0  Warnings: 0
 
 */
@@ -333,10 +381,10 @@ GROUP BY ethnic;
 +--------+----------+
 | ethnic | count(*) |
 +--------+----------+
-|      0 |  1067101 |
-|      1 |   159835 |
+|      0 |  1067241 |
+|      1 |   159695 |
 +--------+----------+
-2 rows in set (1,87 sec)
+2 rows in set (2,07 sec)
 */
 
 SELECT linked, count(*) FROM riccaboni.count_edges_ctt 
