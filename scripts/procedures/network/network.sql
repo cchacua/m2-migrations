@@ -287,8 +287,7 @@ SELECT * FROM riccaboni.edges_dir_count_ctt LIMIT 0,10;
 -- COUNTERFACTUAL AND EDGES BY FIELD
 --------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------
-
--- PBOC
+-- pboc
 DROP TABLE IF EXISTS riccaboni.count_edges_pboc;
 CREATE TABLE riccaboni.count_edges_pboc AS
 SELECT DISTINCT a.finalID, a.finalID_, 1 AS linked, a.nation, a.nation_, a.EARLIEST_FILING_YEAR, IF(a.nation = a.nation_, 1, 0) AS ethnic, a.undid, CONCAT(a.EARLIEST_FILING_YEAR,a.finalID) AS yfinalID, CONCAT(a.EARLIEST_FILING_YEAR,a.finalID_) AS yfinalID_, NULL as counterof
@@ -301,8 +300,9 @@ SELECT c.finalID, c.finalID_, 0 AS linked, c.nation, c.nation_, c.EARLIEST_FILIN
 FROM riccaboni.edges_dir_count_pboc c;  
 
 /*
-Query OK, 1391360 rows affected (1 min 2,23 sec)
+Query OK, 1391360 rows affected (1 min 3,03 sec)
 Records: 1391360  Duplicates: 0  Warnings: 0
+
 */
 
 SHOW INDEX FROM  riccaboni.count_edges_pboc;                                     
@@ -312,38 +312,37 @@ ALTER TABLE riccaboni.count_edges_pboc ADD INDEX(yfinalID_);
 ALTER TABLE riccaboni.count_edges_pboc ADD INDEX(yfinalID);
 ALTER TABLE riccaboni.count_edges_pboc ADD INDEX(undid);
 
-
 SELECT * FROM riccaboni.count_edges_pboc LIMIT 0,10;
 
 SELECT * FROM riccaboni.count_edges_pboc WHERE ethnic='1' AND linked='0' LIMIT 0,10;
 
 SELECT ethnic, count(*) FROM riccaboni.count_edges_pboc 
+WHERE EARLIEST_FILING_YEAR>='1976' AND EARLIEST_FILING_YEAR<='2012'
 GROUP BY ethnic;
 /*
 +--------+----------+
 | ethnic | count(*) |
 +--------+----------+
-|      0 |  1229713 |
-|      1 |   161647 |
+|      0 |  1230194 |
+|      1 |   161166 |
 +--------+----------+
-2 rows in set (2,10 sec)
+2 rows in set (2,27 sec)
 
 */
 
-SELECT linked, COUNT(*) 
-FROM riccaboni.count_edges_pboc 
+SELECT linked, count(*) FROM riccaboni.count_edges_pboc 
+WHERE EARLIEST_FILING_YEAR>='1976' AND EARLIEST_FILING_YEAR<='2012'
 GROUP BY linked;
 /*
 +--------+----------+
-| linked | COUNT(*) |
+| linked | count(*) |
 +--------+----------+
 |      0 |   695680 |
 |      1 |   695680 |
 +--------+----------+
-2 rows in set (2,24 sec)
+2 rows in set (2,26 sec)
+
 */
-
-
 
 -- CTT
 DROP TABLE IF EXISTS riccaboni.count_edges_ctt;

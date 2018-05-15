@@ -322,9 +322,8 @@ SHOW INDEX FROM christian.counter_pboc;
 ALTER TABLE christian.counter_pboc ADD INDEX(finalID_);
 ALTER TABLE christian.counter_pboc ADD INDEX(finalID__);
 
-
 --------------------------------------------
--- Social distance PBOC
+-- Social distance pboc
 --------------------------------------------
 DROP TABLE IF EXISTS christian.socialdis_pboc;
 CREATE TABLE IF NOT EXISTS christian.socialdis_pboc
@@ -346,17 +345,16 @@ lines terminated by '\n'
 IGNORE 1 LINES ;
 SHOW WARNINGS;
 /*
-Query OK, 435459 rows affected (0,95 sec)
-Records: 435459  Deleted: 0  Skipped: 0  Warnings: 0
+Query OK, 436093 rows affected (1,13 sec)
+Records: 436093  Deleted: 0  Skipped: 0  Warnings: 0
 */
 
 SHOW INDEX FROM christian.socialdis_pboc; 
 ALTER TABLE christian.socialdis_pboc ADD INDEX(undid);
 ALTER TABLE christian.socialdis_pboc ADD INDEX(undid_);
 
-
 --------------------------------------------
--- Institutional distance PBOC
+-- Institutional distance pboc
 --------------------------------------------
 DROP TABLE IF EXISTS christian.insdis_pboc;
 CREATE TABLE IF NOT EXISTS christian.insdis_pboc
@@ -378,10 +376,68 @@ lines terminated by '\n'
 IGNORE 1 LINES ;
 SHOW WARNINGS;
 /*
+Query OK, 505742 rows affected (0,98 sec)
+Records: 505742  Deleted: 0  Skipped: 0  Warnings: 0
 
 */
 
 SHOW INDEX FROM christian.insdis_pboc; 
 ALTER TABLE christian.insdis_pboc ADD INDEX(undid);
+
+--------------------------------------------
+-- Degree centrality pboc
+--------------------------------------------
+DROP TABLE IF EXISTS christian.degree_pboc;
+CREATE TABLE IF NOT EXISTS christian.degree_pboc
+(
+degreecen VARCHAR(5),
+finalID VARCHAR(15), 
+EARLIEST_FILING_YEAR CHAR(4),
+yfinalID VARCHAR(20)
+)
+ENGINE=MyISAM
+CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+
+LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/data/sql/degree_pboc.csv' INTO TABLE christian.degree_pboc
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  ESCAPED BY ''
+lines terminated by '\n'
+IGNORE 1 LINES ;
+SHOW WARNINGS;
+/*
+Query OK, 170390 rows affected (0,31 sec)
+Records: 170390  Deleted: 0  Skipped: 0  Warnings: 0
+*/
+
+SHOW INDEX FROM christian.degree_pboc; 
+ALTER TABLE christian.degree_pboc ADD INDEX(yfinalID);
+
+
+--------------------------------------------
+-- Geographic distances pboc
+--------------------------------------------
+DROP TABLE IF EXISTS christian.geodis_locid_pboc;
+CREATE TABLE IF NOT EXISTS christian.geodis_locid_pboc
+(
+geodis VARCHAR(50),
+locid VARCHAR(100)
+)
+ENGINE=MyISAM
+CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+
+LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/data/sql/geodis_locidpboc_list.csv' INTO TABLE christian.geodis_locid_pboc
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  ESCAPED BY ''
+lines terminated by '\n'
+IGNORE 1 LINES ;
+SHOW WARNINGS;
+/*
+
+Query OK, 963986 rows affected (1,86 sec)
+Records: 963986  Deleted: 0  Skipped: 0  Warnings: 0
+*/
+
+SHOW INDEX FROM christian.geodis_locid_pboc; 
+ALTER TABLE christian.geodis_locid_pboc ADD INDEX(locid);
 
 

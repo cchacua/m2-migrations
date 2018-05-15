@@ -19,4 +19,22 @@ source("scripts/functions.R")
 library(foreign)
 library(cem)
 library(geosphere)
+library(stargazer)
+library(miceadds)
+library(multiwayvcov)
+library(foreign)
+#library(sandwich)
+#library(lmtest)
 
+####################################################################
+# Function to compute clusterized SE
+# https://economictheoryblog.com/2016/12/13/clustered-standard-errors-in-r/
+# https://stackoverflow.com/questions/44027482/cluster-robust-standard-errors-in-stargazer
+# load necessary packages for importing the function
+# library(RCurl)
+# # import the function from repository
+# url_robust <- "https://raw.githubusercontent.com/IsidoreBeautrelet/economictheoryblog/master/robust_summary.R"
+# eval(parse(text = getURL(url_robust, ssl.verifypeer = FALSE)),
+#      envir=.GlobalEnv)
+
+####################################################################

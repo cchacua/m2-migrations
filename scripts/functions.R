@@ -836,12 +836,13 @@ insdistance<-function(linkyear, sector="ctt"){
                                                       FROM christian.inv_institu
                                                       WHERE EARLIEST_FILING_YEAR>=",inityear," AND EARLIEST_FILING_YEAR<=",endyear)))
   # Test if the first side appears in the time windows. If not, and at least one of them do not appear, the institutional proximity is zero
+  insti_win_ids<-data.table(finalID=unique(insti_win$finalID))
   setkey(dedges,finalID)
-  setkey(insti_win,finalID)
-  dedges<-dedges[insti_win, nomatch=0]
+  setkey(insti_win_ids,finalID)
+  dedges<-dedges[insti_win_ids, nomatch=0]
   # Test the other side
   setkey(dedges,finalID_)
-  dedges<-dedges[insti_win, nomatch=0]
+  dedges<-dedges[insti_win_ids, nomatch=0]
   
   if(nrow(dedges)>0){
     rr<-mapply(compare_psn, idv=dedges$finalID, id__=dedges$finalID_, MoreArgs = list(lyear=linkyear, instidata=insti_win))
@@ -869,3 +870,208 @@ compare_psn<-function(idv,id__, lyear, instidata){
   return(result)
 }
 
+distance_pointsclass<-function(tfield){
+  file.df<-as.data.table(dbGetQuery(patstat, paste0("SELECT DISTINCT a.locid, a.loc, a.loc_  FROM riccaboni.count_edges_",tfield,"_gs a;")))
+  
+  file.df$loc<-as.character(file.df$loc)
+  file.df$loc_<-as.character(file.df$loc_)
+  file.df1<-do.call("rbind", strsplit(file.df$loc, ","))
+  file.df1<-data.frame(apply(file.df1, 2, as.numeric))
+  colnames(file.df1)<-c("lat","long")
+  file.df1<-as.matrix(file.df1[,c(2,1)])
+  
+  file.df2<-do.call("rbind", strsplit(file.df$loc_, ","))
+  file.df2<-data.frame(apply(file.df2, 2, as.numeric))
+  colnames(file.df2)<-c("lat","long")
+  file.df2<-as.matrix(file.df2[,c(2,1)])
+  
+  distances<-geosphere::distGeo(file.df1, file.df2)
+  distances<-as.data.table(distances)
+  distances$locid<-as.vector(file.df$locid)
+  # print(distances)
+  fwrite(distances, paste0("../output/graphs/geodis_locid",tfield, "_list", ".csv"))
+  return("Done")
+  #return(distances)
+}
+
+
+estimate_models<-function(tfield){
+  
+  file.df<-as.data.table(dbGetQuery(patstat, paste0(
+    "SELECT linked, ethnic, socialdist, av_cent, absdif_cent, geodis, undid, EARLIEST_FILING_YEAR, insprox, counterof, CONCAT(EARLIEST_FILING_YEAR, finalID, IFNULL(counterof, ''), finalID_) AS undidcc, finalID, finalID_, nation, nation_
+    FROM riccaboni.count_edges_",tfield,"_gsi
+    WHERE EARLIEST_FILING_YEAR>='1980' AND EARLIEST_FILING_YEAR<='2012';")))
+  setkey(file.df,undid) 
+  #table(file.df$linked)
+  
+  #####################
+  # Delete when social distance is one, as to focus on first collaborations
+  #####################
+  # Extract when social distance is equal one
+  file_sd_1.df<-file.df[file.df$socialdist==1,]
+  setkey(file_sd_1.df,undid)
+  # Identify the counterfactual pairs
+  # ATTENTION: THE NAME OF THE COUNTERFACTUAL IS pat
+  counter<-as.data.table(dbGetQuery(patstat, 
+                                    "SELECT finalID, finalID_, pat, undid, CONCAT(EARLIEST_FILING_YEAR, finalID, pat) AS undidc, CONCAT(EARLIEST_FILING_YEAR, finalID, pat, finalID_) AS undidcc
+                                    FROM riccaboni.edges_dir_count_ctt
+                                    WHERE EARLIEST_FILING_YEAR>='1980' AND EARLIEST_FILING_YEAR<='2012';"))
+  
+  setkey(counter,undidc)
+  counter<-counter[file_sd_1.df, nomatch=0]
+  
+  delete<-rbind(counter[,"undidcc"],file_sd_1.df[,"undidcc"])
+  setkey(delete,undidcc)
+  
+  # Delete when social distance is equal one
+  setkey(file.df,undidcc)
+  file.df<-file.df[!delete]
+  rm(delete, file_sd_1.df)
+  
+  #####################
+  # Keep only first collaborations (create a new id without year and make the distribution of years)
+  #####################
+  file.df$idnodes<-substr(file.df$undid,5, nchar(file.df$undid))
+  #file.df<-file.df[1:10,]
+  file.df<-file.df[order(file.df$EARLIEST_FILING_YEAR),]
+  file_fc.df<-reshape(transform(file.df[file.df$linked==1], time=ave(EARLIEST_FILING_YEAR, idnodes, FUN=seq_along)), idvar=c("idnodes"), direction="wide")
+  #file_fc.df<-file_fc.df[order(file_fc.df$linked.2),]
+  delete1<-rbind(data.frame(undidcc=unique(file_fc.df$undidcc.2)),data.frame(undidcc=unique(file_fc.df$undidcc.3)), data.frame(undidcc=unique(file_fc.df$undidcc.4)))
+  delete1<-data.table(undidcc=delete1[complete.cases(delete1),"undidcc"])
+  setkey(delete1,undidcc)
+  
+  setkey(counter,undidc)
+  counter<-counter[delete1, nomatch=0]
+  
+  delete<-rbind(counter[,"undidcc"],delete1[,"undidcc"])
+  setkey(delete,undidcc)
+  
+  setkey(file.df,undidcc)
+  file.df<-file.df[!delete]
+  rm(delete, counter, delete1, file_fc.df)
+  
+  # > nrow(file.df)
+  # [1] 1033039
+  # View(file.df[1:10,])
+  
+  
+  #####################
+  # Create dummies of social distance
+  #####################
+  file.df$socialdist<-as.numeric(file.df$socialdist)
+  # file.df$soc_1<-ifelse(file.df$socialdist<2, 1, 0)    
+  # table(file.df$soc_1)
+  # file.df[file.df$soc_1==1,]
+  file.df$soc_2<-ifelse(file.df$socialdist==2, 1, 0)    
+  #table(file.df$soc_2)
+  file.df$soc_3<-ifelse(file.df$socialdist==3, 1, 0)    
+  #table(file.df$soc_3)
+  file.df$soc_4m<-ifelse(file.df$socialdist>3, 1, 0)    
+  #table(file.df$soc_4m)
+  
+  #####################
+  # Recode geographic distance as a numeric and year as factor
+  #####################    
+  file.df$geodis<-as.numeric(file.df$geodis)
+  file.df$EARLIEST_FILING_YEAR<-factor(file.df$EARLIEST_FILING_YEAR)
+  
+  #table(file.df$absdif_cent)
+  fwrite(file.df, paste0("../output/final_tables/",tfield, "_firstcoll.csv"))
+  #####################
+  # Estimation
+  ##################### 
+  # # Basic model
+  # gc()
+  # # + geodis + insprox + degreecenboth
+  # 
+  # lreg<-lm(linked ~ ethnic + soc_2 + soc_3 + av_cent + absdif_cent + geodis + insprox, data = file.df)
+  # #summary(lreg)  
+  # logitmodel<-glm(linked ~ ethnic + soc_2 + soc_3 + av_cent + absdif_cent + geodis + insprox, family=binomial(link='logit'),data = file.df)
+  # 
+  # #summary(logitmodel)
+  # 
+  # # stargazer(lreg, logitmodel, title=paste0(tfield, " basic models, 1980-2012"),
+  # #           align=TRUE, dep.var.labels="Co-invention",
+  # #           covariate.labels=c("Ethnic proximity",
+  # #                              "Social distance = 2","Social distance = 3","Average centrality","Abs. diff. centrality"
+  # #                              , "Geographic distance", "Institutional proximity"),
+  # #           omit.stat=c("ser","f"), no.space=TRUE)
+  # 
+  # lreg_t<-lm(linked ~ ethnic + soc_2 + soc_3 + av_cent + absdif_cent + geodis + insprox + EARLIEST_FILING_YEAR, data = file.df)
+  # #summary(lreg_t) 
+  #   
+  # # What should I do with the missings
+  # 
+  # logitmodel_t<-glm(linked ~ ethnic + soc_2 + soc_3 + av_cent + absdif_cent + geodis + insprox + EARLIEST_FILING_YEAR, family=binomial(link='logit'),data = file.df)
+  # #summary(logitmodel_t)
+  # 
+  # # 
+  # lreg_c<-miceadds::lm.cluster(data = file.df, linked ~ ethnic + soc_2 + soc_3 + av_cent + absdif_cent + geodis + insprox, cluster = "finalID")
+  # logitmodelc_<-  miceadds::glm.cluster(data = file.df, linked ~ ethnic + soc_2 + soc_3 + av_cent + absdif_cent + geodis + insprox, cluster = "finalID",family=binomial(link='logit'))
+  # 
+  # logitmodel_tc<-miceadds::glm.cluster(data=file.df, linked ~ ethnic + soc_2 + soc_3 + av_cent + absdif_cent + geodis + insprox + EARLIEST_FILING_YEAR, cluster = "finalID",family=binomial(link='logit'))
+  # #summary(logitmodel_tc)
+  # lreg_tc<-miceadds::lm.cluster(data=file.df, linked ~ ethnic + soc_2 + soc_3 + av_cent + absdif_cent + geodis + insprox + EARLIEST_FILING_YEAR, cluster = "finalID")
+  # #summary(lreg_tc)
+  # return(list(ols1=lreg, ols2=lreg_t, ols3=lreg_c, ols4=lreg_tc, logit1=logitmodel, logit2=logitmodel_t,logit3=logitmodelc_,logit4=logitmodel_tc))
+  return("Done")
+}
+
+
+
+cognidistance<-function(linkyear, sector="ctt"){
+  # linkyear<-1990
+  # sector<-"ctt"
+  inityear<-linkyear-5
+  endyear<-linkyear-1
+  print("Sector should be pboc or ctt")
+  print(paste("Beginning year (t-5):", inityear))
+  print(paste("Ending year (t-1):", endyear))
+  print(paste("Link year (t0):", linkyear))
+  # Edges with counterfactual: to find
+  dedges<-as.data.table(dbGetQuery(patstat, paste0("SELECT DISTINCT a.finalID, a.finalID_
+                                                   FROM riccaboni.count_edges_", sector," a
+                                                   WHERE a.EARLIEST_FILING_YEAR=",linkyear)))
+  #Time window data
+  patipc6<-as.data.table(dbGetQuery(patstat, paste0("SELECT DISTINCT a.finalID, c.class
+                                                    FROM christian.t08_class_at1us_date_fam_for a 
+                                                    INNER JOIN riccaboni.t01_", sector, "_class b 
+                                                    ON a.pat=b.pat 
+                                                    INNER JOIN christian.pat_6ipc c
+                                                    ON a.pat=c.pat 
+                                                    WHERE a.EARLIEST_FILING_YEAR>=",inityear," AND a.EARLIEST_FILING_YEAR<=",endyear," AND c.EARLIEST_FILING_YEAR>=",inityear," AND c.EARLIEST_FILING_YEAR<=",endyear)))
+  dedges_copy<-dedges
+  # Test if the first side appears in the time windows. If not, and at least one of them do not appear, the institutional proximity is zero
+  patipc6_ids<-data.table(finalID=unique(patipc6$finalID))
+  setkey(dedges,finalID)
+  setkey(patipc6_ids,finalID)
+  dedges<-dedges[patipc6_ids, nomatch=0]
+  # Test the other side
+  setkey(dedges,finalID_)
+  dedges<-dedges[patipc6_ids, nomatch=0]
+  
+  if(nrow(dedges)>0){
+    rr<-mapply(compare_tech, idv=dedges$finalID, id__=dedges$finalID_, MoreArgs = list(lyear=linkyear, techdata=patipc6))
+    rr<-as.data.frame(t(rr))
+    fwrite(rr, paste0("../output/graphs/techproxi/",sector, "_", linkyear, "_list", ".csv"))
+  }
+  
+  return("done")
+  
+}
+
+compare_tech<-function(idv,id__, lyear, techdata){
+  techdata<-as.data.table(techdata)
+  d1<-techdata[techdata$finalID==idv, 2]
+  d2<-techdata[techdata$finalID==id__, 2]
+  setkey(d1,class)
+  setkey(d2,class)
+  sharetech<-d1[d2, nomatch=0]
+  if(nrow(sharetech)>0){
+    result<-data.table(finalID_=idv, finalID__=id__, techprox=1, sharetech=sharetech$class[1], year=lyear)
+  }
+  else{
+    result<-data.table(finalID_=idv, finalID__=id__, techprox=0, sharetech=NA, year=lyear)
+  }
+  return(result)
+}
