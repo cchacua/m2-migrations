@@ -1034,13 +1034,14 @@ cognidistance<-function(linkyear, sector="ctt"){
                                                    WHERE a.EARLIEST_FILING_YEAR=",linkyear)))
   #Time window data
   patipc6<-as.data.table(dbGetQuery(patstat, paste0("SELECT DISTINCT a.finalID, c.class
-                                                    FROM christian.t08_class_at1us_date_fam_for a 
-                                                    INNER JOIN riccaboni.t01_", sector, "_class b 
-                                                    ON a.pat=b.pat 
-                                                    INNER JOIN christian.pat_6ipc c
+                                                    FROM christian.nodes_counter_allsamples_dis_pat a 
+                                                    INNER JOIN christian.pat_6ipc_prox_p c
                                                     ON a.pat=c.pat 
-                                                    WHERE a.EARLIEST_FILING_YEAR>=",inityear," AND a.EARLIEST_FILING_YEAR<=",endyear," AND c.EARLIEST_FILING_YEAR>=",inityear," AND c.EARLIEST_FILING_YEAR<=",endyear)))
-  dedges_copy<-dedges
+                                                    WHERE c.EARLIEST_FILING_YEAR>=",inityear," AND c.EARLIEST_FILING_YEAR<=",endyear)))
+  
+  # INNER JOIN riccaboni.t01_", sector, "_class b 
+  # ON a.pat=b.pat 
+  #dedges_copy<-dedges
   # Test if the first side appears in the time windows. If not, and at least one of them do not appear, the institutional proximity is zero
   patipc6_ids<-data.table(finalID=unique(patipc6$finalID))
   setkey(dedges,finalID)
