@@ -94,7 +94,7 @@ SELECT * FROM christian.socialdis_ctt_e LIMIT 0,10;
 
 DROP TABLE IF EXISTS riccaboni.count_edges_pboc_gs;
 CREATE TABLE riccaboni.count_edges_pboc_gs AS
-SELECT a.*, b.loc AS loc, c.loc AS loc_, CONCAT(b.loc,c.loc) AS locid, IFNULL(d.socialdist, '99') AS socialdist, IFNULL(f.degreecen, '0') AS degreecen, IFNULL(g.degreecen, '0') AS degreecen_, IFNULL(e.insprox, '0') AS insprox, e.shareins
+SELECT a.*, b.loc AS loc, c.loc AS loc_, CONCAT(b.loc,c.loc) AS locid, IFNULL(d.socialdist, '99') AS socialdist, IFNULL(f.degreecen, '0') AS degreecen, IFNULL(g.degreecen, '0') AS degreecen_, e.insprox, e.shareins, h.sharetech, h.techprox
 FROM riccaboni.count_edges_pboc a
 LEFT JOIN christian.geo_onlyone b
 ON a.yfinalID=b.yfinalID
@@ -107,11 +107,13 @@ ON a.undid=e.undid
 LEFT JOIN  christian.degree_pboc f
 ON a.yfinalID=f.yfinalID
 LEFT JOIN  christian.degree_pboc g
-ON a.yfinalID_=g.yfinalID;
+ON a.yfinalID_=g.yfinalID
+LEFT JOIN christian.techdis_pboc h
+ON a.undid=h.undid;
 
 /*
 
-
+IFNULL(e.insprox, '0') AS 
 
 Query OK, 1391360 rows affected (2 min 47,06 sec)
 Records: 1391360  Duplicates: 0  Warnings: 0
@@ -138,8 +140,9 @@ FROM riccaboni.count_edges_pboc_gs a
 LEFT JOIN christian.geodis_locid_pboc h
 ON a.locid=h.locid;
 /*
-Query OK, 1226936 rows affected (1 min 1,94 sec)
-Records: 1226936  Duplicates: 0  Warnings: 0
+Query OK, 1391360 rows affected (1 min 13,36 sec)
+Records: 1391360  Duplicates: 0  Warnings: 0
+
 
 */
 
@@ -159,7 +162,7 @@ SELECT * FROM riccaboni.count_edges_pboc_gsi LIMIT 0,10;
 
 DROP TABLE IF EXISTS riccaboni.count_edges_ctt_gs;
 CREATE TABLE riccaboni.count_edges_ctt_gs AS
-SELECT a.*, b.loc AS loc, c.loc AS loc_, CONCAT(b.loc,c.loc) AS locid, IFNULL(d.socialdist, '99') AS socialdist, IFNULL(f.degreecen, '0') AS degreecen, IFNULL(g.degreecen, '0') AS degreecen_, IFNULL(e.insprox, '0') AS insprox, e.shareins
+SELECT a.*, b.loc AS loc, c.loc AS loc_, CONCAT(b.loc,c.loc) AS locid, IFNULL(d.socialdist, '99') AS socialdist, IFNULL(f.degreecen, '0') AS degreecen, IFNULL(g.degreecen, '0') AS degreecen_, e.insprox, e.shareins, h.sharetech, h.techprox
 FROM riccaboni.count_edges_ctt a
 LEFT JOIN christian.geo_onlyone b
 ON a.yfinalID=b.yfinalID
@@ -172,11 +175,14 @@ ON a.undid=e.undid
 LEFT JOIN  christian.degree_ctt f
 ON a.yfinalID=f.yfinalID
 LEFT JOIN  christian.degree_ctt g
-ON a.yfinalID_=g.yfinalID;
+ON a.yfinalID_=g.yfinalID
+LEFT JOIN christian.techdis_pboc h
+ON a.undid=h.undid;
 
 /*
-Query OK, 1226936 rows affected (2 min 41,44 sec)
+Query OK, 1226936 rows affected (3 min 3,32 sec)
 Records: 1226936  Duplicates: 0  Warnings: 0
+
 */
 
 SHOW INDEX FROM  riccaboni.count_edges_ctt_gs;  

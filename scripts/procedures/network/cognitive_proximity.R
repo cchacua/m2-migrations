@@ -1,6 +1,6 @@
 rs <- dbSendQuery(patstat, 'SET CHARACTER SET "UTF8"')
 
-ynumbers<-seq(1975, 2012, 1)
+ynumbers<-seq(1998, 2012, 1)
 ynumbers<-seq(2000, 2012, 1)
 lapply(ynumbers, cognidistance, sector="ctt")
 lapply(ynumbers, cognidistance, sector="pboc")

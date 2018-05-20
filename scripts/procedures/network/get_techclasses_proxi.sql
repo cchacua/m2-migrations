@@ -81,6 +81,9 @@ Records: 960131  Duplicates: 0  Warnings: 0
 SHOW INDEX FROM christian.nodes_counter_allsamples_dis_pat2; 
 ALTER TABLE christian.nodes_counter_allsamples_dis_pat2 ADD INDEX(pat);
 
+
+SELECT COUNT(DISTINCT pat) FROM christian.nodes_counter_allsamples_dis_pat2;
+
 -- IPC classes for the considered patents IPC 6
 
 SHOW INDEX FROM riccaboni.t10;                                     

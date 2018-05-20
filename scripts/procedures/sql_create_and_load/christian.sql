@@ -226,12 +226,43 @@ lines terminated by '\n'
 IGNORE 1 LINES ;
 SHOW WARNINGS;
 /*
-Query OK, 271156 rows affected (0,54 sec)
-Records: 271156  Deleted: 0  Skipped: 0  Warnings: 0
+Query OK, 305356 rows affected (0,59 sec)
+Records: 305356  Deleted: 0  Skipped: 0  Warnings: 0
 */
 
 SHOW INDEX FROM christian.insdis_ctt; 
 ALTER TABLE christian.insdis_ctt ADD INDEX(undid);
+
+
+--------------------------------------------
+-- Technological distance ctt
+--------------------------------------------
+DROP TABLE IF EXISTS christian.techdis_ctt;
+CREATE TABLE IF NOT EXISTS christian.techdis_ctt
+(
+finalID VARCHAR(15), 
+finalID_ VARCHAR(15),
+techprox CHAR(1),
+sharetech VARCHAR(50),
+EARLIEST_FILING_YEAR CHAR(4),
+undid VARCHAR(50)
+)
+ENGINE=MyISAM
+CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+
+LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/data/sql/tech_ctt.csv' INTO TABLE christian.techdis_ctt
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  ESCAPED BY ''
+lines terminated by '\n'
+IGNORE 1 LINES ;
+SHOW WARNINGS;
+/*
+Query OK, 306173 rows affected (0,58 sec)
+Records: 306173  Deleted: 0  Skipped: 0  Warnings: 0
+*/
+
+SHOW INDEX FROM christian.techdis_ctt; 
+ALTER TABLE christian.techdis_ctt ADD INDEX(undid);
 
 --------------------------------------------
 -- Degree centrality ctt
@@ -376,13 +407,45 @@ lines terminated by '\n'
 IGNORE 1 LINES ;
 SHOW WARNINGS;
 /*
-Query OK, 505742 rows affected (0,98 sec)
-Records: 505742  Deleted: 0  Skipped: 0  Warnings: 0
+Query OK, 564817 rows affected (1,01 sec)
+Records: 564817  Deleted: 0  Skipped: 0  Warnings: 0
+
 
 */
 
 SHOW INDEX FROM christian.insdis_pboc; 
 ALTER TABLE christian.insdis_pboc ADD INDEX(undid);
+
+
+--------------------------------------------
+-- Technological distance pboc
+--------------------------------------------
+DROP TABLE IF EXISTS christian.techdis_pboc;
+CREATE TABLE IF NOT EXISTS christian.techdis_pboc
+(
+finalID VARCHAR(15), 
+finalID_ VARCHAR(15),
+techprox CHAR(1),
+sharetech VARCHAR(50),
+EARLIEST_FILING_YEAR CHAR(4),
+undid VARCHAR(50)
+)
+ENGINE=MyISAM
+CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+
+LOAD DATA LOCAL INFILE '/media/christian/Server/Github/m2-migrations/data/sql/tech_pboc.csv' INTO TABLE christian.techdis_pboc
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'  ESCAPED BY ''
+lines terminated by '\n'
+IGNORE 1 LINES ;
+SHOW WARNINGS;
+/*
+Query OK, 566077 rows affected (1,02 sec)
+Records: 566077  Deleted: 0  Skipped: 0  Warnings: 0
+*/
+
+SHOW INDEX FROM christian.techdis_pboc; 
+ALTER TABLE christian.techdis_pboc ADD INDEX(undid);
 
 --------------------------------------------
 -- Degree centrality pboc
