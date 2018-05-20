@@ -979,3 +979,63 @@ deletecounterofvar<-function(dfcond=file.df[is.na(file.df$insprox) & file.df$lin
   dforigi<-dforigi[!delete]
   return(dforigi)
 }
+
+
+estimate_models<-function(tfield, naaszero=TRUE){
+  file.df<-as.data.table(dbGetQuery(patstat, paste0(
+    "SELECT linked, ethnic, socialdist, av_cent, absdif_cent, geodis, undid, EARLIEST_FILING_YEAR, insprox, techprox, counterof, CONCAT(EARLIEST_FILING_YEAR, finalID, IFNULL(counterof, ''), finalID_) AS undidcc, finalID, finalID_, nation, nation_
+    FROM riccaboni.count_edges_",tfield,"_gsi
+    WHERE EARLIEST_FILING_YEAR>='1980' AND EARLIEST_FILING_YEAR<='2012';")))
+  setkey(file.df,undid) 
+  
+  #####################
+  # Delete when social distance is one, as to focus on first collaborations
+  #####################
+  file.df<-deletecounterofvar(dfcond=file.df[file.df$socialdist==1 & file.df$linked==1,], file.df, tfield)
+  
+  #####################
+  # Keep only first collaborations (create a new id without year and make the distribution of years)
+  #####################
+  file.df$idnodes<-substr(file.df$undid,5, nchar(file.df$undid))
+  file.df<-file.df[order(file.df$EARLIEST_FILING_YEAR),]
+  file_fc.df<-reshape(transform(file.df[file.df$linked==1], time=ave(EARLIEST_FILING_YEAR, idnodes, FUN=seq_along)), idvar=c("idnodes"), direction="wide")
+  delete1<-rbind(data.frame(undidcc=unique(file_fc.df$undidcc.2)),data.frame(undidcc=unique(file_fc.df$undidcc.3)), data.frame(undidcc=unique(file_fc.df$undidcc.4)))
+  delete1<-data.table(undidcc=delete1[complete.cases(delete1),"undidcc"])
+  delete1$undid<-delete1$undidcc
+  file.df<-deletecounterofvar(dfcond=delete1, file.df, tfield)
+  
+  if(naaszero==TRUE){
+    file.df$insprox[is.na(file.df$insprox)]<-0
+    file.df$techprox[is.na(file.df$techprox)]<-0
+  }
+  else{
+    file.df<-deletecounterofvar(dfcond=file.df[is.na(file.df$insprox) & file.df$linked==1,], file.df, tfield)
+    file.df<-deletecounterofvar(dfcond=file.df[is.na(file.df$techprox) & file.df$linked==1,], file.df, tfield)
+    file.df$insprox[is.na(file.df$insprox)]<-0
+    file.df$techprox[is.na(file.df$techprox)]<-0  
+    }
+  
+  #####################
+  # Create dummies of social distance
+  #####################
+  file.df$socialdist<-as.numeric(file.df$socialdist)
+  file.df$soc_2<-ifelse(file.df$socialdist==2, 1, 0)    
+  file.df$soc_3<-ifelse(file.df$socialdist==3, 1, 0)    
+  file.df$soc_4<-ifelse(file.df$socialdist==4, 1, 0)    
+  file.df$soc_5m<-ifelse(file.df$socialdist>4, 1, 0)    
+  
+  # table(file.df$soc_2)
+  # table(file.df$soc_3)
+  # table(file.df$soc_4)
+  # table(file.df$soc_5m)
+  
+  #####################
+  # Recode geographic distance as a numeric and year as factor
+  #####################    
+  file.df$geodis<-as.numeric(file.df$geodis)
+  file.df$EARLIEST_FILING_YEAR<-factor(file.df$EARLIEST_FILING_YEAR)
+  
+  #table(file.df$absdif_cent)
+  fwrite(file.df, paste0("../output/final_tables/",tfield,"_na",naaszero, "_firstcoll.csv"))
+  return("Done")
+}

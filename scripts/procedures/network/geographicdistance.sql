@@ -176,7 +176,7 @@ LEFT JOIN  christian.degree_ctt f
 ON a.yfinalID=f.yfinalID
 LEFT JOIN  christian.degree_ctt g
 ON a.yfinalID_=g.yfinalID
-LEFT JOIN christian.techdis_pboc h
+LEFT JOIN christian.techdis_ctt h
 ON a.undid=h.undid;
 
 /*

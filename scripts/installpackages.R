@@ -43,3 +43,8 @@ install.packages("geosphere")
 install.packages("stargazer")
 install.packages("miceadds")
 install.packages("multiwayvcov")
+install.packages("rms")
+install.packages("DescTools")
+install.packages("rcompanion")
+
+

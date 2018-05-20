@@ -25,6 +25,9 @@ library(multiwayvcov)
 library(foreign)
 #library(sandwich)
 #library(lmtest)
+#library(rms)
+#library(DescTools)
+#library(rcompanion)
 
 ####################################################################
 # Function to compute clusterized SE
