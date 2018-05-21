@@ -1039,3 +1039,31 @@ estimate_models<-function(tfield, naaszero=TRUE){
   fwrite(file.df, paste0("../output/final_tables/",tfield,"_na",naaszero, "_firstcoll.csv"))
   return("Done")
 }
+
+
+sample_nat<-function(ethnic_row, sformulaa=sformula, logitt=logit, clusteredd=clustered, database){
+  sample<-database[database$nation==ethnic_row,]
+  
+  if(logitt==TRUE){
+    reg<-glm(sformulaa, family=binomial(link='logit'), data = sample)
+    
+    if(clusteredd==TRUE){
+      reg_s<-miceadds::glm.cluster(data = sample, sformulaa, cluster = "finalID", family=binomial(link='logit'))
+      reg_s<-sqrt(diag(as.matrix(reg_s$vcov)))
+    }
+    else{
+      reg_s<-"NULL"
+    }
+  }
+  else{
+    reg<-lm(formula=sformulaa, data = sample)
+    if(clusteredd==TRUE){
+      reg_s<-miceadds::lm.cluster(data = sample, sformulaa, cluster = "finalID")
+      reg_s<-sqrt(diag(as.matrix(reg_s$vcov)))
+    } 
+    else{
+      reg_s<-"NULL"
+    }
+  }
+  return(list(regre=reg, se=reg_s))
+}

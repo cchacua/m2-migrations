@@ -2,128 +2,109 @@ files.databases<-list.files(path="../output/final_tables/test2", full.names=TRUE
 files.databases
 
 
-runmodels<-function(sformula, labels_cov, includenas=TRUE, logit=FALSE, clustered=TRUE, flist=files.databases){
+# database<-as.data.table(read.csv(files.databases[1]))
+# sformula<-formulaone
+# logit<-FALSE
+# clustered<-TRUE
+# labels_cov<-labels_one
+runmodels<-function(sformula, labels_cov, ctt=TRUE, includenas=TRUE, logit=FALSE, clustered=TRUE,time_fe=TRUE, flist=files.databases){
   if(includenas==TRUE){
-    database_ctt<-as.data.table(read.csv(flist[2]))
-    database_pboc<-as.data.table(read.csv(flist[4]))
+    if(ctt==TRUE){
+      database<-as.data.table(read.csv(flist[2]))
+    }
+    else{
+      database<-as.data.table(read.csv(flist[4]))
+    }
   }
   else{
-    database_ctt<-as.data.table(read.csv(flist[1]))
-    database_pboc<-as.data.table(read.csv(flist[3]))
+    if(ctt==TRUE){
+      database<-as.data.table(read.csv(flist[1]))
+    }
+    else{
+      database<-as.data.table(read.csv(flist[3]))
+    }
   }
   
-  database_ctt$geodis<-as.numeric(database_ctt$geodis)
-  database_ctt$EARLIEST_FILING_YEAR<-factor(database_ctt$EARLIEST_FILING_YEAR)
-  #write.dta(database_ctt, paste0("../output/final_tables/ctt_na",includenas,".dta"))
-  
-  database_pboc$geodis<-as.numeric(database_pboc$geodis)
-  database_pboc$EARLIEST_FILING_YEAR<-factor(database_pboc$EARLIEST_FILING_YEAR)
-  #write.dta(database_pboc, paste0("../output/final_tables/pboc_na",includenas,".dta"))
+  database$geodis<-as.numeric(database$geodis)
+  database$EARLIEST_FILING_YEAR<-factor(database$EARLIEST_FILING_YEAR)
+  #write.dta(database, paste0("../output/final_tables/ctt_na",includenas,".dta"))
   
   # Attention: sformula should be a string
-  sformula_t<-as.formula(paste0(sformula, " + EARLIEST_FILING_YEAR"))
-  sformula<-as.formula(sformula)
+  if(time_fe==TRUE){
+    sformula<-as.formula(paste0(sformula, " + EARLIEST_FILING_YEAR"))}
+  else{
+    sformula<-as.formula(sformula)
+  }
+  
+  # ethnics<-as.character(unique(database$nation))
+  # ethnics<-ethnics[order(ethnics)]
+  ethnics<-c("European.EastEuropean",      
+             "European.French",
+             "European.German",            
+             "European.Italian.Italy",
+             "European.Russian", 
+             "EastAsian.Chinese",
+             "EastAsian.Indochina.Vietnam",
+             "EastAsian.Japan",
+             "EastAsian.Malay.Indonesia",  
+             "EastAsian.South.Korea",
+             "Muslim.Persian",
+             "SouthAsian")
+  ethnics_label<-c("East European",      
+                   "French",
+                   "German",            
+                   "Italy",
+                   "Russian",
+                   "Chinese",
+                   "Vietnam",
+                   "Japan",
+                   "Indonesia",  
+                   "Korea",         
+                   "Persian",
+                   "South Asian")
+  #g1<-sample_nat(ethnics[1], sformulaa=sformula, logitt=logit, clusteredd=clustered)
+  mbycoo<-lapply(ethnics, sample_nat, sformulaa=sformula, logitt=logit, clusteredd=clustered, database)
   
   if(logit==TRUE){
-    tittle_table<-"Logit Models, 1980-2012"
-    reg_ctt<-glm(sformula, family=binomial(link='logit'), data = database_ctt)
-    reg_pboc<-glm(sformula, family=binomial(link='logit'), data = database_pboc)
-    reg_t_ctt<-glm(sformula_t, family=binomial(link='logit'), data = database_ctt)
-    reg_t_pboc<-glm(sformula_t, family=binomial(link='logit'), data = database_pboc)
-    
-    
-    # print((reg_ctt$null.deviance - reg_ctt$deviance)/reg_ctt$null.deviance)
-    # 
-    # print(paste("McFadden Pseudo-R2", reg_ctt_r2, reg_pboc_r2, reg_t_ctt_r2, paste0(reg_t_pboc_r2, " \\"), sep = " & "))
-    # 
-    # https://mgimond.github.io/Stats-in-R/Logistic.html
-    
-    # nagelkerke(reg_ctt)
-    # reg_ctt_r2<-DescTools::PseudoR2(reg_ctt, which ="McFadden")
-    # reg_pboc_r2<-DescTools::PseudoR2(reg_pboc, which ="McFadden")
-    # reg_t_ctt_r2<-DescTools::PseudoR2(reg_t_ctt, which ="McFadden")
-    # reg_t_pboc_r2<-DescTools::PseudoR2(reg_t_pboc, which ="McFadden")
-    # print(paste("McFadden Pseudo-R2", reg_ctt_r2, reg_pboc_r2, reg_t_ctt_r2, paste0(reg_t_pboc_r2, " \\"), sep = " & "))
-    
-    #reg_ctt<-rms::lrm(sformula, data = database_ctt)
-    #reg_pboc<-rms::lrm(sformula, data = database_pboc)
-    #reg_t_ctt<-rms::lrm(sformula_t, data = database_ctt)
-    #reg_t_pboc<-rms::lrm(sformula_t, data = database_pboc)
-    
-    
-    if(clustered==TRUE){
-      reg_ctt_c<-miceadds::glm.cluster(data = database_ctt, sformula, cluster = "finalID", family=binomial(link='logit'))
-      reg_pboc_c<-miceadds::glm.cluster(data = database_pboc, sformula, cluster = "finalID", family=binomial(link='logit'))
-      reg_t_ctt_c<-miceadds::glm.cluster(data = database_ctt, sformula_t, cluster = "finalID", family=binomial(link='logit'))
-      reg_t_pboc_c<-miceadds::glm.cluster(data = database_pboc, sformula_t, cluster = "finalID", family=binomial(link='logit'))
-      
-      reg_ctt_c_s<-sqrt(diag(as.matrix(reg_ctt_c$vcov)))
-      reg_pboc_c_s<-sqrt(diag(as.matrix(reg_pboc_c$vcov)))
-      reg_t_ctt_c_s<-sqrt(diag(as.matrix(reg_t_ctt_c$vcov)))
-      reg_t_pboc_c_s<-sqrt(diag(as.matrix(reg_t_pboc_c$vcov)))
+    if(ctt==TRUE){
+      tittle_table<-"CTT Logit Models by CEL group, 1980-2012"
     }
-  }
+    else{
+      tittle_table<-"PBOC Logit Models by CEL group, 1980-2012"
+    }
+    }
   else{
-    tittle_table<-"Linear Probability Models, 1980-2012"
-    reg_ctt<-lm(formula=sformula, data = database_ctt)
-    reg_pboc<-lm(formula=sformula, data = database_pboc)
-    reg_t_ctt<-lm(sformula_t, data = database_ctt)
-    reg_t_pboc<-lm(sformula_t, data = database_pboc)
-    if(clustered==TRUE){
-      reg_ctt_c<-miceadds::lm.cluster(data = database_ctt, sformula, cluster = "finalID")
-      reg_pboc_c<-miceadds::lm.cluster(data = database_pboc, sformula, cluster = "finalID")
-      reg_t_ctt_c<-miceadds::lm.cluster(data = database_ctt, sformula_t, cluster = "finalID")
-      reg_t_pboc_c<-miceadds::lm.cluster(data = database_pboc, sformula_t, cluster = "finalID")
-      
-      reg_ctt_c_s<-sqrt(diag(as.matrix(reg_ctt_c$vcov)))
-      reg_pboc_c_s<-sqrt(diag(as.matrix(reg_pboc_c$vcov)))
-      reg_t_ctt_c_s<-sqrt(diag(as.matrix(reg_t_ctt_c$vcov)))
-      reg_t_pboc_c_s<-sqrt(diag(as.matrix(reg_t_pboc_c$vcov)))
+    if(ctt==TRUE){
+      tittle_table<-"CTT Linear Probability Models by CEL group, 1980-2012"
     }
+    else{
+      tittle_table<-"PBOC Linear Probability Models by CEL group, 1980-2012"
+    }
+    
   }
-  
-  # print(summary(reg_ctt))
-  # print(summary(reg_pboc))
-  # print(summary(reg_t_ctt))
-  # print(summary(reg_t_pboc))
-  # if(clustered==TRUE){
-  #   print(summary(reg_ctt_c))
-  #   print(summary(reg_pboc_c))
-  #   print(summary(reg_t_ctt_c))
-  #   print(summary(reg_t_pboc_c))
-  # }
   
   print("Don't forget to change Yes, No, fot the time fixed effects")  
-  if(clustered==TRUE){
-    stargazer(reg_ctt, reg_t_ctt, reg_pboc, reg_t_pboc, title=tittle_table,
-              align=TRUE, column.labels=c("CTT", "PBOC"), column.separate=c(2,2),
+
+    stargazer(mbycoo[[1]]$regre, mbycoo[[2]]$regre, mbycoo[[3]]$regre,
+              mbycoo[[5]]$regre, mbycoo[[5]]$regre, mbycoo[[6]]$regre,
+              mbycoo[[7]]$regre, mbycoo[[8]]$regre, mbycoo[[9]]$regre,
+              mbycoo[[10]]$regre, mbycoo[[11]]$regre, mbycoo[[12]]$regre,
+              title=tittle_table,
+              align=TRUE,
               column.sep.width="-20pt", digits=4,
-              notes.label="", header=FALSE,
+              notes.label="", header=FALSE, column.labels=ethnics_label,
               omit        = "EARLIEST_FILING_YEAR",
               omit.labels = "Time fixed effects",
               omit.yes.no = c("Yes","No"),
               dep.var.labels=" ",
               dep.var.labels.include=TRUE,
               dep.var.caption="Co-invention",
-              se=list(reg_ctt_c_s,reg_pboc_c_s,reg_t_ctt_c_s,reg_t_pboc_c_s),
+              se=list(mbycoo[[1]]$se, mbycoo[[2]]$se, mbycoo[[3]]$se,
+                      mbycoo[[5]]$se, mbycoo[[5]]$se, mbycoo[[6]]$se,
+                      mbycoo[[7]]$se, mbycoo[[8]]$se, mbycoo[[9]]$se,
+                      mbycoo[[10]]$se, mbycoo[[11]]$se, mbycoo[[12]]$se),
               covariate.labels=labels_cov,
               omit.stat=c("ser","f"), no.space=TRUE)
-  }
-  else{
-    stargazer(reg_ctt, reg_t_ctt, reg_pboc, reg_t_pboc, title=tittle_table,
-              align=TRUE, column.labels=c("CTT", "PBOC"), column.separate=c(2,2),
-              column.sep.width="-20pt", digits=4,
-              notes.label="", header=FALSE,
-              omit        = "EARLIEST_FILING_YEAR",
-              omit.labels = "Time fixed effects",
-              omit.yes.no = c("Yes","No"),
-              dep.var.labels=" ",
-              dep.var.labels.include=TRUE,
-              dep.var.caption="Co-invention",
-              covariate.labels=labels_cov,
-              omit.stat=c("ser","f"), no.space=TRUE)
-  }
-  
 }
 
 
@@ -138,3 +119,6 @@ labels_one<-c("Ethnic proximity",
               "Geographic distance", 
               "Institutional proximity",
               "Technological proximity")
+
+runmodels(sformula=formulaone, labels_cov=labels_one, ctt=TRUE, includenas=FALSE, logit=FALSE, clustered=TRUE,time_fe=TRUE, flist=files.databases)
+  
