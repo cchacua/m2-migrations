@@ -19,4 +19,5 @@ lines terminated by '\n'
 IGNORE 1 LINES ;
 SHOW WARNINGS;
 
-
+SHOW INDEX FROM christian.id_nat;
+ALTER TABLE christian.id_nat ADD INDEX(finalID);

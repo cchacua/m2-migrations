@@ -8,6 +8,9 @@ estimate_models("pboc", FALSE)
 files.databases<-list.files(path="../output/final_tables/test2", full.names=TRUE)
 files.databases
 
+d3<-as.data.table(read.csv(files.databases[3]))
+table(d3$linked)
+
 runmodels<-function(sformula, labels_cov, includenas=TRUE, logit=FALSE, clustered=TRUE, flist=files.databases){
   if(includenas==TRUE){
     database_ctt<-as.data.table(read.csv(flist[2]))
@@ -157,7 +160,7 @@ runmodels(sformula=formulaone, labels_cov=labels_one, includenas=FALSE, logit=TR
 # LPM with clustered errors, only for the small sample
 runmodels(sformula=formulaone, labels_cov=labels_one, includenas=FALSE, logit=FALSE, clustered=TRUE, flist=files.databases)
 
-# Logit with clustered errors, only for the small sample
+# Logit with clustered errors, only for the large sample
 runmodels(sformula=formulaone, labels_cov=labels_one, includenas=TRUE, logit=TRUE, clustered=TRUE, flist=files.databases)
 # LPM with clustered errors, only for the large sample
 runmodels(sformula=formulaone, labels_cov=labels_one, includenas=TRUE, logit=FALSE, clustered=TRUE, flist=files.databases)
@@ -173,18 +176,8 @@ labels_two<-c("Ethnic proximity",
               "Abs. diff. centrality",
               "Geographic distance")
 
-runmodels(sformula=formula_two, labels_cov=labels_two, includenas=FALSE, logit=FALSE, clustered=TRUE, flist=files.databases)
+# Logit with clustered errors, only for the large sample
+runmodels(sformula=formula_two, labels_cov=labels_two, includenas=TRUE, logit=TRUE, clustered=TRUE, flist=files.databases)
+# LPM with clustered errors, only for the large sample
+runmodels(sformula=formula_two, labels_cov=labels_two, includenas=TRUE, logit=FALSE, clustered=TRUE, flist=files.databases)
 
-database_ctt<-as.data.table(read.csv(files.databases[1]))
-database_pboc<-as.data.table(read.csv(files.databases[3]))
-
-database_ctt_corr <- cor(database_ctt[,c("linked", "ethnic", "soc_2", "soc_3", "soc_4", "av_cent", "absdif_cent", "geodis", "insprox", "techprox")])
-database_ctt_corr<-as.matrix(database_ctt_corr)
-database_ctt_corr[upper.tri(database_ctt_corr, diag = TRUE)]<-NA
-stargazer(database_ctt_corr[2:10,1:9], title="CTT: Correlation Matrix", column.sep.width="0pt", digits=4)
-
-
-#https://stats.stackexchange.com/questions/108007/correlations-with-unordered-categorical-variables
-
-correlation.matrix <- cor(attitude[,c("rating","complaints","privileges")])
-stargazer(correlation.matrix, title="Correlation Matrix")

@@ -28,6 +28,7 @@ library(foreign)
 library(rms)
 library(DescTools)
 #library(rcompanion)
+library(psych)
 
 ####################################################################
 # Function to compute clusterized SE

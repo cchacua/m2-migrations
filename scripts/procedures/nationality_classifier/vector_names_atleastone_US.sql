@@ -370,7 +370,7 @@ SHOW INDEX FROM riccaboni.t08_names_allclasses_us_mob_atleastone_one;
 ALTER TABLE riccaboni.t08_names_allclasses_us_mob_atleastone_one ADD INDEX(finalID);
 
 SHOW INDEX FROM christian.id_nat;
-ALTER TABLE christian.id_nat ADD INDEX(finalID);
+
 
 ---------------------------------------------------------------------------------------------------
 -- Only the IDS of the name-analysis that correspond to inventors (no firms)

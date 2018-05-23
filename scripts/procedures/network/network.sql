@@ -464,6 +464,8 @@ Records: 1092659  Duplicates: 0  Warnings: 0
 SHOW INDEX FROM riccaboni.edges_undir_pyrctt;                                     
 ALTER TABLE riccaboni.edges_undir_pyrctt ADD INDEX(undid);
 
+
+
 -- Undirected list using priority year: Pharmaceuticals, biotechnology and organic fine chemistry
 -- the one for calculating distances: riccaboni.edges_undir_pyrpboc
 

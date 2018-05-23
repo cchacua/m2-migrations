@@ -1046,7 +1046,8 @@ sample_nat<-function(ethnic_row, sformulaa=sformula, logitt=logit, clusteredd=cl
   
   if(logitt==TRUE){
     reg<-glm(sformulaa, family=binomial(link='logit'), data = sample)
-    
+    reg_pseudo<-(reg$null.deviance - reg$deviance)/reg$null.deviance
+    #reg<-rms::lrm(sformulaa, data = sample)
     if(clusteredd==TRUE){
       reg_s<-miceadds::glm.cluster(data = sample, sformulaa, cluster = "finalID", family=binomial(link='logit'))
       reg_s<-sqrt(diag(as.matrix(reg_s$vcov)))
@@ -1057,6 +1058,7 @@ sample_nat<-function(ethnic_row, sformulaa=sformula, logitt=logit, clusteredd=cl
   }
   else{
     reg<-lm(formula=sformulaa, data = sample)
+    reg_pseudo<-"NULL"
     if(clusteredd==TRUE){
       reg_s<-miceadds::lm.cluster(data = sample, sformulaa, cluster = "finalID")
       reg_s<-sqrt(diag(as.matrix(reg_s$vcov)))
@@ -1065,5 +1067,14 @@ sample_nat<-function(ethnic_row, sformulaa=sformula, logitt=logit, clusteredd=cl
       reg_s<-"NULL"
     }
   }
-  return(list(regre=reg, se=reg_s))
+  return(list(regre=reg, se=reg_s, pseudo=reg_pseudo))
+}
+
+
+table.latex <- function(table.df, ndigits=0, tcaption=NULL, tlabel=NULL, brnames=FALSE) {
+  table.latex<-xtable(table.df)
+  digits(table.latex) <- ndigits
+  caption(table.latex)<- tcaption
+  label(table.latex)<-tlabel
+  print(table.latex, include.rownames = brnames, booktabs = TRUE)
 }

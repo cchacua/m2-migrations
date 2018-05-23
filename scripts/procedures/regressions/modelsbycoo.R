@@ -66,6 +66,12 @@ runmodels<-function(sformula, labels_cov, ctt=TRUE, includenas=TRUE, logit=FALSE
   mbycoo<-lapply(ethnics, sample_nat, sformulaa=sformula, logitt=logit, clusteredd=clustered, database)
   
   if(logit==TRUE){
+    print(paste(round(mbycoo[[1]]$pseudo, 4), round(mbycoo[[2]]$pseudo, 4), round(mbycoo[[3]]$pseudo, 4),
+                round(mbycoo[[5]]$pseudo, 4), round(mbycoo[[5]]$pseudo, 4), round(mbycoo[[6]]$pseudo, 4),
+                round(mbycoo[[7]]$pseudo, 4), round(mbycoo[[8]]$pseudo, 4), round(mbycoo[[9]]$pseudo, 4),
+                round(mbycoo[[10]]$pseudo, 4), round(mbycoo[[11]]$pseudo, 4), round(mbycoo[[12]]$pseudo, 4), sep = " fff "))
+    print("Don't forget to change Yes, No, fot the time fixed effects")  
+    
     if(ctt==TRUE){
       tittle_table<-"CTT Logit Models by CEL group, 1980-2012"
     }
@@ -83,7 +89,20 @@ runmodels<-function(sformula, labels_cov, ctt=TRUE, includenas=TRUE, logit=FALSE
     
   }
   
-  print("Don't forget to change Yes, No, fot the time fixed effects")  
+  # print(paste(paste0("Pseudo R$^[2]$  \multicolumn[1][c][",mbycoo[[1]]$pseudo), mbycoo[[2]]$pseudo, mbycoo[[3]]$pseudo,
+  #              mbycoo[[5]]$pseudo, mbycoo[[5]]$pseudo, mbycoo[[6]]$pseudo,
+  #              mbycoo[[7]]$pseudo, mbycoo[[8]]$pseudo, mbycoo[[9]]$pseudo,
+  #              mbycoo[[10]]$pseudo, mbycoo[[11]]$pseudo, paste0(mbycoo[[12]]$pseudo, "] \\"), sep = "] &  \multicolumn[1][c]["))
+  # Pseudo R$^{2}$ & \multicolumn{1}{c}{
+  # } \\
+  # } &  \multicolumn{1}{c}{
+  
+  # print(paste(mbycoo[[1]]$pseudo, mbycoo[[2]]$pseudo, mbycoo[[3]]$pseudo,
+  #             mbycoo[[5]]$pseudo, mbycoo[[5]]$pseudo, mbycoo[[6]]$pseudo,
+  #             mbycoo[[7]]$pseudo, mbycoo[[8]]$pseudo, mbycoo[[9]]$pseudo,
+  #             mbycoo[[10]]$pseudo, mbycoo[[11]]$pseudo, mbycoo[[12]]$pseudo, sep = " fff "))
+  
+  
 
     stargazer(mbycoo[[1]]$regre, mbycoo[[2]]$regre, mbycoo[[3]]$regre,
               mbycoo[[5]]$regre, mbycoo[[5]]$regre, mbycoo[[6]]$regre,
@@ -120,5 +139,61 @@ labels_one<-c("Ethnic proximity",
               "Institutional proximity",
               "Technological proximity")
 
+# CTT LPM, Small sample, clustered
 runmodels(sformula=formulaone, labels_cov=labels_one, ctt=TRUE, includenas=FALSE, logit=FALSE, clustered=TRUE,time_fe=TRUE, flist=files.databases)
-  
+
+# CTT Logit, Small sample, clustered
+runmodels(sformula=formulaone, labels_cov=labels_one, ctt=TRUE, includenas=FALSE, logit=TRUE, clustered=TRUE,time_fe=TRUE, flist=files.databases)
+
+# PBOC LPM, Small sample, clustered
+runmodels(sformula=formulaone, labels_cov=labels_one, ctt=FALSE, includenas=FALSE, logit=FALSE, clustered=TRUE,time_fe=TRUE, flist=files.databases)
+
+# PBOC Logit, Small sample, clustered
+runmodels(sformula=formulaone, labels_cov=labels_one, ctt=FALSE, includenas=FALSE, logit=TRUE, clustered=TRUE,time_fe=TRUE, flist=files.databases)
+
+# CTT LPM, Large sample, clustered
+runmodels(sformula=formulaone, labels_cov=labels_one, ctt=TRUE, includenas=TRUE, logit=FALSE, clustered=TRUE,time_fe=TRUE, flist=files.databases)
+# PBOC LPM, Large sample, clustered
+runmodels(sformula=formulaone, labels_cov=labels_one, ctt=FALSE, includenas=TRUE, logit=FALSE, clustered=TRUE,time_fe=TRUE, flist=files.databases)
+
+
+formula_two<-"linked ~ ethnic + soc_2 + soc_3 + soc_4 + av_cent + absdif_cent + geodis + techprox"  
+labels_two<-c("Ethnic proximity",
+              "Social distance = 2",
+              "Social distance = 3",
+              "Social distance = 4",
+              "Average centrality",
+              "Abs. diff. centrality",
+              "Geographic distance", 
+              "Technological proximity")
+# CTT LPM, Large sample, clustered
+runmodels(sformula=formula_two, labels_cov=labels_two, ctt=TRUE, includenas=TRUE, logit=FALSE, clustered=TRUE,time_fe=TRUE, flist=files.databases)
+# PBOC LPM, Large sample, clustered
+runmodels(sformula=formula_two, labels_cov=labels_two, ctt=FALSE, includenas=TRUE, logit=FALSE, clustered=TRUE,time_fe=TRUE, flist=files.databases)
+
+
+# CTT Logit, Large sample, clustered
+runmodels(sformula=formula_two, labels_cov=labels_two, ctt=TRUE, includenas=TRUE, logit=TRUE, clustered=TRUE,time_fe=TRUE, flist=files.databases)
+# PBOC Logit, Large sample, clustered
+runmodels(sformula=formula_two, labels_cov=labels_two, ctt=FALSE, includenas=TRUE, logit=TRUE, clustered=TRUE,time_fe=TRUE, flist=files.databases)
+
+
+formula_three<-"linked ~ ethnic + soc_2 + soc_3 + soc_4 + av_cent + absdif_cent + geodis"  
+labels_three<-c("Ethnic proximity",
+              "Social distance = 2",
+              "Social distance = 3",
+              "Social distance = 4",
+              "Average centrality",
+              "Abs. diff. centrality",
+              "Geographic distance")
+# CTT LPM, Large sample, clustered
+runmodels(sformula=formula_three, labels_cov=labels_three, ctt=TRUE, includenas=TRUE, logit=FALSE, clustered=TRUE,time_fe=TRUE, flist=files.databases)
+# PBOC LPM, Large sample, clustered
+runmodels(sformula=formula_three, labels_cov=labels_three, ctt=FALSE, includenas=TRUE, logit=FALSE, clustered=TRUE,time_fe=TRUE, flist=files.databases)
+
+
+# CTT Logit, Large sample, clustered
+runmodels(sformula=formula_three, labels_cov=labels_three, ctt=TRUE, includenas=TRUE, logit=TRUE, clustered=TRUE,time_fe=TRUE, flist=files.databases)
+# PBOC Logit, Large sample, clustered
+runmodels(sformula=formula_three, labels_cov=labels_three, ctt=FALSE, includenas=TRUE, logit=TRUE, clustered=TRUE,time_fe=TRUE, flist=files.databases)
+
