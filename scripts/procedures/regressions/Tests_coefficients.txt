@@ -1,0 +1,181 @@
+> differences_social(lotiglarge[[1]])
+Linear hypothesis test
+
+Hypothesis:
+soc_2 - soc_3 = 0
+
+Model 1: restricted model
+Model 2: linked ~ ethnic + soc_2 + soc_3 + soc_4 + av_cent + absdif_cent + 
+    geodis + EARLIEST_FILING_YEAR
+
+   Res.Df Df  Chisq Pr(>Chisq)    
+1 1030485                         
+2 1030484  1 476.97  < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Linear hypothesis test
+
+Hypothesis:
+soc_3 - soc_4 = 0
+
+Model 1: restricted model
+Model 2: linked ~ ethnic + soc_2 + soc_3 + soc_4 + av_cent + absdif_cent + 
+    geodis + EARLIEST_FILING_YEAR
+
+   Res.Df Df  Chisq Pr(>Chisq)    
+1 1030485                         
+2 1030484  1 411.13  < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Linear hypothesis test
+
+Hypothesis:
+soc_2 - soc_4 = 0
+
+Model 1: restricted model
+Model 2: linked ~ ethnic + soc_2 + soc_3 + soc_4 + av_cent + absdif_cent + 
+    geodis + EARLIEST_FILING_YEAR
+
+   Res.Df Df  Chisq Pr(>Chisq)    
+1 1030485                         
+2 1030484  1 1632.7  < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+
+###################################
+
+Linear hypothesis test
+
+Hypothesis:
+soc_2 - soc_3 = 0
+
+Model 1: restricted model
+Model 2: linked ~ ethnic + soc_2 + soc_3 + soc_4 + av_cent + absdif_cent + 
+    geodis + EARLIEST_FILING_YEAR
+
+   Res.Df Df  Chisq Pr(>Chisq)    
+1 1003945                         
+2 1003944  1 57.545  3.304e-14 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Linear hypothesis test
+
+Hypothesis:
+soc_3 - soc_4 = 0
+
+Model 1: restricted model
+Model 2: linked ~ ethnic + soc_2 + soc_3 + soc_4 + av_cent + absdif_cent + 
+    geodis + EARLIEST_FILING_YEAR
+
+   Res.Df Df  Chisq Pr(>Chisq)    
+1 1003945                         
+2 1003944  1 43.599   4.03e-11 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Linear hypothesis test
+
+Hypothesis:
+soc_2 - soc_4 = 0
+
+Model 1: restricted model
+Model 2: linked ~ ethnic + soc_2 + soc_3 + soc_4 + av_cent + absdif_cent + 
+    geodis + EARLIEST_FILING_YEAR
+
+   Res.Df Df  Chisq Pr(>Chisq)    
+1 1003945                         
+2 1003944  1 337.17  < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+#####################################################
+## LPM
+
+> differences_social(lpmlarge[[1]])
+Linear hypothesis test
+
+Hypothesis:
+soc_2 - soc_3 = 0
+
+Model 1: restricted model
+Model 2: linked ~ ethnic + soc_2 + soc_3 + soc_4 + av_cent + absdif_cent + 
+    geodis + EARLIEST_FILING_YEAR
+
+   Res.Df    RSS Df Sum of Sq      F    Pr(>F)    
+1 1030485 163775                                  
+2 1030484 163766  1    9.4832 59.672 1.122e-14 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Linear hypothesis test
+
+Hypothesis:
+soc_3 - soc_4 = 0
+
+Model 1: restricted model
+Model 2: linked ~ ethnic + soc_2 + soc_3 + soc_4 + av_cent + absdif_cent + 
+    geodis + EARLIEST_FILING_YEAR
+
+   Res.Df    RSS Df Sum of Sq      F    Pr(>F)    
+1 1030485 163782                                  
+2 1030484 163766  1    15.949 100.36 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Linear hypothesis test
+
+Hypothesis:
+soc_2 - soc_4 = 0
+
+Model 1: restricted model
+Model 2: linked ~ ethnic + soc_2 + soc_3 + soc_4 + av_cent + absdif_cent + 
+    geodis + EARLIEST_FILING_YEAR
+
+   Res.Df    RSS Df Sum of Sq      F    Pr(>F)    
+1 1030485 163816                                  
+2 1030484 163766  1     50.44 317.39 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> differences_social(lpmlarge[[2]])
+Linear hypothesis test
+
+Hypothesis:
+soc_2 - soc_3 = 0
+
+Model 1: restricted model
+Model 2: linked ~ ethnic + soc_2 + soc_3 + soc_4 + av_cent + absdif_cent + 
+    geodis + EARLIEST_FILING_YEAR
+
+   Res.Df    RSS Df Sum of Sq      F    Pr(>F)    
+1 1003945 170930                                  
+2 1003944 170920  1    9.9533 58.463 2.073e-14 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Linear hypothesis test
+
+Hypothesis:
+soc_3 - soc_4 = 0
+
+Model 1: restricted model
+Model 2: linked ~ ethnic + soc_2 + soc_3 + soc_4 + av_cent + absdif_cent + 
+    geodis + EARLIEST_FILING_YEAR
+
+   Res.Df    RSS Df Sum of Sq      F  Pr(>F)  
+1 1003945 170921                              
+2 1003944 170920  1   0.97493 5.7265 0.01671 *
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Linear hypothesis test
+
+Hypothesis:
+soc_2 - soc_4 = 0
+
+Model 1: restricted model
+Model 2: linked ~ ethnic + soc_2 + soc_3 + soc_4 + av_cent + absdif_cent + 
+    geodis + EARLIEST_FILING_YEAR
+
+   Res.Df    RSS Df Sum of Sq      F    Pr(>F)    
+1 1003945 170933                                  
+2 1003944 170920  1    12.362 72.612 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

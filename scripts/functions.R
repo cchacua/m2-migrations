@@ -983,7 +983,7 @@ deletecounterofvar<-function(dfcond=file.df[is.na(file.df$insprox) & file.df$lin
 
 estimate_models<-function(tfield, naaszero=TRUE){
   file.df<-as.data.table(dbGetQuery(patstat, paste0(
-    "SELECT linked, ethnic, socialdist, av_cent, absdif_cent, geodis, undid, EARLIEST_FILING_YEAR, insprox, techprox, counterof, CONCAT(EARLIEST_FILING_YEAR, finalID, IFNULL(counterof, ''), finalID_) AS undidcc, finalID, finalID_, nation, nation_
+    "SELECT linked, ethnic, socialdist, av_cent, absdif_cent, geodis, undid, EARLIEST_FILING_YEAR, insprox, techprox, counterof, CONCAT(EARLIEST_FILING_YEAR, finalID, IFNULL(counterof, ''), finalID_) AS undidcc, finalID, finalID_, nation, nation_, sharetech, shareins
     FROM riccaboni.count_edges_",tfield,"_gsi
     WHERE EARLIEST_FILING_YEAR>='1980' AND EARLIEST_FILING_YEAR<='2012';")))
   setkey(file.df,undid) 
@@ -1077,4 +1077,22 @@ table.latex <- function(table.df, ndigits=0, tcaption=NULL, tlabel=NULL, brnames
   caption(table.latex)<- tcaption
   label(table.latex)<-tlabel
   print(table.latex, include.rownames = brnames, booktabs = TRUE)
+}
+
+
+lis_to_df<-function(lista){
+  df<-as.data.frame(lista)
+  df<-t(df)
+  df<-as.data.frame(df)
+  colnames(df)<-c("Value", "Year")
+  rownames(df)<-df$Year
+  df$Value<-as.numeric(as.character(df$Value))
+  df$Year<-as.numeric(as.character(df$Year))
+  return(df)
+}
+
+
+logit_pseudor2<-function(regression){
+  reg_pseudo<-(regression$null.deviance - regression$deviance)/regression$null.deviance
+  return(reg_pseudo)
 }

@@ -22,33 +22,52 @@ corr_matrix_l<-function(files=files.databases, ctt=TRUE, includenas=FALSE){
     }
   }
   # c("linked", "ethnic", "soc_2", "soc_3", "soc_4", "av_cent", "absdif_cent", "geodis", "insprox", "techprox")
-  
-  df_corr<- cor(df[,c("linked","ethnic", 
-                      "insprox","techprox",
-                      "soc_2", "soc_3", 
-                      "soc_4","soc_5m",
-                      "absdif_cent","av_cent" ,
-                      "geodis")])
+  if(includenas==FALSE){
+    df_corr<- cor(df[,c("linked","ethnic", 
+                        "insprox","techprox",
+                        "soc_2", "soc_3", 
+                        "soc_4","soc_5m",
+                        "absdif_cent","av_cent" ,
+                        "geodis")])
+    labels<-c("Co-patent",
+              "Ethnic proximity", 
+              "Institutional proximity",
+              "Technological proximity",
+              "Social distance = 2",
+              "Social distance = 3",
+              "Social distance = 4",
+              "Social distance = 5",
+              "Abs. diff. centrality",
+              "Average centrality" ,
+              "Geographic distance")
+  }
+  else{
+    df_corr<- cor(df[,c("linked","ethnic", 
+                        "soc_2", "soc_3", 
+                        "soc_4","soc_5m",
+                        "absdif_cent","av_cent" ,
+                        "geodis")])
+    labels<-c("Co-patent",
+              "Ethnic proximity",
+              "Social distance = 2",
+              "Social distance = 3",
+              "Social distance = 4",
+              "Social distance = 5",
+              "Abs. diff. centrality",
+              "Average centrality" ,
+              "Geographic distance")
+  }
+
   
   df_corr<-as.matrix(df_corr)
   df_corr[upper.tri(df_corr, diag = FALSE)]<-NA
-  labels<-c("Co-patent",
-            "Ethnic proximity", 
-            "Institutional proximity",
-            "Technological proximity",
-            "Social distance = 2",
-            "Social distance = 3",
-            "Social distance = 4",
-            "Social distance = 5",
-            "Abs. diff. centrality",
-            "Average centrality" ,
-            "Geographic distance")
+  
   numbers<-seq(1,ncol(df_corr), 1)
   
   rownames(df_corr)<-paste0(numbers, " - ",labels)
   colnames(df_corr)<-numbers
   stargazer(df_corr[,1:ncol(df_corr)-1], title=tittle_table,
-            column.sep.width="-14pt", digits=4, align=TRUE)
+            column.sep.width="-4pt", digits=2, align=TRUE)
   
   #https://stats.stackexchange.com/questions/108007/correlations-with-unordered-categorical-variables
   

@@ -260,6 +260,8 @@ ALTER TABLE riccaboni.edges_dir_count_pboc ADD INDEX(finalID_);
 ALTER TABLE riccaboni.edges_dir_count_pboc ADD INDEX(finalID);
 
 SELECT * FROM riccaboni.edges_dir_count_pboc LIMIT 0,10;
+SELECT * FROM christian.counter_pboc LIMIT 0,10;
+
 
 -- CTT
 DROP TABLE IF EXISTS riccaboni.edges_dir_count_ctt;

@@ -33,7 +33,7 @@ summary_table<-function(files=files.databases, ctt=TRUE, includenas=FALSE){
                    "Social distance = 2",
                    "Social distance = 3",
                    "Social distance = 4",
-                   "Social distance = 5",
+                   "Social distance >4",
                    "Abs. diff. centrality",
                    "Average centrality" ,
                    "Geographic distance")

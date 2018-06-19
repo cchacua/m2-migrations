@@ -44,7 +44,11 @@ install.packages("stargazer")
 install.packages("miceadds")
 install.packages("multiwayvcov")
 install.packages("rms")
+install.packages("ggsci")
+install.packages("tikzDevice")
 # install.packages("DescTools")
 # install.packages("rcompanion")
-
-
+install.packages("car")
+install.packages("margins")
+install.packages("tibble")
+install.packages("aod")

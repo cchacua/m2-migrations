@@ -86,11 +86,11 @@ m1$Var1<-gsub("([a-z])([A-Z])", "\\1 \\2", m1$Var1)
 m1$Var1<-gsub("\\.", " - ", m1$Var1)
 colnames(m1)<-c("CEL group", "CTT", "PBOC")
 m1<-m1[order(m1$CTT, decreasing = TRUE),]
-
+m1$`CEL group`
 print(paste0("Total number of inventors: ",ctt_ao_fulls$total," in the CTT and ", pboc_ao_fulls$total, " in the PBOC field."))
-print("Total & 100.0000 & 100.0000 \\")
+print("Total & 100.00 & 100.00 \\")
 
-table.latex (m1, ndigits=4, tcaption="Inventors by ethnic group and technological fields, partial-US-based teams, 1975-2012", tlabel="table-inv-count-ao", brnames=FALSE)
+table.latex (m1, ndigits=2, tcaption="Inventors by ethnic group and technological fields, partial-US-based teams, 1975-2012", tlabel="table-inv-count-ao", brnames=FALSE)
 
 # stargazer(m1, summary=FALSE, align=TRUE,
 #           column.sep.width="0pt", digits=4)
@@ -107,7 +107,7 @@ m2<-m2[order(m2$CTT, decreasing = TRUE),]
 m2<-m2[1:12,]
 print(paste0("Total number of inventors: ",ctt_all_fulls$total," in the CTT and ", pboc_all_fulls$total, " in the PBOC field."))
 
-table.latex (m2, ndigits=4, tcaption="Inventors by ethnic group and technological fields, final sample, 1975-2012", tlabel="table-inv-count-finalsample", brnames=FALSE)
+table.latex (m2, ndigits=2, tcaption="Inventors by ethnic group and technological fields, final sample, 1975-2012", tlabel="table-inv-count-finalsample", brnames=FALSE)
 
 
 

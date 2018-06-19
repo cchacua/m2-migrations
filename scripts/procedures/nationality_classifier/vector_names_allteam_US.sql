@@ -129,6 +129,8 @@ Records: 1729886  Duplicates: 0  Warnings: 0
 */
 
 SELECT * FROM christian.t08_class_at1us_date_fam_for LIMIT 0,10;
+SELECT * FROM christian.t08_class_at1us_date_fam_for
+WHERE APPLN_FILING_YEAR='2005' LIMIT 0,10;
 
 SHOW INDEX FROM  christian.t08_class_at1us_date_fam_for;                                     
 ALTER TABLE  christian.t08_class_at1us_date_fam_for ADD INDEX(pat);
