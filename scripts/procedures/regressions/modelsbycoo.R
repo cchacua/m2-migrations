@@ -67,7 +67,7 @@ runmodels<-function(sformula, labels_cov, ctt=TRUE, includenas=TRUE, logit=FALSE
   
   if(logit==TRUE){
     print(paste(round(mbycoo[[1]]$pseudo, 4), round(mbycoo[[2]]$pseudo, 4), round(mbycoo[[3]]$pseudo, 4),
-                round(mbycoo[[5]]$pseudo, 4), round(mbycoo[[5]]$pseudo, 4), round(mbycoo[[6]]$pseudo, 4),
+                round(mbycoo[[4]]$pseudo, 4), round(mbycoo[[5]]$pseudo, 4), round(mbycoo[[6]]$pseudo, 4),
                 round(mbycoo[[7]]$pseudo, 4), round(mbycoo[[8]]$pseudo, 4), round(mbycoo[[9]]$pseudo, 4),
                 round(mbycoo[[10]]$pseudo, 4), round(mbycoo[[11]]$pseudo, 4), round(mbycoo[[12]]$pseudo, 4), sep = " fff "))
     print("Don't forget to change Yes, No, fot the time fixed effects")  
@@ -90,7 +90,7 @@ runmodels<-function(sformula, labels_cov, ctt=TRUE, includenas=TRUE, logit=FALSE
   }
   
   # print(paste(paste0("Pseudo R$^[2]$  \multicolumn[1][c][",mbycoo[[1]]$pseudo), mbycoo[[2]]$pseudo, mbycoo[[3]]$pseudo,
-  #              mbycoo[[5]]$pseudo, mbycoo[[5]]$pseudo, mbycoo[[6]]$pseudo,
+  #              mbycoo[[4]]$pseudo, mbycoo[[5]]$pseudo, mbycoo[[6]]$pseudo,
   #              mbycoo[[7]]$pseudo, mbycoo[[8]]$pseudo, mbycoo[[9]]$pseudo,
   #              mbycoo[[10]]$pseudo, mbycoo[[11]]$pseudo, paste0(mbycoo[[12]]$pseudo, "] \\"), sep = "] &  \multicolumn[1][c]["))
   # Pseudo R$^{2}$ & \multicolumn{1}{c}{
@@ -98,14 +98,14 @@ runmodels<-function(sformula, labels_cov, ctt=TRUE, includenas=TRUE, logit=FALSE
   # } &  \multicolumn{1}{c}{
   
   # print(paste(mbycoo[[1]]$pseudo, mbycoo[[2]]$pseudo, mbycoo[[3]]$pseudo,
-  #             mbycoo[[5]]$pseudo, mbycoo[[5]]$pseudo, mbycoo[[6]]$pseudo,
+  #             mbycoo[[4]]$pseudo, mbycoo[[5]]$pseudo, mbycoo[[6]]$pseudo,
   #             mbycoo[[7]]$pseudo, mbycoo[[8]]$pseudo, mbycoo[[9]]$pseudo,
   #             mbycoo[[10]]$pseudo, mbycoo[[11]]$pseudo, mbycoo[[12]]$pseudo, sep = " fff "))
   
   
 
     stargazer(mbycoo[[1]]$regre, mbycoo[[2]]$regre, mbycoo[[3]]$regre,
-              mbycoo[[5]]$regre, mbycoo[[5]]$regre, mbycoo[[6]]$regre,
+              mbycoo[[4]]$regre, mbycoo[[5]]$regre, mbycoo[[6]]$regre,
               mbycoo[[7]]$regre, mbycoo[[8]]$regre, mbycoo[[9]]$regre,
               mbycoo[[10]]$regre, mbycoo[[11]]$regre, mbycoo[[12]]$regre,
               title=tittle_table,
@@ -119,7 +119,7 @@ runmodels<-function(sformula, labels_cov, ctt=TRUE, includenas=TRUE, logit=FALSE
               dep.var.labels.include=TRUE,
               dep.var.caption="Co-invention",
               se=list(mbycoo[[1]]$se, mbycoo[[2]]$se, mbycoo[[3]]$se,
-                      mbycoo[[5]]$se, mbycoo[[5]]$se, mbycoo[[6]]$se,
+                      mbycoo[[4]]$se, mbycoo[[5]]$se, mbycoo[[6]]$se,
                       mbycoo[[7]]$se, mbycoo[[8]]$se, mbycoo[[9]]$se,
                       mbycoo[[10]]$se, mbycoo[[11]]$se, mbycoo[[12]]$se),
               covariate.labels=labels_cov,
